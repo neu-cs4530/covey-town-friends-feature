@@ -21,7 +21,6 @@ import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 
-
 /**
  * The Town class implements the logic for each town: managing the various events that
  * can occur (e.g. joining a town, moving, leaving a town)
@@ -181,7 +180,7 @@ export default class Town {
    * @param sender Player who is requesting another player to be their friend
    * @param recipient Player who is the intended recipient of the friend request
    */
-   public inviteFriend(sender: Player, recipient: Player): void {
+  public inviteFriend(sender: Player, recipient: Player): void {
     // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
   }
@@ -297,7 +296,7 @@ export default class Town {
     decliner.removeConversationAreaInvite(declinedInvite);
     this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
   }
-  
+
   /**
    * Updates the location of a player within the town
    *
