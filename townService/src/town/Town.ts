@@ -14,10 +14,13 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  ConversationAreaInvite,
+  TeleportInviteSingular,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -172,6 +175,129 @@ export default class Town {
     }
   }
 
+  /**
+   * Emit a friendRequestSent event with the given sender and recipient
+   *
+   * @param sender Player who is requesting another player to be their friend
+   * @param recipient Player who is the intended recipient of the friend request
+   */
+   public inviteFriend(sender: Player, recipient: Player): void {
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
+  }
+
+  /**
+   * Emit a friendRequestAccepted event with the given acceptor and accepted. Adds each player to other
+   * player's friends list
+   *
+   * @param acceptor the recipient of the initial friend request. Is ACCEPTING the received friend request
+   * @param accepted the sender of the initial request
+   */
+  public acceptFriendRequest(acceptor: Player, accepted: Player): void {
+    acceptor.addFriend(accepted);
+    accepted.addFriend(acceptor);
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestAccepted', { actor: acceptor, affected: accepted });
+  }
+
+  /**
+   * Emit a friendRequestDeclined event with the given decliner and declined. Does not each player to other
+   * player's friends list
+   *
+   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request
+   * @param declined the sender of the initial request
+   */
+  public declineFriendRequest(decliner: Player, declined: Player): void {
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
+  }
+
+  /**
+   * Emit a friendRemoved event with the given remover and removed. Removes each player from each other's friends list
+   *
+   * @param instigator the player removing the affected from their friend's list
+   * @param affected the player to be removed from the instigator's friends list
+   */
+  public removeFriend(instigator: Player, affected: Player): void {
+    instigator.removeFriend(affected);
+    affected.removeFriend(instigator);
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRemoved', { actor: instigator, affected });
+  }
+
+  /**
+   * Modifies a player's location to match the given destination player's location.
+   * Assuming that UI enforces teleportation only between friends.
+   *
+   * @param teleportInvite the invite representing the teleportation information
+   */
+  public teleportToFriend(teleportInvite: TeleportInviteSingular): void {
+    const { requester, requested, requesterLocation } = teleportInvite;
+    if (this._players.includes(requester)) {
+      this._updatePlayerLocation(requested, requesterLocation);
+    }
+  }
+
+  /**
+   * Invites the given list of friends to the instigator's location within a ConversationArea.
+   *
+   * @param instigator the player sending out the invites
+   * @param invitedFriends the players invited
+   */
+  public inviteToConversationArea(instigator: Player, invitedFriends: Player[]): void {
+    const instigatorLocation: PlayerLocation = instigator.location;
+    const inviteToAll: ConversationAreaInvite = {
+      requester: instigator,
+      requested: invitedFriends,
+      requesterLocation: instigatorLocation,
+    };
+    invitedFriends.forEach(friend => {
+      const inviteToOne: TeleportInviteSingular = {
+        requester: instigator,
+        requested: friend,
+        requesterLocation: instigatorLocation,
+      };
+      friend.addConversationAreaInvite(inviteToOne);
+    });
+    this._broadcastEmitter.emit('conversationAreaRequestSent', inviteToAll);
+  }
+
+  /**
+   * Accepts the instigator's invite to join a ConversationArea and sends the acceptor there.
+   *
+   * @param instigator the player that sent out the invite
+   * @param acceptor the player who accepted the invite
+   */
+  public acceptConversationAreaInvite(instigator: Player, acceptor: Player): void {
+    const instigatorLocation: PlayerLocation = instigator.location;
+    const acceptedInvite: TeleportInviteSingular = {
+      requester: instigator,
+      requested: acceptor,
+      requesterLocation: instigatorLocation,
+    };
+    acceptor.removeConversationAreaInvite(acceptedInvite);
+    // TODO: check if need to pass in instigator's location instead of just player
+    this.teleportToFriend(acceptedInvite);
+    this._broadcastEmitter.emit('conversationAreaRequestAccepted', acceptedInvite);
+  }
+
+  /**
+   * Declines the instigator's invite to join a ConversationArea.
+   *
+   * @param instigator the player that sent out the invite
+   * @param decliner the player who declined the invite
+   */
+  public declineConversationAreaInvite(instigator: Player, decliner: Player): void {
+    const instigatorLocation: PlayerLocation = instigator.location;
+    const declinedInvite: TeleportInviteSingular = {
+      requester: instigator,
+      requested: decliner,
+      requesterLocation: instigatorLocation,
+    };
+    decliner.removeConversationAreaInvite(declinedInvite);
+    this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+  }
+  
   /**
    * Updates the location of a player within the town
    *
