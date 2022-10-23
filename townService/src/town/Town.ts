@@ -204,7 +204,7 @@ export default class Town {
    * add each player to other player's friends list.
    *
    * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
-   * @param declined the sender of the initial request.
+   * @param declined the sender of the initial friend request.
    */
   public declineFriendRequest(decliner: Player, declined: Player): void {
     // TODO this should be caught by TownController

@@ -122,14 +122,16 @@ export default class Player {
 
   /**
    * Add the given friend to this player's selected friends list. Assumes this player is already a
-   * friend of this player.
+   * friend of this player. It should not add anyone to the list who is already on the list.
+   * It should not let you select someone who isn't a friend. Assumes that friend to select is
+   * in the friends list as this should be enforced by the UI.
    *
    * @param friendToSelect player to add to the selected friends list.
    */
-  public selectFriends(friendToSelect: Player): void {
-    // Assumes that friend to select is in the friends list as this should be enforced by the UI.
-    // it should not let you select someone who isn't a friend.
-    this._selectedFriends.push(friendToSelect);
+  public selectFriend(friendToSelect: Player): void {
+    if (!this._selectedFriends.includes(friendToSelect)) {
+      this._selectedFriends.push(friendToSelect);
+    }
   }
 
   /**
@@ -145,20 +147,13 @@ export default class Player {
   }
 
   /**
-   * Adds the given ConversationAreaInvite to this player's list of invites.
+   * Adds the given ConversationAreaInvite to this player's list of invites. Ignores the request
+   * if the conversation area request is already in the list of requests.
    *
    * @param invite the invite to add.
    */
   public addConversationAreaInvite(invite: TeleportInviteSingular): void {
-    if (
-      // make sure that the invite that is being requested to be added is not already in the
-      // list of conversation area invites. If it is already in the list, ignore the request.
-      !this._conversationAreaInvites.find(
-        // the requested is the current player, so this would inherently be equal, and does not
-        // need to be checked.
-        i => i.requester === invite.requester && i.requesterLocation === invite.requesterLocation,
-      )
-    ) {
+    if (!this._conversationAreaInvites.includes(invite)) {
       this._conversationAreaInvites.push(invite);
     }
   }
