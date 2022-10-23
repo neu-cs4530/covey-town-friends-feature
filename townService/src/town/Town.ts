@@ -23,7 +23,7 @@ import ViewingArea from './ViewingArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
- * can occur (e.g. joining a town, moving, leaving a town)
+ * can occur (e.g. joining a town, moving, leaving a town).
  */
 export default class Town {
   get capacity(): number {
@@ -106,7 +106,7 @@ export default class Town {
 
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
-   * player, and returning them
+   * player, and returning them.
    *
    * @param newPlayer The new player to add to the town
    */
@@ -175,7 +175,7 @@ export default class Town {
   }
 
   /**
-   * Emit a friendRequestSent event with the given sender and recipient
+   * Emit a friendRequestSent event with the given sender and recipient.
    *
    * @param sender Player who is requesting another player to be their friend
    * @param recipient Player who is the intended recipient of the friend request
@@ -187,7 +187,7 @@ export default class Town {
 
   /**
    * Emit a friendRequestAccepted event with the given acceptor and accepted. Adds each player to other
-   * player's friends list
+   * player's friends list.
    *
    * @param acceptor the recipient of the initial friend request. Is ACCEPTING the received friend request
    * @param accepted the sender of the initial request
@@ -200,8 +200,8 @@ export default class Town {
   }
 
   /**
-   * Emit a friendRequestDeclined event with the given decliner and declined. Does not each player to other
-   * player's friends list
+   * Emit a friendRequestDeclined event with the given decliner and declined. Does not
+   * add each player to other player's friends list.
    *
    * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request
    * @param declined the sender of the initial request
@@ -212,7 +212,8 @@ export default class Town {
   }
 
   /**
-   * Emit a friendRemoved event with the given remover and removed. Removes each player from each other's friends list
+   * Emit a friendRemoved event with the given remover and removed.
+   * Removes each player from each other's friends list.
    *
    * @param instigator the player removing the affected from their friend's list
    * @param affected the player to be removed from the instigator's friends list
@@ -226,9 +227,10 @@ export default class Town {
 
   /**
    * Modifies a player's location to match the given destination player's location.
-   * Assuming that UI enforces teleportation only between friends.
+   * Assumes that UI enforces teleportation only between friends.
    *
-   * @param teleportInvite the invite representing the teleportation information
+   * @param teleportInvite the invite representing the teleportation information:
+   * the player to teleport to, the player doing the teleporting, and the teleport location.
    */
   public teleportToFriend(teleportInvite: TeleportInviteSingular): void {
     const { requester, requested, requesterLocation } = teleportInvite;
@@ -250,19 +252,31 @@ export default class Town {
       requested: invitedFriends,
       requesterLocation: instigatorLocation,
     };
+    // For each requested player, add the corresponding teleport request to their invite list.
     invitedFriends.forEach(friend => {
       const inviteToOne: TeleportInviteSingular = {
         requester: instigator,
         requested: friend,
         requesterLocation: instigatorLocation,
       };
-      friend.addConversationAreaInvite(inviteToOne);
+      if (
+        // check to make sure that there is not already an invite from this player to this specific location
+        // before adding it to the conversation area invite list.
+        !friend.conversationAreaInvites.find(
+          invite =>
+            invite.requesterLocation === instigatorLocation && invite.requester === instigator,
+        )
+      ) {
+        friend.addConversationAreaInvite(inviteToOne);
+      }
     });
     this._broadcastEmitter.emit('conversationAreaRequestSent', inviteToAll);
   }
 
   /**
-   * Accepts the instigator's invite to join a ConversationArea and sends the acceptor to the instigator's location.
+   * Accepts the instigator's invite to join a ConversationArea and sends
+   * the acceptor to the instigator's location. Removes the corresponding invite
+   * request from the list.
    *
    * @param instigator the player that sent out the invite
    * @param acceptor the player who accepted the invite
@@ -282,6 +296,7 @@ export default class Town {
 
   /**
    * Declines the instigator's invite to join a ConversationArea.
+   * Removes the invite from the decliner's list of invites.
    *
    * @param instigator the player that sent out the invite
    * @param decliner the player who declined the invite
@@ -298,11 +313,11 @@ export default class Town {
   }
 
   /**
-   * Updates the location of a player within the town
+   * Updates the location of a player within the town.
    *
    * If the player has changed conversation areas, this method also updates the
    * corresponding ConversationArea objects tracked by the town controller, and dispatches
-   * any onConversationUpdated events as appropriate
+   * any onConversationUpdated events as appropriate.
    *
    * @param player Player to update location for
    * @param location New location for this player
@@ -335,7 +350,7 @@ export default class Town {
 
   /**
    * Removes a player from a conversation area, updating the conversation area's occupants list,
-   * and emitting the appropriate message (area updated or area destroyed)
+   * and emitting the appropriate message (area updated or area destroyed).
    *
    * @param player Player to remove from their current conversation area
    */
@@ -356,14 +371,14 @@ export default class Town {
    *
    * If successful creating the conversation area, this method:
    *  Adds any players who are in the region defined by the conversation area to it.
-   *  Notifies all players in the town that the conversation area has been updated
+   *  Notifies all players in the town that the conversation area has been updated.
    *
    * @param conversationArea Information describing the conversation area to create. Ignores any
    *  occupantsById that are set on the conversation area that is passed to this method.
    *
    * @returns true if the conversation is successfully created, or false if there is no known
    * conversation area with the specified ID or if there is already an active conversation area
-   * with the specified ID
+   * with the specified ID.
    */
   public addConversationArea(conversationArea: ConversationAreaModel): boolean {
     const area = this._interactables.find(
@@ -387,7 +402,7 @@ export default class Town {
    * If successful creating the viewing area, this method:
    *    Adds any players who are in the region defined by the viewing area to it
    *    Notifies all players in the town that the viewing area has been updated by
-   *      emitting an interactableUpdate event
+   *      emitting an interactableUpdate event.
    *
    * @param viewingArea Information describing the viewing area to create.
    *
@@ -419,7 +434,7 @@ export default class Town {
   }
 
   /**
-   * Find an interactable by its ID
+   * Find an interactable by its ID.
    *
    * @param id
    * @returns the interactable

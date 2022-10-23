@@ -6,7 +6,7 @@ import {
   TeleportInviteSingular,
 } from '../types/CoveyTownSocket';
 /**
- * Each user who is connected to a town is represented by a Player object
+ * Each user who is connected to a town is represented by a Player object.
  */
 export default class Player {
   /** The current location of this user in the world map * */
@@ -32,7 +32,7 @@ export default class Player {
    */
   private _selectedFriends: Player[] = [];
 
-  /** The current list of invites to conversation areas. */
+  /** The current list of invites to conversation areas that this player has. */
   private _conversationAreaInvites: TeleportInviteSingular[] = [];
 
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
@@ -92,7 +92,8 @@ export default class Player {
   }
 
   /**
-   * Add the given player to this player's friends list
+   * Add the given player to this player's friends list.
+   *
    * @param friendToAdd the player to add
    */
   public addFriend(friendToAdd: Player): void {
@@ -100,7 +101,8 @@ export default class Player {
   }
 
   /**
-   * Remove the given player from this player's friends list, AND the selected friend's list
+   * Remove the given player from this player's friends list, AND the selected friend's list.
+   *
    * @param friendToRemove player to remove from this player's friends list
    */
   public removeFriend(friendToRemove: Player): void {
@@ -117,16 +119,19 @@ export default class Player {
 
   /**
    * Add the given friend to this player's selected friends list. Assumes this player is already a
-   * friend of this player
+   * friend of this player.
+   *
    * @param friendToSelect player to add to the selected friends list
    */
   public selectFriends(friendToSelect: Player): void {
-    // Assumes that friend to select is in the friends list
+    // Assumes that friend to select is in the friends list as this should be enforced by the UI.
+    // it should not let you select someone who isn't a friend.
     this._selectedFriends.push(friendToSelect);
   }
 
   /**
-   * Player to deselected (remove from the selected friends list)
+   * Player to deselected (remove from the selected friends list).
+   *
    * @param friendToDeselect player to remove from selected friends list
    */
   public deselectFriend(friendToDeselect: Player): void {
@@ -146,8 +151,8 @@ export default class Player {
   }
 
   /**
-   * Removes the given ConversationAreaInvite from this player's list of invites upon either
-   * accepting or decling an invite.
+   * Removes the given ConversationAreaInvite from this player's list of invites
+   * (upon either accepting or decling an invite).
    *
    * @param inviteToRemove the ConversationAreaInvite to remove
    */
