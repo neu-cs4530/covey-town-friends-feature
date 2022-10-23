@@ -177,8 +177,8 @@ export default class Town {
   /**
    * Emit a friendRequestSent event with the given sender and recipient.
    *
-   * @param sender Player who is requesting another player to be their friend
-   * @param recipient Player who is the intended recipient of the friend request
+   * @param sender Player who is requesting another player to be their friend.
+   * @param recipient Player who is the intended recipient of the friend request.
    */
   public inviteFriend(sender: Player, recipient: Player): void {
     // TODO this should be caught by TownController
@@ -189,8 +189,8 @@ export default class Town {
    * Emit a friendRequestAccepted event with the given acceptor and accepted. Adds each player to other
    * player's friends list.
    *
-   * @param acceptor the recipient of the initial friend request. Is ACCEPTING the received friend request
-   * @param accepted the sender of the initial request
+   * @param acceptor the recipient of the initial friend request. Is ACCEPTING the received friend request.
+   * @param accepted the sender of the initial request.
    */
   public acceptFriendRequest(acceptor: Player, accepted: Player): void {
     acceptor.addFriend(accepted);
@@ -203,8 +203,8 @@ export default class Town {
    * Emit a friendRequestDeclined event with the given decliner and declined. Does not
    * add each player to other player's friends list.
    *
-   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request
-   * @param declined the sender of the initial request
+   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
+   * @param declined the sender of the initial request.
    */
   public declineFriendRequest(decliner: Player, declined: Player): void {
     // TODO this should be caught by TownController
@@ -215,8 +215,8 @@ export default class Town {
    * Emit a friendRemoved event with the given remover and removed.
    * Removes each player from each other's friends list.
    *
-   * @param instigator the player removing the affected from their friend's list
-   * @param affected the player to be removed from the instigator's friends list
+   * @param instigator the player removing the affected from their friend's list.
+   * @param affected the player to be removed from the instigator's friends list.
    */
   public removeFriend(instigator: Player, affected: Player): void {
     instigator.removeFriend(affected);
@@ -242,8 +242,8 @@ export default class Town {
   /**
    * Invites the given list of friends to the instigator's location within a ConversationArea.
    *
-   * @param instigator the player sending out the invites
-   * @param invitedFriends the players invited
+   * @param instigator the player sending out the invites.
+   * @param invitedFriends the players invited.
    */
   public inviteToConversationArea(instigator: Player, invitedFriends: Player[]): void {
     const instigatorLocation: PlayerLocation = instigator.location;
@@ -278,8 +278,8 @@ export default class Town {
    * the acceptor to the instigator's location. Removes the corresponding invite
    * request from the list.
    *
-   * @param instigator the player that sent out the invite
-   * @param acceptor the player who accepted the invite
+   * @param instigator the player that sent out the invite.
+   * @param acceptor the player who accepted the invite.
    */
   public acceptConversationAreaInvite(instigator: Player, acceptor: Player): void {
     const instigatorLocation: PlayerLocation = instigator.location;
@@ -298,8 +298,8 @@ export default class Town {
    * Declines the instigator's invite to join a ConversationArea.
    * Removes the invite from the decliner's list of invites.
    *
-   * @param instigator the player that sent out the invite
-   * @param decliner the player who declined the invite
+   * @param instigator the player that sent out the invite.
+   * @param decliner the player who declined the invite.
    */
   public declineConversationAreaInvite(instigator: Player, decliner: Player): void {
     const instigatorLocation: PlayerLocation = instigator.location;
@@ -319,8 +319,8 @@ export default class Town {
    * corresponding ConversationArea objects tracked by the town controller, and dispatches
    * any onConversationUpdated events as appropriate.
    *
-   * @param player Player to update location for
-   * @param location New location for this player
+   * @param player Player to update location for.
+   * @param location New location for this player.
    */
   private _updatePlayerLocation(player: Player, location: PlayerLocation): void {
     const prevInteractable = this._interactables.find(
@@ -352,7 +352,7 @@ export default class Town {
    * Removes a player from a conversation area, updating the conversation area's occupants list,
    * and emitting the appropriate message (area updated or area destroyed).
    *
-   * @param player Player to remove from their current conversation area
+   * @param player Player to remove from their current conversation area.
    */
   private _removePlayerFromInteractable(player: Player): void {
     const area = this._interactables.find(

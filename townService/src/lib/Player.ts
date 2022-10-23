@@ -28,11 +28,10 @@ export default class Player {
   private _friends: Player[] = [];
 
   /** The current set of selected friends this player has. This list is used for requesting multiple friends
-   * at once, or sending a message to multiple friends.
-   */
+   * at once to join a conversation area, or sending a message to multiple friends. */
   private _selectedFriends: Player[] = [];
 
-  /** The current list of invites to conversation areas that this player has. */
+  /** The current list of invites to conversation areas that this player has recieved. */
   private _conversationAreaInvites: TeleportInviteSingular[] = [];
 
   /** A special town emitter that will emit events to the entire town BUT NOT to this player. */
@@ -94,11 +93,11 @@ export default class Player {
   /**
    * Add the given player to this player's friends list.
    *
-   * @param friendToAdd the player to add
+   * @param friendToAdd the player to add.
    */
   public addFriend(friendToAdd: Player): void {
     // make sure that the friend with the given ID is not already in the list of friends.
-    // If they are already in teh list of friends, ignore the addFreind request.
+    // If they are already in the list of friends, ignore the addFriend request.
     if (!this._friends.find(friend => friend._id === friendToAdd._id)) {
       this._friends.push(friendToAdd);
     }
@@ -107,7 +106,7 @@ export default class Player {
   /**
    * Remove the given player from this player's friends list, AND the selected friend's list.
    *
-   * @param friendToRemove player to remove from this player's friends list
+   * @param friendToRemove player to remove from this player's friends list.
    */
   public removeFriend(friendToRemove: Player): void {
     const friendsListIndexToRemove = this._friends.indexOf(friendToRemove);
@@ -125,7 +124,7 @@ export default class Player {
    * Add the given friend to this player's selected friends list. Assumes this player is already a
    * friend of this player.
    *
-   * @param friendToSelect player to add to the selected friends list
+   * @param friendToSelect player to add to the selected friends list.
    */
   public selectFriends(friendToSelect: Player): void {
     // Assumes that friend to select is in the friends list as this should be enforced by the UI.
@@ -148,7 +147,7 @@ export default class Player {
   /**
    * Adds the given ConversationAreaInvite to this player's list of invites.
    *
-   * @param invite the invite to add
+   * @param invite the invite to add.
    */
   public addConversationAreaInvite(invite: TeleportInviteSingular): void {
     if (
@@ -168,7 +167,7 @@ export default class Player {
    * Removes the given ConversationAreaInvite from this player's list of invites
    * (upon either accepting or decling an invite).
    *
-   * @param inviteToRemove the ConversationAreaInvite to remove
+   * @param inviteToRemove the ConversationAreaInvite to remove.
    */
   public removeConversationAreaInvite(inviteToRemove: TeleportInviteSingular): void {
     const inviteToRemoveIndex = this._conversationAreaInvites.indexOf(inviteToRemove);
