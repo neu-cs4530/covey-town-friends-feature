@@ -170,8 +170,8 @@ export default class Player {
    * @param inviteToRemove the ConversationAreaInvite to remove.
    */
   public removeConversationAreaInvite(inviteToRemove: TeleportInviteSingular): void {
-    // TO-DO: Make sure you have a test check that this still works correctly when the 
-    // passed in inviteToRemove and the equivalent invite in the list are not the same 
+    // TO-DO: Make sure you have a test check that this still works correctly when the
+    // passed in inviteToRemove and the equivalent invite in the list are not the same
     // base object --> i.e. check how deep the equality compariosn is for this
     const inviteToRemoveIndex = this._conversationAreaInvites.indexOf(inviteToRemove);
     if (inviteToRemoveIndex >= 0) {
