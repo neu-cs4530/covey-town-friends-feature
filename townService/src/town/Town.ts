@@ -262,7 +262,7 @@ export default class Town {
   }
 
   /**
-   * Accepts the instigator's invite to join a ConversationArea and sends the acceptor there.
+   * Accepts the instigator's invite to join a ConversationArea and sends the acceptor to the instigator's location.
    *
    * @param instigator the player that sent out the invite
    * @param acceptor the player who accepted the invite
