@@ -28,14 +28,14 @@ export default class Player {
   private _friends: Player[] = [];
 
   /** The current set of selected friends this player has. This list is used for requesting multiple friends
-   * at once, or sending a message to multiple friends
+   * at once, or sending a message to multiple friends.
    */
   private _selectedFriends: Player[] = [];
 
   /** The current list of invites to conversation areas that this player has. */
   private _conversationAreaInvites: TeleportInviteSingular[] = [];
 
-  /** A special town emitter that will emit events to the entire town BUT NOT to this player */
+  /** A special town emitter that will emit events to the entire town BUT NOT to this player. */
   public readonly townEmitter: TownEmitter;
 
   constructor(userName: string, townEmitter: TownEmitter) {
@@ -97,7 +97,11 @@ export default class Player {
    * @param friendToAdd the player to add
    */
   public addFriend(friendToAdd: Player): void {
-    this._friends.push(friendToAdd);
+    // make sure that the friend with the given ID is not already in the list of friends.
+    // If they are already in teh list of friends, ignore the addFreind request.
+    if (!this._friends.find(friend => friend._id === friendToAdd._id)) {
+      this._friends.push(friendToAdd);
+    }
   }
 
   /**
@@ -132,7 +136,7 @@ export default class Player {
   /**
    * Player to deselected (remove from the selected friends list).
    *
-   * @param friendToDeselect player to remove from selected friends list
+   * @param friendToDeselect player to remove from selected friends list.
    */
   public deselectFriend(friendToDeselect: Player): void {
     const selectedListIndexToRemove = this._selectedFriends.indexOf(friendToDeselect);
@@ -147,7 +151,17 @@ export default class Player {
    * @param invite the invite to add
    */
   public addConversationAreaInvite(invite: TeleportInviteSingular): void {
-    this._conversationAreaInvites.push(invite);
+    if (
+      // make sure that the invite that is being requested to be added is not already in the
+      // list of conversation area invites. If it is already in the list, ignore the request.
+      !this._conversationAreaInvites.find(
+        // the requested is the current player, so this would inherently be equal, and does not
+        // need to be checked.
+        i => i.requester === invite.requester && i.requesterLocation === invite.requesterLocation,
+      )
+    ) {
+      this._conversationAreaInvites.push(invite);
+    }
   }
 
   /**
