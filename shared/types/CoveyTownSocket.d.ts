@@ -1,3 +1,5 @@
+import { Player as PlayerSrc } from "covey-town-townService/src/lib/Player";
+
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -69,6 +71,24 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 }
 
+export type PlayerToPlayerUpdate = {
+  actor: PlayerSrc;
+  affected: PlayerSrc;
+};
+
+export type ConversationAreaInvite = {
+  requester: PlayerSrc;
+  requested: PlayerSrc[];
+  // Check whether this is a shallow/deep copy, potentially remove player location
+  requesterLocation: PlayerLocation;
+};
+
+export type TeleportInviteSingular = {
+  requester: PlayerSrc;
+  requested: PlayerSrc;
+  requesterLocation: PlayerLocation;
+};
+
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
@@ -78,8 +98,24 @@ export interface ServerToClientEvents {
   townClosing: () => void;
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
+  // actor is sender, affected is recipient
+  friendRequestSent: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is accepter, affected is the initial sender of the request
+  friendRequestAccepted: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is decliner, affected is the initial sender of the request
+  friendRequestDeclined: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is remover, affected is the removed friend
+  friendRemoved: (friendRequest: PlayerToPlayerUpdate) => void;
+  conversationAreaRequestSent: (
+    conversationAreaInviteRequest: ConversationAreaInvite
+  ) => void;
+  conversationAreaRequestAccepted: (
+    conversationAreaInviteRequest: TeleportInviteSingular
+  ) => void;
+  conversationAreaRequestDeclined: (
+    conversationAreaInviteRequest: TeleportInviteSingular
+  ) => void;
 }
-
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;

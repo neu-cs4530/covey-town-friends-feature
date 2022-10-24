@@ -1,8 +1,12 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
-
+import {
+  Player as PlayerModel,
+  PlayerLocation,
+  TownEmitter,
+  TeleportInviteSingular,
+} from '../types/CoveyTownSocket';
 /**
- * Each user who is connected to a town is represented by a Player object
+ * Each user who is connected to a town is represented by a Player object.
  */
 export default class Player {
   /** The current location of this user in the world map * */
@@ -20,7 +24,17 @@ export default class Player {
   /** The secret token that allows this client to access our video resources for this town * */
   private _videoToken?: string;
 
-  /** A special town emitter that will emit events to the entire town BUT NOT to this player */
+  /** The current set of friends this player has. */
+  private _friends: Player[] = [];
+
+  /** The current set of selected friends this player has. This list is used for requesting multiple friends
+   * at once to join a conversation area, or sending a message to multiple friends. */
+  private _selectedFriends: Player[] = [];
+
+  /** The current list of invites to conversation areas that this player has recieved. */
+  private _conversationAreaInvites: TeleportInviteSingular[] = [];
+
+  /** A special town emitter that will emit events to the entire town BUT NOT to this player. */
   public readonly townEmitter: TownEmitter;
 
   constructor(userName: string, townEmitter: TownEmitter) {
@@ -62,5 +76,106 @@ export default class Player {
       location: this.location,
       userName: this._userName,
     };
+  }
+
+  get friends(): Player[] {
+    return this._friends;
+  }
+
+  get selectedFriends(): Player[] {
+    return this._selectedFriends;
+  }
+
+  get conversationAreaInvites(): TeleportInviteSingular[] {
+    return this._conversationAreaInvites;
+  }
+
+  /**
+   * Add the given player to this player's friends list.
+   *
+   * @param friendToAdd the player to add.
+   */
+  public addFriend(friendToAdd: Player): void {
+    // make sure that the friend with the given ID is not already in the list of friends.
+    // If they are already in the list of friends, ignore the addFriend request.
+    if (!this._friends.find(friend => friend._id === friendToAdd._id)) {
+      this._friends.push(friendToAdd);
+    }
+  }
+
+  /**
+   * Remove the given player from this player's friends list, AND the selected friend's list.
+   *
+   * @param friendToRemove player to remove from this player's friends list.
+   */
+  public removeFriend(friendToRemove: Player): void {
+    const friendsListIndexToRemove = this._friends.indexOf(friendToRemove);
+    if (friendsListIndexToRemove >= 0) {
+      this._friends.splice(friendsListIndexToRemove, 1);
+    }
+
+    const selectedListIndexToRemove = this._selectedFriends.indexOf(friendToRemove);
+    if (selectedListIndexToRemove >= 0) {
+      this._selectedFriends.splice(selectedListIndexToRemove, 1);
+    }
+  }
+
+  /**
+   * Add the given friend to this player's selected friends list. Assumes this player is already a
+   * friend of this player.
+   *
+   * @param friendToSelect player to add to the selected friends list.
+   */
+  public selectFriends(friendToSelect: Player): void {
+    // Assumes that friend to select is in the friends list as this should be enforced by the UI.
+    // it should not let you select someone who isn't a friend.
+    this._selectedFriends.push(friendToSelect);
+  }
+
+  /**
+   * Player to deselected (remove from the selected friends list).
+   *
+   * @param friendToDeselect player to remove from selected friends list.
+   */
+  public deselectFriend(friendToDeselect: Player): void {
+    const selectedListIndexToRemove = this._selectedFriends.indexOf(friendToDeselect);
+    if (selectedListIndexToRemove >= 0) {
+      this._selectedFriends.splice(selectedListIndexToRemove, 1);
+    }
+  }
+
+  /**
+   * Adds the given ConversationAreaInvite to this player's list of invites.
+   *
+   * @param invite the invite to add.
+   */
+  public addConversationAreaInvite(invite: TeleportInviteSingular): void {
+    if (
+      // make sure that the invite that is being requested to be added is not already in the
+      // list of conversation area invites. If it is already in the list, ignore the request.
+      !this._conversationAreaInvites.find(
+        // the requested is the current player, so this would inherently be equal, and does not
+        // need to be checked.
+        i => i.requester === invite.requester && i.requesterLocation === invite.requesterLocation,
+      )
+    ) {
+      this._conversationAreaInvites.push(invite);
+    }
+  }
+
+  /**
+   * Removes the given ConversationAreaInvite from this player's list of invites
+   * (upon either accepting or decling an invite).
+   *
+   * @param inviteToRemove the ConversationAreaInvite to remove.
+   */
+  public removeConversationAreaInvite(inviteToRemove: TeleportInviteSingular): void {
+    // TO-DO: Make sure you have a test check that this still works correctly when the
+    // passed in inviteToRemove and the equivalent invite in the list are not the same
+    // base object --> i.e. check how deep the equality compariosn is for this
+    const inviteToRemoveIndex = this._conversationAreaInvites.indexOf(inviteToRemove);
+    if (inviteToRemoveIndex >= 0) {
+      this._conversationAreaInvites.splice(inviteToRemoveIndex, 1);
+    }
   }
 }
