@@ -2,12 +2,7 @@ import { DeepMockProxy, mockDeep, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import Player from './Player';
 import { MockedPlayer, mockPlayer } from '../TestUtils';
-import {
-  ConversationAreaInvite,
-  PlayerLocation,
-  TeleportInviteSingular,
-  TownEmitter,
-} from '../types/CoveyTownSocket';
+import { PlayerLocation, TeleportInviteSingular, TownEmitter } from '../types/CoveyTownSocket';
 import Town from '../town/Town';
 
 describe('Player', () => {
@@ -55,7 +50,6 @@ describe('Player', () => {
       requested: player4,
       requesterLocation: playerLocation,
     };
-    '
     mockReset(townEmitter);
   });
   describe('addFriend', () => {
