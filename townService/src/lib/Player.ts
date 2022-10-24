@@ -165,9 +165,16 @@ export default class Player {
    * @param inviteToRemove the ConversationAreaInvite to remove.
    */
   public removeConversationAreaInvite(inviteToRemove: TeleportInviteSingular): void {
-    const inviteToRemoveIndex = this._conversationAreaInvites.indexOf(inviteToRemove);
-    if (inviteToRemoveIndex >= 0) {
-      this._conversationAreaInvites.splice(inviteToRemoveIndex, 1);
-    }
+    // const inviteToRemoveIndex = this._conversationAreaInvites.indexOf(inviteToRemove);
+    // if (inviteToRemoveIndex >= 0) {
+    //   this._conversationAreaInvites.splice(inviteToRemoveIndex, 1);
+    // }
+    this._conversationAreaInvites = this._conversationAreaInvites.filter(
+      invite =>
+        !(
+          invite.requesterLocation.x === inviteToRemove.requesterLocation.x &&
+          invite.requesterLocation.y === inviteToRemove.requesterLocation.y
+        ),
+    );
   }
 }

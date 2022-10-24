@@ -1,5 +1,4 @@
 import { ITiledMap } from '@jonbell/tiled-map-type-guard';
-import exp from 'constants';
 import { DeepMockProxy, mockClear, mockDeep, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import Player from '../lib/Player';
@@ -364,7 +363,7 @@ describe('Town', () => {
   beforeEach(async () => {
     town = new Town(nanoid(), false, nanoid(), townEmitter);
     playerTestData = mockPlayer(town.townID);
-    playerTestData2 = mockPlayer('mockPlayer2');
+    playerTestData2 = mockPlayer(town.townID);
     player = await town.addPlayer(playerTestData.userName, playerTestData.socket);
     player2 = await town.addPlayer(playerTestData2.userName, playerTestData2.socket);
     playerTestData.player = player;
@@ -840,17 +839,20 @@ describe('Town', () => {
   describe('declineFriendRequest', () => {
     it('Emits a friendRequestDeclined event when called.', () => {
       town.inviteFriend(player, player2);
-      expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
-        actor: player,
-        affected: player2,
+      town.declineFriendRequest(player2, player);
+      expect(townEmitter.emit).toHaveBeenLastCalledWith('friendRequestDeclined', {
+        actor: player2,
+        affected: player,
       });
     });
     it('Does not change the actors friends lists.', () => {
       town.inviteFriend(player, player2);
+      town.declineFriendRequest(player2, player);
       expect(player.friends).toEqual(playerFriends);
     });
     it('Does not change the affected friends lists.', () => {
       town.inviteFriend(player, player2);
+      town.declineFriendRequest(player2, player);
       expect(player2.friends).toEqual(player2Friends);
     });
   });
