@@ -811,10 +811,12 @@ describe('Town', () => {
       });
     });
     it('Does not change the actors friends lists.', () => {
+      expect(player.friends).toEqual(playerFriends);
       town.inviteFriend(player, player2);
       expect(player.friends).toEqual(playerFriends);
     });
     it('Does not change the affected friends lists.', () => {
+      expect(player2.friends).toEqual(player2Friends);
       town.inviteFriend(player, player2);
       expect(player2.friends).toEqual(player2Friends);
     });
@@ -847,11 +849,13 @@ describe('Town', () => {
     });
     it('Does not change the actors friends lists.', () => {
       town.inviteFriend(player, player2);
+      expect(player.friends).toEqual(playerFriends);
       town.declineFriendRequest(player2, player);
       expect(player.friends).toEqual(playerFriends);
     });
     it('Does not change the affected friends lists.', () => {
       town.inviteFriend(player, player2);
+      expect(player2.friends).toEqual(player2Friends);
       town.declineFriendRequest(player2, player);
       expect(player2.friends).toEqual(player2Friends);
     });
@@ -919,26 +923,33 @@ describe('Town', () => {
   describe('acceptConversationAreaInvite', () => {
     it('Emits a conversationAreaRequestAccepted when called.', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
-      town.acceptConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.acceptConversationAreaInvite(teleportRequest);
       expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestAccepted', teleportRequest);
     });
     it('Transports the requested player to the requesters location', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player2.location).toEqual(player2Location);
-      town.acceptConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.acceptConversationAreaInvite(teleportRequest);
       expect(player2.location).toEqual(playerLocation);
     });
     it('Does not move the requester', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player.location).toEqual(playerLocation);
-      town.acceptConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.acceptConversationAreaInvite(teleportRequest);
       expect(player.location).toEqual(playerLocation);
     });
     it('Removes the request from the requested players conversation area requests list.', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player2.conversationAreaInvites.length).toEqual(1);
-      town.acceptConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.acceptConversationAreaInvite(teleportRequest);
       expect(player2.conversationAreaInvites.length).toEqual(0);
+    });
+    it('Player should be sent to OG location, even when other player moves in the meantime', () => {
+      town.inviteToConversationArea(player, [player2]);
+      player.location.x = 0;
+      player.location.y = 0;
+      town.acceptConversationAreaInvite(player2.conversationAreaInvites[0]);
+      expect(player2.location).toEqual(playerLocation);
     });
   });
   describe('declineConversationAreaInvite', () => {

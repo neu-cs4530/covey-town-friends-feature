@@ -278,20 +278,13 @@ export default class Town {
    * the acceptor to the instigator's location. Removes the corresponding invite
    * request from the list.
    *
-   * @param instigator the player that sent out the invite.
-   * @param acceptor the player who accepted the invite.
+   * @param teleportInvite the teleport invite request that is being accepted
    */
-  public acceptConversationAreaInvite(instigator: Player, acceptor: Player): void {
-    const instigatorLocation: PlayerLocation = instigator.location;
-    const acceptedInvite: TeleportInviteSingular = {
-      requester: instigator,
-      requested: acceptor,
-      requesterLocation: instigatorLocation,
-    };
-    acceptor.removeConversationAreaInvite(acceptedInvite);
-    // TODO: check if need to pass in instigator's location instead of just player
-    this.teleportToFriend(acceptedInvite);
-    this._broadcastEmitter.emit('conversationAreaRequestAccepted', acceptedInvite);
+  public acceptConversationAreaInvite(teleportInvite: TeleportInviteSingular): void {
+    const { requested } = teleportInvite;
+    requested.removeConversationAreaInvite(teleportInvite);
+    this.teleportToFriend(teleportInvite);
+    this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
   }
 
   /**
