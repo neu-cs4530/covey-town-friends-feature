@@ -515,10 +515,11 @@ describe('Town', () => {
           town.addConversationArea({ id: 'Name1', topic: 'test', occupantsByID: [] }),
         ).toBeTruthy();
         const convArea = town.getInteractable('Name1') as ConversationArea;
+        const previousOccupancy = town.occupancy;
         expect(convArea.occupantsByID).toEqual([player.id]);
         disconnectPlayer(playerTestData);
         expect(convArea.occupantsByID).toEqual([]);
-        expect(town.occupancy).toBe(0);
+        expect(town.occupancy).toBe(previousOccupancy - 1);
       });
 
       it('Removes the player from any active viewing area', () => {
