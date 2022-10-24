@@ -72,6 +72,25 @@ describe('Player', () => {
       player.removeFriend(player2);
       expect(player.friends.length).toEqual(0);
     });
+    it('Removes the given player from the selected friend list IF the friend was selected', () => {
+      player.addFriend(player2);
+      player.addFriend(player3);
+      player.selectFriend(player3);
+      expect(player.friends.length).toEqual(2);
+      expect(player.selectedFriends.length).toEqual(1);
+      player.removeFriend(player2);
+      expect(player.friends.length).toEqual(1);
+      expect(player.selectedFriends.length).toEqual(1);
+      player.removeFriend(player3);
+      expect(player.friends.length).toEqual(0);
+      expect(player.selectedFriends.length).toEqual(0);
+    });
+    it('Does nothing if there is no such Friend to remove', () => {
+      player.addFriend(player2);
+      expect(player.friends.length).toEqual(1);
+      player.removeFriend(player3);
+      expect(player.friends.length).toEqual(1);
+    });
   });
   describe('selectFriends', () => {
     it('Adds the other player to the current players selected friends list', () => {
@@ -82,7 +101,7 @@ describe('Player', () => {
       expect(player.friends.length).toEqual(1);
       expect(player.selectedFriends.length).toEqual(1);
     });
-    it('Does duplicate a selected friend in the list when added twice.', () => {
+    it('Does NOT duplicate a selected friend in the list when added twice.', () => {
       player.addFriend(player2);
       expect(player.friends.length).toEqual(1);
       expect(player.selectedFriends.length).toEqual(0);
@@ -100,6 +119,14 @@ describe('Player', () => {
       player.selectFriend(player2);
       expect(player.friends.length).toEqual(1);
       expect(player.selectedFriends.length).toEqual(1);
+      player.deselectFriend(player2);
+      expect(player.friends.length).toEqual(1);
+      expect(player.selectedFriends.length).toEqual(0);
+    });
+    it('Does nothing if given player is not in the list/not selected', () => {
+      player.addFriend(player2);
+      expect(player.friends.length).toEqual(1);
+      expect(player.selectedFriends.length).toEqual(0);
       player.deselectFriend(player2);
       expect(player.friends.length).toEqual(1);
       expect(player.selectedFriends.length).toEqual(0);
@@ -139,6 +166,14 @@ describe('Player', () => {
       expect(player4.conversationAreaInvites.length).toEqual(3);
       player4.removeConversationAreaInvite(invite2);
       expect(player4.conversationAreaInvites.length).toEqual(2);
+    });
+    it('Does nothing if there is no such conversation area invite to remove', () => {
+      player.addFriend(player3);
+      player.addFriend(player4);
+      town.inviteToConversationArea(player3, [player4]);
+      expect(player4.conversationAreaInvites.length).toEqual(1);
+      player4.removeConversationAreaInvite(invite);
+      expect(player4.conversationAreaInvites.length).toEqual(1);
     });
   });
 });
