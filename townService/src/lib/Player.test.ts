@@ -12,10 +12,12 @@ describe('Player', () => {
   let player2: Player;
   let player3: Player;
   let player4: Player;
+  let player5: Player;
   let playerTestData: MockedPlayer;
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
   let playerTestData4: MockedPlayer;
+  let playerTestData5: MockedPlayer;
   let playerLocation: PlayerLocation;
   let invite: TeleportInviteSingular;
   let invite2: TeleportInviteSingular;
@@ -26,19 +28,23 @@ describe('Player', () => {
     playerTestData2 = mockPlayer(town.townID);
     playerTestData3 = mockPlayer(town.townID);
     playerTestData4 = mockPlayer(town.townID);
+    playerTestData5 = mockPlayer(town.townID);
     player = await town.addPlayer(playerTestData.userName, playerTestData.socket);
     player2 = await town.addPlayer(playerTestData2.userName, playerTestData2.socket);
     player3 = await town.addPlayer(playerTestData3.userName, playerTestData3.socket);
     player4 = await town.addPlayer(playerTestData4.userName, playerTestData4.socket);
+    player5 = await town.addPlayer(playerTestData5.userName, playerTestData5.socket);
     playerTestData.player = player;
     playerTestData2.player = player2;
     playerTestData3.player = player3;
     playerTestData4.player = player4;
+    playerTestData5.player = player5;
     // Set this dummy player to be off the map so that they do not show up in conversation areas
     playerTestData.moveTo(-1, -1);
     playerTestData2.moveTo(-5, -5);
     playerTestData3.moveTo(-4, -4);
     playerTestData4.moveTo(-3, -3);
+    playerTestData5.moveTo(-3, -3);
     playerLocation = player.location;
     invite = {
       requester: player,
@@ -48,7 +54,7 @@ describe('Player', () => {
     invite2 = {
       requester: player3,
       requested: player4,
-      requesterLocation: playerLocation,
+      requesterLocation: player3.location,
     };
     mockReset(townEmitter);
   });
@@ -79,11 +85,11 @@ describe('Player', () => {
       expect(player.friends.length).toEqual(2);
       expect(player.selectedFriends.length).toEqual(1);
       player.removeFriend(player2);
-      expect(player.friends.length).toEqual(1);
-      expect(player.selectedFriends.length).toEqual(1);
+      expect(player.friends).toEqual([player3]);
+      expect(player.selectedFriends).toEqual([player3]);
       player.removeFriend(player3);
-      expect(player.friends.length).toEqual(0);
-      expect(player.selectedFriends.length).toEqual(0);
+      expect(player.friends).toEqual([]);
+      expect(player.selectedFriends).toEqual([]);
     });
     it('Does nothing if there is no such Friend to remove', () => {
       player.addFriend(player2);
@@ -133,7 +139,7 @@ describe('Player', () => {
     });
   });
   describe('addConversationAreaInvite', () => {
-    it('Adds an invited to the list of conversation area invites', () => {
+    it('Adds an invite to the list of conversation area invites', () => {
       player.addFriend(player2);
       expect(player.conversationAreaInvites.length).toEqual(0);
       player.addConversationAreaInvite(invite);
@@ -174,6 +180,23 @@ describe('Player', () => {
       expect(player4.conversationAreaInvites.length).toEqual(1);
       player4.removeConversationAreaInvite(invite);
       expect(player4.conversationAreaInvites.length).toEqual(1);
+    });
+    it('Should see 2 invites from the same location but dif players as a different invite', () => {
+      town.inviteToConversationArea(player4, [player2]);
+      town.inviteToConversationArea(player5, [player2]);
+      expect(player2.conversationAreaInvites.length).toEqual(2);
+      player2.removeConversationAreaInvite({
+        requester: player4,
+        requested: player2,
+        requesterLocation: player4.location,
+      });
+      expect(player2.conversationAreaInvites).toStrictEqual([
+        {
+          requester: player5,
+          requested: player2,
+          requesterLocation: player5.location,
+        },
+      ]);
     });
   });
 });
