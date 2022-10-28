@@ -429,6 +429,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+    this._socket.on('friendRequestSent', friendRequest => {
+      //
+    });
   }
 
   /**
