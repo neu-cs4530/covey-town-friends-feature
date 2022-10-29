@@ -160,6 +160,16 @@ export class MockedPlayer {
     const onMovementListener = getEventListener(this.socket, 'playerMovement');
     onMovementListener({ x, y, rotation, moving });
   }
+
+  acceptedFriendRequest(actor: Player, affected: Player): void {
+    const onAcceptFriendRequestListener = getEventListener(this.socket, 'acceptFriendRequest');
+    onAcceptFriendRequestListener({ actor, affected });
+  }
+
+  declinedFriendRequest(actor: Player, affected: Player): void {
+    const onDeclineFriendRequestListener = getEventListener(this.socket, 'declineFriendRequest');
+    onDeclineFriendRequestListener({ actor, affected });
+  }
 }
 
 /**

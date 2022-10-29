@@ -411,6 +411,8 @@ describe('Town', () => {
         'chatMessage',
         'playerMovement',
         'interactableUpdate',
+        'acceptFriendRequest',
+        'declineFriendRequest',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -593,6 +595,44 @@ describe('Town', () => {
         const interactable = town.getInteractable(update.id);
         expect(interactable?.toModel()).toEqual(update);
       });
+    });
+    describe('acceptFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.acceptedFriendRequest(player, player2);
+      });
+      it('Should call the towns acceptFriendRequest method and add each Player as friends', () => {
+        expect(player.friends.includes(player2)).toBeTruthy();
+        expect(player2.friends.includes(player)).toBeTruthy();
+      });
+      it(
+        'Should call the towns acceptFriendRequest method and emit a friendRequestAccepted' +
+          'event',
+        () => {
+          expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
+            actor: player,
+            affected: player2,
+          });
+        },
+      );
+    });
+    describe('declineFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.declinedFriendRequest(player, player2);
+      });
+      it('Should call the towns declineFriendRequest method and NOT modify any friend list', () => {
+        expect(player.friends.includes(player2)).toBeFalsy();
+        expect(player2.friends.includes(player)).toBeFalsy();
+      });
+      it(
+        'Should call the towns acceptFriendRequest method and emit a friendRequestDeclined' +
+          'event',
+        () => {
+          expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
+            actor: player,
+            affected: player2,
+          });
+        },
+      );
     });
     it('Forwards chat messages to all players in the same town', async () => {
       const chatHandler = getEventListener(playerTestData.socket, 'chatMessage');
