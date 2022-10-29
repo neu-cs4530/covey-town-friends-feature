@@ -120,4 +120,8 @@ export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
+  // actor is the Player who clicked accept 
+  acceptFriendRequest(friendRequest: PlayerToPlayerUpdate);
+  // actor is the Player who clicked decline
+  declineFriendRequest(friendRequest: PlayerToPlayerUpdate);
 }
