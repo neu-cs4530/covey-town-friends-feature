@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -58,6 +59,12 @@ export type TownEvents = {
    * the new location can be found on the PlayerController.
    */
   playerMoved: (movedPlayer: PlayerController) => void;
+  /**
+   * An event that indicates that the set of conversation area requests has changed. This event is
+   * dispatched when a request is added to the list, or removed - i.e., after updating this town
+   * controller's record of conversation area requests.
+   */
+  conversationAreaRequestsChanged: (currentConvAreaRequests: TeleportInviteSingular[]) => void;
   /**
    * An event that indicates that the set of conversation areas has changed. This event is dispatched
    * when a conversation area is created, or when the set of active conversations has changed. This event is dispatched
@@ -125,6 +132,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * with a new one; clients should take note not to retain stale references.
    */
   private _playersInternal: PlayerController[] = [];
+
+  /**
+   * The current list of conversation area requests in the town. Adding or removing reuqests might
+   * replace the array with a new one; clients should take note not to retain stale references.
+   */
+  private _conversationAreaRequestsInternal: TeleportInviteSingular[] = [];
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -428,9 +441,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         );
         updatedViewingArea?.updateFrom(interactable);
       }
-    });
-    this._socket.on('friendRequestSent', friendRequest => {
-      //
     });
   }
 
