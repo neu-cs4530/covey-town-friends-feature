@@ -159,12 +159,14 @@ export default class Town {
         }
       }
     });
+
     // Set up a listener to process accepted friend requests.
     // Makes the necessary backend changes & then emits an event to let the TownController know
     // the changes have been made.
     socket.on('acceptFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
       this.acceptFriendRequest(friendRequest.actor, friendRequest.affected);
     });
+
     // Set up a listener to process declined friend request.
     // Makes the necessary backend changes & then emits an event to let the TownController know
     // the changes have been made.
