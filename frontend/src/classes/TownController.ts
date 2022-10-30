@@ -64,7 +64,7 @@ export type TownEvents = {
    * dispatched when a request is added to the list, or removed - i.e., after updating this town
    * controller's record of conversation area requests.
    */
-  conversationAreaRequestsChanged: (currentConvAreaRequests: TeleportInviteSingular[]) => void;
+  conversationAreaInvitesChanged: (currentConvAreaInvites: TeleportInviteSingular[]) => void;
   /**
    * An event that indicates that the set of conversation areas has changed. This event is dispatched
    * when a conversation area is created, or when the set of active conversations has changed. This event is dispatched
@@ -137,7 +137,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * The current list of conversation area requests in the town. Adding or removing reuqests might
    * replace the array with a new one; clients should take note not to retain stale references.
    */
-  private _conversationAreaRequestsInternal: TeleportInviteSingular[] = [];
+  private _conversationAreaInvitesInternal: TeleportInviteSingular[] = [];
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -307,6 +307,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private set _conversationAreas(newConversationAreas: ConversationAreaController[]) {
     this._conversationAreasInternal = newConversationAreas;
     this.emit('conversationAreasChanged', newConversationAreas);
+  }
+
+  public get conversationAreaInvites() {
+    return this._conversationAreaInvitesInternal;
+  }
+
+  private set _conversationAreaInvites(newConversationAreaRequests: TeleportInviteSingular[]) {
+    this._conversationAreaInvitesInternal = newConversationAreaRequests;
+    this.emit('conversationAreaInvitesChanged', newConversationAreaRequests);
   }
 
   public get interactableEmitter() {
@@ -712,6 +721,32 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
     };
   }, [townController, setConversationAreas]);
   return conversationAreas;
+}
+
+/**
+ * A react hook to retrieve the current conversation area requests. This hook will re-render any
+ * components that use it when the set of conversation area requests changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of conversation area requests that are currently un-answered
+ */
+export function usePendingConversationAreaRequests(): TeleportInviteSingular[] {
+  const townController = useTownController();
+  const [conversationAreaInvites, setConversationAreaInvites] = useState<TeleportInviteSingular[]>(
+    townController.conversationAreaInvites,
+  );
+
+  useEffect(() => {
+    const updater = (currentConvAreaInvites: TeleportInviteSingular[]) => {
+      setConversationAreaInvites(currentConvAreaInvites);
+    };
+    townController.addListener('conversationAreaInvitesChanged', updater);
+    return () => {
+      townController.removeListener('conversationAreaInvitesChanged', updater);
+    };
+  }, [townController, setConversationAreaInvites]);
+  return conversationAreaInvites;
 }
 
 /**
