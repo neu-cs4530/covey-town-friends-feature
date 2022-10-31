@@ -100,6 +100,8 @@ export interface ServerToClientEvents {
   interactableUpdate: (interactable: Interactable) => void;
   // actor is sender, affected is recipient
   friendRequestSent: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is sender / canceler, affected is original recipient
+  friendRequestCanceled: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is accepter, affected is the initial sender of the request
   friendRequestAccepted: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is decliner, affected is the initial sender of the request
@@ -124,4 +126,8 @@ export interface ClientToServerEvents {
   acceptFriendRequest(friendRequest: PlayerToPlayerUpdate);
   // actor is the Player who clicked decline
   declineFriendRequest(friendRequest: PlayerToPlayerUpdate);
+  // actor is sender, affected is recipient
+  sentFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is sender / canceler, affected is original recipient
+  canceledFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
 }
