@@ -662,7 +662,6 @@ describe('Town', () => {
           actor: player,
           affected: player2,
         });
-
       });
     });
     it('Forwards chat messages to all players in the same town', async () => {
