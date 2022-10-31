@@ -626,6 +626,45 @@ describe('Town', () => {
         });
       });
     });
+    describe('sendFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.sendFriendRequest(player, player2);
+      });
+      it('Should NOT modify either of the Players friends lists', () => {
+        expect(player.friends.includes(player2)).toBeFalsy();
+        expect(player2.friends.includes(player)).toBeFalsy();
+      });
+      it('TownService should emit a sentFriendRequest event', () => {
+        expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
+          actor: player,
+          affected: player2,
+        });
+      });
+    });
+    describe('cancelFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.sendFriendRequest(player, player2);
+      });
+      it('Should NOT modify either of the Players friends lists', () => {
+        expect(player.friends.includes(player2)).toBeFalsy();
+        expect(player2.friends.includes(player)).toBeFalsy();
+      });
+      it('TownService should emit a canceledFriendRequest event', () => {
+        // expect the request was sent
+        expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
+          actor: player,
+          affected: player2,
+        });
+        // cancel the request
+        playerTestData.cancelFriendRequest(player, player2);
+        // expect it to be canceled
+        expect(townEmitter.emit).toBeCalledWith('friendRequestCanceled', {
+          actor: player,
+          affected: player2,
+        });
+
+      });
+    });
     it('Forwards chat messages to all players in the same town', async () => {
       const chatHandler = getEventListener(playerTestData.socket, 'chatMessage');
       const chatMessage: ChatMessage = {
