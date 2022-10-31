@@ -411,6 +411,8 @@ describe('Town', () => {
         'chatMessage',
         'playerMovement',
         'interactableUpdate',
+        'acceptFriendRequest',
+        'declineFriendRequest',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -592,6 +594,36 @@ describe('Town', () => {
       it('updates the local model for that interactable', () => {
         const interactable = town.getInteractable(update.id);
         expect(interactable?.toModel()).toEqual(update);
+      });
+    });
+    describe('acceptFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.acceptedFriendRequest(player, player2);
+      });
+      it('Should add each Player to each others friends lists', () => {
+        expect(player.friends.includes(player2)).toBeTruthy();
+        expect(player2.friends.includes(player)).toBeTruthy();
+      });
+      it('TownService should emit a friendRequestAccepted event', () => {
+        expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
+          actor: player,
+          affected: player2,
+        });
+      });
+    });
+    describe('declineFriendRequest', () => {
+      beforeEach(() => {
+        playerTestData.declinedFriendRequest(player, player2);
+      });
+      it('Should NOT modify either of the Players friends lists', () => {
+        expect(player.friends.includes(player2)).toBeFalsy();
+        expect(player2.friends.includes(player)).toBeFalsy();
+      });
+      it('TownService should emit a friendRequestDeclined event', () => {
+        expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
+          actor: player,
+          affected: player2,
+        });
       });
     });
     it('Forwards chat messages to all players in the same town', async () => {

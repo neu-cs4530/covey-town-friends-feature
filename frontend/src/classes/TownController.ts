@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PlayerToPlayerUpdate,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -88,6 +89,20 @@ export type TownEvents = {
    * @param obj the interactable that is being interacted with
    */
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
+
+  /**
+   * An event that indicates that the player has accepted a friend Request.
+   * The request object contains the current Player and the Player whose friend
+   * request was accepted.
+   */
+  clickedAcceptFriendRequest: (acceptedRequest: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player has declined a friend Request.
+   * The request object contains the current Player and the Player whose friend
+   * request was declined.
+   */
+  clickedDeclineFriendRequest: (declinedRequest: PlayerToPlayerUpdate) => void;
 };
 
 /**
@@ -617,6 +632,24 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _playersByIDs(playerIDs: string[]): PlayerController[] {
     return this._playersInternal.filter(eachPlayer => playerIDs.includes(eachPlayer.id));
+  }
+
+  /**
+   * Emits a friend accepted event to the townService
+   * @param acceptedRequest the friend request - holds the current player and the player whose
+   * friend request was accepted.
+   */
+  public clickedAcceptFriendRequest(acceptedRequest: PlayerToPlayerUpdate): void {
+    this._socket.emit('acceptFriendRequest', acceptedRequest);
+  }
+
+  /**
+   * Emits a friend declined event to the townService
+   * @param declinedRequest the friend reqeust - holds the current player and the player whose
+   * friend request was declined
+   */
+  public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
+    this._socket.emit('declineFriendRequest', declinedRequest);
   }
 }
 
