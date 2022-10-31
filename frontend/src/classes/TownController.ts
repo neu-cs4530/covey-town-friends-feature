@@ -286,7 +286,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  // test
   public unPause(): void {
     if (this._paused) {
       this._paused = false;
