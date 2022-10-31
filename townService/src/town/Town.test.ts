@@ -413,6 +413,7 @@ describe('Town', () => {
         'interactableUpdate',
         'acceptFriendRequest',
         'declineFriendRequest',
+        'removeFriend',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -621,6 +622,22 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestDeclined event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
+          actor: player,
+          affected: player2,
+        });
+      });
+    });
+    describe('removeFriend', () => {
+      beforeEach(() => {
+        playerTestData.acceptedFriendRequest(player, player2);
+        playerTestData.removedFriend(player, player2);
+      });
+      it('Should modify both of the Players friends lists', () => {
+        expect(player.friends.includes(player2)).toBeFalsy();
+        expect(player2.friends.includes(player)).toBeFalsy();
+      });
+      it('TownService should emit a friendRemoved event', () => {
+        expect(townEmitter.emit).toBeCalledWith('friendRemoved', {
           actor: player,
           affected: player2,
         });

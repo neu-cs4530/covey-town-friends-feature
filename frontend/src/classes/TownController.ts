@@ -103,6 +103,13 @@ export type TownEvents = {
    * request was declined.
    */
   clickedDeclineFriendRequest: (declinedRequest: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player has requested to unfriend the affected.
+   * The request object contains the current Player and the Player who is
+   * being un-friended.
+   */
+  clickedRemoveFriend: (removeFriend: PlayerToPlayerUpdate) => void;
 };
 
 /**
@@ -650,6 +657,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('declineFriendRequest', declinedRequest);
+  }
+
+  /**
+   * Emits a friend removed event to the townService
+   * @param removeFriend holds the current player and the player who
+   * is being unfreinded.
+   */
+  public clickedRemoveFriend(removeFriend: PlayerToPlayerUpdate): void {
+    this._socket.emit('removeFriend', removeFriend);
   }
 }
 

@@ -124,4 +124,6 @@ export interface ClientToServerEvents {
   acceptFriendRequest(friendRequest: PlayerToPlayerUpdate);
   // actor is the Player who clicked decline
   declineFriendRequest(friendRequest: PlayerToPlayerUpdate);
+  // actor is the Player who clicked remove friend
+  removeFriend(removeFriend: PlayerToPlayerUpdate);
 }
