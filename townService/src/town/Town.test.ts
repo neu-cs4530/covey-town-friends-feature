@@ -351,12 +351,16 @@ describe('Town', () => {
   let town: Town;
   let player: Player;
   let player2: Player;
+  let player3: Player;
   let playerTestData: MockedPlayer;
   let playerTestData2: MockedPlayer;
+  let playerTestData3: MockedPlayer;
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
+  let player3Location: PlayerLocation;
   let playerFriends: Player[];
   let player2Friends: Player[];
+  let player3Friends: Player[];
   let teleportRequest: TeleportInviteSingular;
   let conversationRequest: ConversationAreaInvite;
 
@@ -364,13 +368,17 @@ describe('Town', () => {
     town = new Town(nanoid(), false, nanoid(), townEmitter);
     playerTestData = mockPlayer(town.townID);
     playerTestData2 = mockPlayer(town.townID);
+    playerTestData3 = mockPlayer(town.townID);
     player = await town.addPlayer(playerTestData.userName, playerTestData.socket);
     player2 = await town.addPlayer(playerTestData2.userName, playerTestData2.socket);
+    player3 = await town.addPlayer(playerTestData3.userName, playerTestData3.socket);
     playerTestData.player = player;
     playerTestData2.player = player2;
+    playerTestData3.player = player3;
     // Set this dummy player to be off the map so that they do not show up in conversation areas
     playerTestData.moveTo(-1, -1);
     playerTestData2.moveTo(-5, -5);
+    playerTestData3.moveTo(-3, -3);
     teleportRequest = {
       requester: player,
       requested: player2,
@@ -630,16 +638,19 @@ describe('Town', () => {
     describe('removeFriend', () => {
       beforeEach(() => {
         playerTestData.acceptedFriendRequest(player, player2);
-        playerTestData.removedFriend(player, player2);
+        playerTestData.acceptedFriendRequest(player, player3);
+        playerTestData.removedFriend(player, player3);
       });
       it('Should modify both of the Players friends lists', () => {
-        expect(player.friends.includes(player2)).toBeFalsy();
-        expect(player2.friends.includes(player)).toBeFalsy();
+        expect(player.friends.includes(player2)).toBeTruthy();
+        expect(player2.friends.includes(player)).toBeTruthy();
+        expect(player.friends.includes(player3)).toBeFalsy();
+        expect(player3.friends.includes(player)).toBeFalsy();
       });
       it('TownService should emit a friendRemoved event', () => {
-        expect(townEmitter.emit).toBeCalledWith('friendRemoved', {
+        expect(townEmitter.emit).toHaveBeenCalledWith('friendRemoved', {
           actor: player,
-          affected: player2,
+          affected: player3,
         });
       });
     });
