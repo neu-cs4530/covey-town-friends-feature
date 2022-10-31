@@ -204,6 +204,22 @@ describe('TownController', () => {
       testController.clickedDeclineFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
     });
+    it('Emits sentFriendRequest event when clickedSendFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedSendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('sentFriendRequest', testRequest);
+    });
+    it('Emits canceledFriendRequest event when clickedCancelFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedCancelRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('canceledFriendRequest', testRequest);
+    });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {
         function emptyConversationArea() {
