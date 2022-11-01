@@ -15,12 +15,17 @@ import PlayerController from '../classes/PlayerController';
 import TownController, {
   TownEvents,
   useActiveConversationAreas,
+  useCurrentPlayerFriendRequests,
   usePendingConversationAreaInvites,
   usePlayers,
   useTownSettings,
 } from '../classes/TownController';
 import { EventNames, getTownEventListener, mockTownController } from '../TestUtils';
-import { PlayerLocation, TeleportInviteSingular } from '../types/CoveyTownSocket';
+import {
+  PlayerLocation,
+  PlayerToPlayerUpdate,
+  TeleportInviteSingular,
+} from '../types/CoveyTownSocket';
 import * as useTownController from './useTownController';
 describe('[T3] TownController-Dependent Hooks', () => {
   let useTownControllerSpy: jest.SpyInstance<TownController, []>;
@@ -351,6 +356,122 @@ describe('[T3] TownController-Dependent Hooks', () => {
       expect(getSingleListenerRemoved('conversationAreaInvitesChanged')).toBe(addCall);
 
       getSingleListenerAdded('conversationAreaInvitesChanged', newController.addListener);
+    });
+  });
+
+  describe('useCurrentPlayerFriendRequests', () => {
+    let playerFriendRequests: PlayerToPlayerUpdate[];
+
+    let hookReturnValue: PlayerToPlayerUpdate[] = [];
+    let renderData: RenderResult;
+
+    let player1: Player;
+    let player2: Player;
+    let player3: Player;
+    let playerTestData1: MockedPlayer;
+    let playerTestData2: MockedPlayer;
+    let playerTestData3: MockedPlayer;
+    let request1: PlayerToPlayerUpdate;
+    let request2: PlayerToPlayerUpdate;
+
+    function TestComponent() {
+      hookReturnValue = useCurrentPlayerFriendRequests();
+      return null;
+    }
+
+    beforeEach(() => {
+      playerFriendRequests = [];
+
+      townController = mockTownController({
+        playerFriendRequests,
+      });
+      useTownControllerSpy.mockReturnValue(townController);
+      playerTestData1 = mockPlayer(townController.townID);
+      playerTestData2 = mockPlayer(townController.townID);
+      playerTestData3 = mockPlayer(townController.townID);
+      player1 = playerTestData1.player as Player;
+      player2 = playerTestData2.player as Player;
+      player3 = playerTestData3.player as Player;
+
+      // Push conversation area invites with requested = townController.ourPlayer
+      request1 = {
+        actor: player1,
+        affected: townController.ourPlayer,
+      };
+      request2 = {
+        actor: townController.ourPlayer,
+        affected: player2,
+      };
+      playerFriendRequests.push(request1);
+      playerFriendRequests.push(request2);
+
+      renderData = render(<TestComponent />);
+    });
+    it('Returns an initial state of the current player friend requests', () => {
+      hookReturnValue.sort((a, b) => (a.actor && b.actor ? a.actor.localeCompare(b.actor) : 0));
+      expect(hookReturnValue).toEqual([request1, request2]);
+    });
+    it('Updates its value in response to playerFriendRequestsChanged events', () => {
+      act(() => {
+        const listener = getSingleListenerAdded('playerFriendRequestsChanged');
+        playerFriendRequests.push({
+          actor: player3,
+          affected: townController.ourPlayer,
+        });
+        listener(playerFriendRequests);
+      });
+      hookReturnValue.sort((a, b) => (a.actor && b.actor ? a.actor.localeCompare(b.actor) : 0));
+      expect(hookReturnValue).toEqual([
+        request1,
+        request2,
+        {
+          actor: player3,
+          affected: townController.ourPlayer,
+        },
+      ]);
+    });
+    it('Only adds a listener once', () => {
+      // Check that there was one listener added
+      getSingleListenerAdded('playerFriendRequestsChanged');
+      // Trigger re-render
+      act(() => {
+        const listener = getTownEventListener(townController, 'playerFriendRequestsChanged');
+        playerFriendRequests.push({
+          actor: player3,
+          affected: townController.ourPlayer,
+        });
+        listener(playerFriendRequests);
+      });
+      renderData.rerender(<TestComponent />);
+      // Should still be one
+      getSingleListenerAdded('playerFriendRequestsChanged');
+    });
+    it('Removes the listener when the component is unmounted', () => {
+      const addCall = getSingleListenerAdded('playerFriendRequestsChanged');
+      cleanup();
+      const removeCall = getSingleListenerRemoved('playerFriendRequestsChanged');
+      expect(addCall).toBe(removeCall);
+    });
+    it('Adds a listener on first render and does not re-register a listener on each render', () => {
+      getSingleListenerAdded('playerFriendRequestsChanged');
+      renderData.rerender(<TestComponent />);
+      renderData.rerender(<TestComponent />);
+      renderData.rerender(<TestComponent />);
+      getSingleListenerAdded('playerFriendRequestsChanged');
+    });
+    it('Removes the listener if the townController changes and adds one to the new controller', () => {
+      const addCall = getSingleListenerAdded('playerFriendRequestsChanged');
+      const newController = mockTownController({
+        friendlyName: nanoid(),
+        townID: nanoid(),
+        conversationAreas: [],
+      });
+
+      useTownControllerSpy.mockReturnValue(newController);
+      renderData.rerender(<TestComponent />);
+      expect(getSingleListenerRemoved('playerFriendRequestsChanged')).toBe(addCall);
+
+      getSingleListenerAdded('playerFriendRequestsChanged', newController.addListener);
     });
   });
 

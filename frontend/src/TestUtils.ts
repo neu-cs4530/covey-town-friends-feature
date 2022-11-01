@@ -8,6 +8,7 @@ import ViewingAreaController from './classes/ViewingAreaController';
 import { TownsService } from './generated/client';
 import {
   CoveyTownSocket,
+  PlayerToPlayerUpdate,
   ServerToClientEvents,
   TeleportInviteSingular,
   TownJoinResponse,
@@ -91,6 +92,7 @@ type MockedTownControllerProperties = {
   conversationAreas?: ConversationAreaController[];
   viewingAreas?: ViewingAreaController[];
   conversationAreaInvites?: TeleportInviteSingular[];
+  playerFriendRequests?: PlayerToPlayerUpdate[];
 };
 export function mockTownController({
   friendlyName,
@@ -102,6 +104,7 @@ export function mockTownController({
   conversationAreas,
   viewingAreas,
   conversationAreaInvites,
+  playerFriendRequests,
 }: MockedTownControllerProperties) {
   const mockedController = mock<TownController>();
   if (friendlyName) {
@@ -133,6 +136,11 @@ export function mockTownController({
   if (conversationAreaInvites) {
     Object.defineProperty(mockedController, 'conversationAreaInvites', {
       value: conversationAreaInvites,
+    });
+  }
+  if (playerFriendRequests) {
+    Object.defineProperty(mockedController, 'playerFriendRequests', {
+      value: playerFriendRequests,
     });
   }
   return mockedController;
