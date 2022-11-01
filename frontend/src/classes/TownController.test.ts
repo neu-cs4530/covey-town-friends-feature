@@ -206,18 +206,19 @@ describe('TownController', () => {
       expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
     });
     it('Emits a playerMovement when clickedTeleportToFriend is called', () => {
+      const testPlayerLocation: PlayerLocation ={
+        moving: false,
+        rotation: 'back',
+        x: 0,
+        y: 1,
+        interactableID: nanoid(),
+      };
       const testTeleportAction: TeleportAction = {
         actor: playerTestData.player,
-        playerDestinationLocation: {
-          moving: false,
-          rotation: 'back',
-          x: 0,
-          y: 1,
-          interactableID: nanoid(),
-        },
+        playerDestinationLocation: testPlayerLocation,
       };
       testController.clickedTeleportToFriend(testTeleportAction);
-      expect(mockSocket.emit).toBeCalledWith('playerMovement', testTeleportAction);
+      expect(mockSocket.emit).toBeCalledWith('playerMovement', testPlayerLocation);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {
