@@ -14,6 +14,7 @@ import {
   CoveyTownSocket,
   PlayerLocation,
   PlayerToPlayerUpdate,
+  TeleportAction,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -103,6 +104,13 @@ export type TownEvents = {
    * request was declined.
    */
   clickedDeclineFriendRequest: (declinedRequest: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the actor player wants to teleport to
+   * the destination player's location. The request object contains the current Player
+   * and the location of the player to teleport to.
+   */
+  clickedTeleportToFriend: (teleportAction: TeleportAction) => void;
 };
 
 /**
@@ -650,6 +658,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('declineFriendRequest', declinedRequest);
+  }
+
+  /**
+   * Emits a teleport event to the TownService
+   * @param teleportAction the teleport action to complete - whom to teleport and to where
+   */
+  public clickedTeleportToFriend(teleportAction: TeleportAction): void {
+    this._socket.emit('playerMovement', teleportAction.playerDestinationLocation);
   }
 }
 

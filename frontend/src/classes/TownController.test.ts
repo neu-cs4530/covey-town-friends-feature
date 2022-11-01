@@ -16,6 +16,7 @@ import {
   Player as PlayerModel,
   PlayerLocation,
   PlayerToPlayerUpdate,
+  TeleportAction,
   ServerToClientEvents,
   TownJoinResponse,
 } from '../types/CoveyTownSocket';
@@ -203,6 +204,20 @@ describe('TownController', () => {
       };
       testController.clickedDeclineFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
+    });
+    it('Emits a playerMovement when clickedTeleportToFriend is called', () => {
+      const testTeleportAction: TeleportAction = {
+        actor: playerTestData.player,
+        playerDestinationLocation: {
+          moving: false,
+          rotation: 'back',
+          x: 0,
+          y: 1,
+          interactableID: nanoid(),
+        },
+      };
+      testController.clickedTeleportToFriend(testTeleportAction);
+      expect(mockSocket.emit).toBeCalledWith('playerMovement', testTeleportAction);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {
