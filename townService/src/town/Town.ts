@@ -213,6 +213,7 @@ export default class Town {
    */
   public inviteFriend(sender: Player, recipient: Player): void {
     // TODO this should be caught by TownController
+    // TODO: dylan: possibly remove altogether
     this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
   }
 
@@ -224,6 +225,8 @@ export default class Town {
    */
   public cancelFriendRequest(sender: Player, recipient: Player): void {
     // TODO this should be caught by TownController
+    // TODO: chloe: emit special event
+    // TODO: dylan: possibly remove altogether
     this._broadcastEmitter.emit('friendRequestCanceled', { actor: sender, affected: recipient });
   }
 

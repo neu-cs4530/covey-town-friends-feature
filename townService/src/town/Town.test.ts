@@ -596,7 +596,7 @@ describe('Town', () => {
         expect(interactable?.toModel()).toEqual(update);
       });
     });
-    describe('acceptFriendRequest', () => {
+    describe('acceptFriendRequest (listener)', () => {
       beforeEach(() => {
         playerTestData.acceptedFriendRequest(player, player2);
       });
@@ -611,7 +611,7 @@ describe('Town', () => {
         });
       });
     });
-    describe('declineFriendRequest', () => {
+    describe('declineFriendRequest (listener)', () => {
       beforeEach(() => {
         playerTestData.declinedFriendRequest(player, player2);
       });
@@ -634,7 +634,7 @@ describe('Town', () => {
         expect(player.friends.includes(player2)).toBeFalsy();
         expect(player2.friends.includes(player)).toBeFalsy();
       });
-      it('TownService should emit a sentFriendRequest event', () => {
+      it('TownService should emit a friendRequestSent event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
           actor: player,
           affected: player2,
@@ -892,7 +892,7 @@ describe('Town', () => {
       expect(player2.friends).toEqual(player2Friends);
     });
   });
-  describe('acceptFriendRequest', () => {
+  describe('acceptFriendRequest (method)', () => {
     it('Emits a friendRequestAccepted event when called.', () => {
       town.acceptFriendRequest(player, player2);
       expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
@@ -909,7 +909,7 @@ describe('Town', () => {
       expect(player2.friends.includes(player)).toBeTruthy();
     });
   });
-  describe('declineFriendRequest', () => {
+  describe('declineFriendRequest (method)', () => {
     it('Emits a friendRequestDeclined event when called.', () => {
       town.inviteFriend(player, player2);
       town.declineFriendRequest(player2, player);
