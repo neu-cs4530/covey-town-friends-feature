@@ -105,6 +105,19 @@ export type TownEvents = {
   clickedDeclineFriendRequest: (declinedRequest: PlayerToPlayerUpdate) => void;
 
   /**
+   * An event that indicates that the player has sent a friend Request.
+   * @param sentRequest object containing the current Player and the Player who
+   * is being requested
+   */
+  clickedSendFriendRequest: (sentRequest: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player is canceling a friend Request.
+   * @param canceledRequest object containing the current Player and the Player who
+   * the canceled request was intended for
+   */
+  clickedCancelRequest: (canceledRequest: PlayerToPlayerUpdate) => void;
+
    * An event that indicates that the player has requested to unfriend the affected.
    * The request object contains the current Player and the Player who is
    * being un-friended.
@@ -659,6 +672,26 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
+  /**
+   * Emits a sent friend request event to the townService
+   * @param sentRequest the friend request - holds the current player and the player whose
+   * who is being requested
+   */
+  public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
+    // TODO: emit special event
+    this._socket.emit('sentFriendRequest', sentRequest);
+  }
+
+  /**
+   * Emits a canceled friend request event to the townService
+   * @param canceledRequest the friend request being canceled - holds the current player and the player whose
+   * who is being requested
+   */
+  public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
+    // TODO: emit special event
+    this._socket.emit('canceledFriendRequest', canceledRequest);
+  }
+  
   /**
    * Emits a friend removed event to the townService
    * @param removeFriend holds the current player and the player who
