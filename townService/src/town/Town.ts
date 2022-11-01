@@ -173,6 +173,14 @@ export default class Town {
     socket.on('declineFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
       this.declineFriendRequest(friendRequest.actor, friendRequest.affected);
     });
+
+    // Set up a listener to process the remove friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController
+    // know the changes have been made.
+    socket.on('removeFriend', (removeFriend: PlayerToPlayerUpdate) => {
+      this.removeFriend(removeFriend.actor, removeFriend.affected);
+    });
+
     return newPlayer;
   }
 
