@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PlayerToPlayerUpdate,
   TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
@@ -65,6 +66,11 @@ export type TownEvents = {
    * controller's record of conversation area requests.
    */
   conversationAreaInvitesChanged: (currentConvAreaInvites: TeleportInviteSingular[]) => void;
+  /**
+   * An event that indicates that the set of friend requests for this player has changed. This event
+   * is dispatched when a request is added to the list (sent), or removed (accepted/declined).
+   */
+  playerFriendRequestsChanged: (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => void;
   /**
    * An event that indicates that the set of conversation areas has changed. This event is dispatched
    * when a conversation area is created, or when the set of active conversations has changed. This event is dispatched
@@ -133,8 +139,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _playersInternal: PlayerController[] = [];
 
+  // When designing frontend, would just have to check:
+  // - if request.actor = TownController.ourPlayer -> render a 'cancel request' button
+  // - if request.affected = TownController.ourPlayer -> render a 'accept request' button
   /**
-   * The current list of conversation area requests in the town. Adding or removing reuqests might
+   * The current list of friend requests that concerns TownController.ourPlayer. Includes
+   * requests where the actor is TownController.ourPlayer, and where the affected is.
+   * Adding or removing requests might replace the array with a new one; clients should take
+   * note not to retain stale references.
+   */
+  private _playerFriendRequestsInternal: PlayerToPlayerUpdate[] = [];
+
+  /**
+   * The current list of conversation area requests in the town. Adding or removing requests might
    * replace the array with a new one; clients should take note not to retain stale references.
    */
   private _conversationAreaInvitesInternal: TeleportInviteSingular[] = [];
@@ -316,6 +333,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private set _conversationAreaInvites(newConversationAreaRequests: TeleportInviteSingular[]) {
     this._conversationAreaInvitesInternal = newConversationAreaRequests;
     this.emit('conversationAreaInvitesChanged', newConversationAreaRequests);
+  }
+
+  public get playerFriendRequests() {
+    return this._playerFriendRequestsInternal;
+  }
+
+  public set _playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
+    this._playerFriendRequestsInternal = newPlayerFriendRequests;
+    this.emit('playerFriendRequestsChanged', newPlayerFriendRequests);
   }
 
   public get interactableEmitter() {
@@ -563,6 +589,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._conversationAreas = [];
         this._viewingAreas = [];
         this._conversationAreaInvites = [];
+        this._playerFriendRequests = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -732,7 +759,7 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
  *
  * @returns the list of conversation area requests that are currently un-answered
  */
-export function usePendingConversationAreaRequests(): TeleportInviteSingular[] {
+export function usePendingConversationAreaInvites(): TeleportInviteSingular[] {
   const townController = useTownController();
   const [conversationAreaInvites, setConversationAreaInvites] = useState<TeleportInviteSingular[]>(
     townController.conversationAreaInvites,
@@ -748,6 +775,33 @@ export function usePendingConversationAreaRequests(): TeleportInviteSingular[] {
     };
   }, [townController, setConversationAreaInvites]);
   return conversationAreaInvites;
+}
+
+/**
+ * A react hook to retrieve the current friend requests for the town controller's player.
+ * This hook will re-render any components that use it when the set of friend requests
+ * changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of player friend requests that have been sent/received (but not answered).
+ */
+export function useCurrentPlayerFriendRequests(): PlayerToPlayerUpdate[] {
+  const townController = useTownController();
+  const [playerFriendRequests, setPlayerFriendRequests] = useState<PlayerToPlayerUpdate[]>(
+    townController.playerFriendRequests,
+  );
+
+  useEffect(() => {
+    const updater = (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => {
+      setPlayerFriendRequests(currentPlayerFriendRequests);
+    };
+    townController.addListener('playerFriendRequestsChanged', updater);
+    return () => {
+      townController.removeListener('playerFriendRequestsChanged', updater);
+    };
+  }, [townController, setPlayerFriendRequests]);
+  return playerFriendRequests;
 }
 
 /**
