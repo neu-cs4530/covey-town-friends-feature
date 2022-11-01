@@ -219,6 +219,13 @@ describe('TownController', () => {
       };
       testController.clickedCancelRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('canceledFriendRequest', testRequest);
+    it('Emits removeFriend when clickedRemoveFriend is called', () => {
+      const testRemoveFriend: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedRemoveFriend(testRemoveFriend);
+      expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {

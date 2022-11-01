@@ -130,4 +130,6 @@ export interface ClientToServerEvents {
   sentFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is sender / canceler, affected is original recipient
   canceledFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is the Player who clicked remove friend
+  removeFriend(removeFriend: PlayerToPlayerUpdate);
 }
