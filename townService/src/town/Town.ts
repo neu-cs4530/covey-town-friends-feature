@@ -167,6 +167,29 @@ export default class Town {
       this.acceptFriendRequest(friendRequest.actor, friendRequest.affected);
     });
 
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('declineFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      this.declineFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('sendFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      // emits a friend request event which IS sending the friendrequest
+      this.inviteFriend(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('cancelFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      // emits a friend request event which will remove the request
+      this.cancelFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
     // Set up a listener to process the remove friend request.
     // Makes the necessary backend changes & then emits an event to let the TownController
     // know the changes have been made.
@@ -188,6 +211,30 @@ export default class Town {
     if (player.location.interactableID) {
       this._removePlayerFromInteractable(player);
     }
+  }
+
+  /**
+   * Emit a friendRequestSent event with the given sender and recipient.
+   *
+   * @param sender Player who is requesting another player to be their friend.
+   * @param recipient Player who is the intended recipient of the friend request.
+   */
+  public inviteFriend(sender: Player, recipient: Player): void {
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
+  }
+
+  /**
+   * Emit a canceledFriendRequest event with the given sender and recipient.
+   *
+   * @param sender Player who is canceling a request that THEY sent to another player.
+   * @param recipient Player who is the intended recipient of the original friend request that is being canceled.
+   */
+  public cancelFriendRequest(sender: Player, recipient: Player): void {
+    // TODO this should be caught by TownController
+    // TODO: chloe: emit special event
+    // TODO: dylan: possibly remove altogether
+    this._broadcastEmitter.emit('friendRequestCanceled', { actor: sender, affected: recipient });
   }
 
   /**
@@ -216,6 +263,18 @@ export default class Town {
     affected.removeFriend(instigator);
     // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRemoved', { actor: instigator, affected });
+  }
+
+  /**
+   * Emit a friendRequestDeclined event with the given decliner and declined. Does not
+   * add each player to other player's friends list.
+   *
+   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
+   * @param declined the sender of the initial friend request.
+   */
+  public declineFriendRequest(decliner: Player, declined: Player): void {
+    // TODO this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
   }
 
   /**

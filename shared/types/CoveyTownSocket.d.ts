@@ -103,9 +103,15 @@ export interface ServerToClientEvents {
   townClosing: () => void;
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
+  // actor is sender, affected is recipient
+  friendRequestSent: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is sender / canceler, affected is original recipient
+  friendRequestCanceled: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is accepter, affected is the initial sender of the request
   friendRequestAccepted: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is decliner, affected is the initial sender of the request
+  friendRequestDeclined: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is remover, affected is the removed friend
   friendRemoved: (friendRequest: PlayerToPlayerUpdate) => void;
   conversationAreaRequestSent: (
     conversationAreaInviteRequest: ConversationAreaInvite
@@ -123,6 +129,12 @@ export interface ClientToServerEvents {
   interactableUpdate: (update: Interactable) => void;
   // actor is the Player who clicked accept 
   acceptFriendRequest(friendRequest: PlayerToPlayerUpdate);
+  // actor is the Player who clicked decline
+  declineFriendRequest(friendRequest: PlayerToPlayerUpdate);
+  // actor is sender, affected is recipient
+  sendFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
+  // actor is sender / canceler, affected is original recipient
+  cancelFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is the Player who clicked remove friend
   removeFriend(removeFriend: PlayerToPlayerUpdate);
 }

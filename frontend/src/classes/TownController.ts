@@ -677,10 +677,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param declinedRequest the friend reqeust - holds the current player and the player whose
    * friend request was declined
    */
-  // TODO rmeove
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
+    this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
   /**
@@ -696,10 +695,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param sentRequest the friend request - holds the current player and the player whose
    * who is being requested
    */
-  // TODO rmeove
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
+    this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
@@ -707,10 +705,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
    * who is being requested
    */
-  // TODO rmeove
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
+    this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
