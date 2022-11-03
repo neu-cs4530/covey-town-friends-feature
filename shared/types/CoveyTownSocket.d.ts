@@ -89,6 +89,11 @@ export type TeleportInviteSingular = {
   requesterLocation: PlayerLocation;
 };
 
+export type TeleportAction = {
+  actor: PlayerSrc;
+  playerDestinationLocation: PlayerLocation;
+}
+
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
