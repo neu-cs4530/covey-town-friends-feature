@@ -112,6 +112,7 @@ export type TownEvents = {
    */
   clickedTeleportToFriend: (teleportAction: TeleportAction) => void;
 
+  /**
    * An event that indicates that the player has sent a friend Request.
    * @param sentRequest object containing the current Player and the Player who
    * is being requested
@@ -676,8 +677,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param declinedRequest the friend reqeust - holds the current player and the player whose
    * friend request was declined
    */
+  // TODO rmeove
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
-    this._socket.emit('declineFriendRequest', declinedRequest);
+    // TODO: emit special event
   }
 
   /**
@@ -686,14 +689,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedTeleportToFriend(teleportAction: TeleportAction): void {
     this._socket.emit('playerMovement', teleportAction.playerDestinationLocation);
+  }
 
+  /**
    * Emits a sent friend request event to the townService
    * @param sentRequest the friend request - holds the current player and the player whose
    * who is being requested
    */
+  // TODO rmeove
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
-    this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
@@ -701,9 +707,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
    * who is being requested
    */
+  // TODO rmeove
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
-    this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
