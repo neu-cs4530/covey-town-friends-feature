@@ -16,6 +16,7 @@ import {
   ViewingArea as ViewingAreaModel,
   ConversationAreaInvite,
   TeleportInviteSingular,
+  PlayerToPlayerUpdate,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
@@ -158,6 +159,21 @@ export default class Town {
         }
       }
     });
+
+    // Set up a listener to process accepted friend requests.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('acceptFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      this.acceptFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process the remove friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController
+    // know the changes have been made.
+    socket.on('removeFriend', (removeFriend: PlayerToPlayerUpdate) => {
+      this.removeFriend(removeFriend.actor, removeFriend.affected);
+    });
+
     return newPlayer;
   }
 
@@ -175,17 +191,6 @@ export default class Town {
   }
 
   /**
-   * Emit a friendRequestSent event with the given sender and recipient.
-   *
-   * @param sender Player who is requesting another player to be their friend.
-   * @param recipient Player who is the intended recipient of the friend request.
-   */
-  public inviteFriend(sender: Player, recipient: Player): void {
-    // TODO this should be caught by TownController
-    this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
-  }
-
-  /**
    * Emit a friendRequestAccepted event with the given acceptor and accepted. Adds each player to other
    * player's friends list.
    *
@@ -197,18 +202,6 @@ export default class Town {
     accepted.addFriend(acceptor);
     // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestAccepted', { actor: acceptor, affected: accepted });
-  }
-
-  /**
-   * Emit a friendRequestDeclined event with the given decliner and declined. Does not
-   * add each player to other player's friends list.
-   *
-   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
-   * @param declined the sender of the initial friend request.
-   */
-  public declineFriendRequest(decliner: Player, declined: Player): void {
-    // TODO this should be caught by TownController
-    this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
   }
 
   /**
