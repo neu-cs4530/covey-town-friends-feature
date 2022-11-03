@@ -118,6 +118,7 @@ export type TownEvents = {
    */
   clickedCancelRequest: (canceledRequest: PlayerToPlayerUpdate) => void;
 
+  /**
    * An event that indicates that the player has requested to unfriend the affected.
    * The request object contains the current Player and the Player who is
    * being un-friended.
@@ -691,7 +692,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     // TODO: emit special event
     this._socket.emit('canceledFriendRequest', canceledRequest);
   }
-  
+
   /**
    * Emits a friend removed event to the townService
    * @param removeFriend holds the current player and the player who
