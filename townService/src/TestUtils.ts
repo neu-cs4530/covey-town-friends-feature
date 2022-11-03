@@ -170,6 +170,21 @@ export class MockedPlayer {
     const onDeclineFriendRequestListener = getEventListener(this.socket, 'declineFriendRequest');
     onDeclineFriendRequestListener({ actor, affected });
   }
+
+  sendFriendRequest(actor: Player, affected: Player): void {
+    const onSendFriendRequestListener = getEventListener(this.socket, 'sentFriendRequest');
+    onSendFriendRequestListener({ actor, affected });
+  }
+
+  cancelFriendRequest(actor: Player, affected: Player): void {
+    const onCancelFriendRequestListener = getEventListener(this.socket, 'canceledFriendRequest');
+    onCancelFriendRequestListener({ actor, affected });
+  }
+    
+  removedFriend(actor: Player, affected: Player): void {
+    const onRemoveFriendListener = getEventListener(this.socket, 'removeFriend');
+    onRemoveFriendListener({ actor, affected });
+  }
 }
 
 /**

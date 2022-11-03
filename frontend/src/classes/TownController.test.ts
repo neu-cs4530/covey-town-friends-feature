@@ -219,6 +219,28 @@ describe('TownController', () => {
       };
       testController.clickedTeleportToFriend(testTeleportAction);
       expect(mockSocket.emit).toBeCalledWith('playerMovement', testPlayerLocation);
+    it('Emits sentFriendRequest event when clickedSendFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedSendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('sentFriendRequest', testRequest);
+    });
+    it('Emits canceledFriendRequest event when clickedCancelFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedCancelRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('canceledFriendRequest', testRequest);
+    it('Emits removeFriend when clickedRemoveFriend is called', () => {
+      const testRemoveFriend: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedRemoveFriend(testRemoveFriend);
+      expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {
