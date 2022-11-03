@@ -357,10 +357,6 @@ describe('Town', () => {
   let playerTestData3: MockedPlayer;
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
-  let player3Location: PlayerLocation;
-  let playerFriends: Player[];
-  let player2Friends: Player[];
-  let player3Friends: Player[];
   let teleportRequest: TeleportInviteSingular;
   let conversationRequest: ConversationAreaInvite;
 
@@ -391,8 +387,6 @@ describe('Town', () => {
     };
     playerLocation = player.location;
     player2Location = player2.location;
-    playerFriends = player.friends;
-    player2Friends = player2.friends;
     mockReset(townEmitter);
   });
 
@@ -420,7 +414,6 @@ describe('Town', () => {
         'playerMovement',
         'interactableUpdate',
         'acceptFriendRequest',
-        'declineFriendRequest',
         'removeFriend',
       ];
       expectedEvents.forEach(eachEvent =>
@@ -615,59 +608,6 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestAccepted event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
-          actor: player,
-          affected: player2,
-        });
-      });
-    });
-    describe('declineFriendRequest (listener)', () => {
-      beforeEach(() => {
-        playerTestData.declinedFriendRequest(player, player2);
-      });
-      it('Should NOT modify either of the Players friends lists', () => {
-        expect(player.friends.includes(player2)).toBeFalsy();
-        expect(player2.friends.includes(player)).toBeFalsy();
-      });
-      it('TownService should emit a friendRequestDeclined event', () => {
-        expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
-          actor: player,
-          affected: player2,
-        });
-      });
-    });
-    describe('sendFriendRequest', () => {
-      beforeEach(() => {
-        playerTestData.sendFriendRequest(player, player2);
-      });
-      it('Should NOT modify either of the Players friends lists', () => {
-        expect(player.friends.includes(player2)).toBeFalsy();
-        expect(player2.friends.includes(player)).toBeFalsy();
-      });
-      it('TownService should emit a friendRequestSent event', () => {
-        expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
-        });
-      });
-    });
-    describe('cancelFriendRequest', () => {
-      beforeEach(() => {
-        playerTestData.sendFriendRequest(player, player2);
-      });
-      it('Should NOT modify either of the Players friends lists', () => {
-        expect(player.friends.includes(player2)).toBeFalsy();
-        expect(player2.friends.includes(player)).toBeFalsy();
-      });
-      it('TownService should emit a canceledFriendRequest event', () => {
-        // expect the request was sent
-        expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
-        });
-        // cancel the request
-        playerTestData.cancelFriendRequest(player, player2);
-        // expect it to be canceled
-        expect(townEmitter.emit).toBeCalledWith('friendRequestCanceled', {
           actor: player,
           affected: player2,
         });
@@ -901,25 +841,6 @@ describe('Town', () => {
       });
     });
   });
-  describe('inviteFriend', () => {
-    it('Emits a friendRequestSent event when called.', () => {
-      town.inviteFriend(player, player2);
-      expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-        actor: player,
-        affected: player2,
-      });
-    });
-    it('Does not change the actors friends lists.', () => {
-      expect(player.friends).toEqual(playerFriends);
-      town.inviteFriend(player, player2);
-      expect(player.friends).toEqual(playerFriends);
-    });
-    it('Does not change the affected friends lists.', () => {
-      expect(player2.friends).toEqual(player2Friends);
-      town.inviteFriend(player, player2);
-      expect(player2.friends).toEqual(player2Friends);
-    });
-  });
   describe('acceptFriendRequest (method)', () => {
     it('Emits a friendRequestAccepted event when called.', () => {
       town.acceptFriendRequest(player, player2);
@@ -935,28 +856,6 @@ describe('Town', () => {
     it('Expects the actor to be added to the affected friend list.', () => {
       town.acceptFriendRequest(player, player2);
       expect(player2.friends.includes(player)).toBeTruthy();
-    });
-  });
-  describe('declineFriendRequest (method)', () => {
-    it('Emits a friendRequestDeclined event when called.', () => {
-      town.inviteFriend(player, player2);
-      town.declineFriendRequest(player2, player);
-      expect(townEmitter.emit).toHaveBeenLastCalledWith('friendRequestDeclined', {
-        actor: player2,
-        affected: player,
-      });
-    });
-    it('Does not change the actors friends lists.', () => {
-      town.inviteFriend(player, player2);
-      expect(player.friends).toEqual(playerFriends);
-      town.declineFriendRequest(player2, player);
-      expect(player.friends).toEqual(playerFriends);
-    });
-    it('Does not change the affected friends lists.', () => {
-      town.inviteFriend(player, player2);
-      expect(player2.friends).toEqual(player2Friends);
-      town.declineFriendRequest(player2, player);
-      expect(player2.friends).toEqual(player2Friends);
     });
   });
   describe('removeFriend', () => {
