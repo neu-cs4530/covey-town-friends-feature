@@ -8,13 +8,16 @@ import {
   mockTownControllerConnection,
   ReceivedEventParameter,
 } from '../TestUtils';
+import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
   Player as PlayerModel,
   PlayerLocation,
+  PlayerToPlayerUpdate,
   ServerToClientEvents,
+  TeleportAction,
   TownJoinResponse,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
@@ -46,6 +49,8 @@ describe('TownController', () => {
     process.env.REACT_APP_TOWNS_SERVICE_URL = 'test';
   });
   let testController: TownController;
+  let playerTestData: MockedPlayer;
+  let playerTestData2: MockedPlayer;
 
   /**
    * Testing harness that mocks the arrival of an event from the CoveyTownSocket and expects that
@@ -85,6 +90,8 @@ describe('TownController', () => {
     userName = nanoid();
     townID = nanoid();
     testController = new TownController({ userName, townID, loginController: mockLoginController });
+    playerTestData = mockPlayer(townID);
+    playerTestData2 = mockPlayer(townID);
   });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {
@@ -181,6 +188,37 @@ describe('TownController', () => {
       } else {
         fail('Did not find an existing, empty conversation area in the town join response');
       }
+    });
+    it('Emits acceptFriendRequest when clickedAcceptFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedAcceptFriendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('acceptFriendRequest', testRequest);
+    });
+    it('Emits a playerMovement when clickedTeleportToFriend is called', () => {
+      const testPlayerLocation: PlayerLocation = {
+        moving: false,
+        rotation: 'back',
+        x: 0,
+        y: 1,
+        interactableID: nanoid(),
+      };
+      const testTeleportAction: TeleportAction = {
+        actor: playerTestData.player,
+        playerDestinationLocation: testPlayerLocation,
+      };
+      testController.clickedTeleportToFriend(testTeleportAction);
+      expect(mockSocket.emit).toBeCalledWith('playerMovement', testPlayerLocation);
+    });
+    it('Emits removeFriend when clickedRemoveFriend is called', () => {
+      const testRemoveFriend: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedRemoveFriend(testRemoveFriend);
+      expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {

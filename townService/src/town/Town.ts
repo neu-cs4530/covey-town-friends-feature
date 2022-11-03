@@ -16,6 +16,7 @@ import {
   ViewingArea as ViewingAreaModel,
   ConversationAreaInvite,
   TeleportInviteSingular,
+  PlayerToPlayerUpdate,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
@@ -158,6 +159,44 @@ export default class Town {
         }
       }
     });
+
+    // Set up a listener to process accepted friend requests.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('acceptFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      this.acceptFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('declineFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      this.declineFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('sendFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      // emits a friend request event which IS sending the friendrequest
+      this.inviteFriend(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process declined friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('cancelFriendRequest', (friendRequest: PlayerToPlayerUpdate) => {
+      // emits a friend request event which will remove the request
+      this.cancelFriendRequest(friendRequest.actor, friendRequest.affected);
+    });
+
+    // Set up a listener to process the remove friend request.
+    // Makes the necessary backend changes & then emits an event to let the TownController
+    // know the changes have been made.
+    socket.on('removeFriend', (removeFriend: PlayerToPlayerUpdate) => {
+      this.removeFriend(removeFriend.actor, removeFriend.affected);
+    });
+
     return newPlayer;
   }
 
@@ -181,8 +220,19 @@ export default class Town {
    * @param recipient Player who is the intended recipient of the friend request.
    */
   public inviteFriend(sender: Player, recipient: Player): void {
-    // TODO this should be caught by TownController
+    // this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
+  }
+
+  /**
+   * Emit a canceledFriendRequest event with the given sender and recipient.
+   *
+   * @param sender Player who is canceling a request that THEY sent to another player.
+   * @param recipient Player who is the intended recipient of the original friend request that is being canceled.
+   */
+  public cancelFriendRequest(sender: Player, recipient: Player): void {
+    // this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestCanceled', { actor: sender, affected: recipient });
   }
 
   /**
@@ -200,18 +250,6 @@ export default class Town {
   }
 
   /**
-   * Emit a friendRequestDeclined event with the given decliner and declined. Does not
-   * add each player to other player's friends list.
-   *
-   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
-   * @param declined the sender of the initial friend request.
-   */
-  public declineFriendRequest(decliner: Player, declined: Player): void {
-    // TODO this should be caught by TownController
-    this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
-  }
-
-  /**
    * Emit a friendRemoved event with the given remover and removed.
    * Removes each player from each other's friends list.
    *
@@ -223,6 +261,18 @@ export default class Town {
     affected.removeFriend(instigator);
     // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRemoved', { actor: instigator, affected });
+  }
+
+  /**
+   * Emit a friendRequestDeclined event with the given decliner and declined. Does not
+   * add each player to other player's friends list.
+   *
+   * @param decliner the recipient of the initial friend request. Is DECLINING the received friend request.
+   * @param declined the sender of the initial friend request.
+   */
+  public declineFriendRequest(decliner: Player, declined: Player): void {
+    // this should be caught by TownController
+    this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
   }
 
   /**
