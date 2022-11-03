@@ -220,7 +220,7 @@ export default class Town {
    * @param recipient Player who is the intended recipient of the friend request.
    */
   public inviteFriend(sender: Player, recipient: Player): void {
-    // TODO this should be caught by TownController
+    // this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
   }
 
@@ -231,9 +231,7 @@ export default class Town {
    * @param recipient Player who is the intended recipient of the original friend request that is being canceled.
    */
   public cancelFriendRequest(sender: Player, recipient: Player): void {
-    // TODO this should be caught by TownController
-    // TODO: chloe: emit special event
-    // TODO: dylan: possibly remove altogether
+    // this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestCanceled', { actor: sender, affected: recipient });
   }
 
@@ -273,7 +271,7 @@ export default class Town {
    * @param declined the sender of the initial friend request.
    */
   public declineFriendRequest(decliner: Player, declined: Player): void {
-    // TODO this should be caught by TownController
+    // this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
   }
 
