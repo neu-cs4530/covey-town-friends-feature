@@ -357,10 +357,6 @@ describe('Town', () => {
   let playerTestData3: MockedPlayer;
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
-  let player3Location: PlayerLocation;
-  let playerFriends: Player[];
-  let player2Friends: Player[];
-  let player3Friends: Player[];
   let teleportRequest: TeleportInviteSingular;
   let conversationRequest: ConversationAreaInvite;
 
@@ -391,8 +387,6 @@ describe('Town', () => {
     };
     playerLocation = player.location;
     player2Location = player2.location;
-    playerFriends = player.friends;
-    player2Friends = player2.friends;
     mockReset(townEmitter);
   });
 

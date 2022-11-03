@@ -680,7 +680,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
-    this._socket.emit('sentFriendRequest', sentRequest);
+    this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
@@ -690,7 +690,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
-    this._socket.emit('canceledFriendRequest', canceledRequest);
+    this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
