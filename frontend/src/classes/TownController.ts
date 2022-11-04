@@ -373,9 +373,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._conversationAreaInvitesInternal;
   }
 
-  private set _conversationAreaInvites(newConversationAreaRequests: TeleportInviteSingular[]) {
-    this._conversationAreaInvitesInternal = newConversationAreaRequests;
-    this.emit('conversationAreaInvitesChanged', newConversationAreaRequests);
+  private set _conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
+    // Only update the list if the new list is not the same as the current one
+    if (
+      !(
+        this._conversationAreaInvitesInternal.length === newConversationAreaInvites.length &&
+        this._conversationAreaInvitesInternal.every(
+          (val, index) => val === newConversationAreaInvites[index],
+        )
+      )
+    ) {
+      this._conversationAreaInvitesInternal = newConversationAreaInvites;
+      this.emit('conversationAreaInvitesChanged', newConversationAreaInvites);
+    }
   }
 
   public get playerFriendRequests() {
@@ -383,8 +393,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   public set _playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
-    this._playerFriendRequestsInternal = newPlayerFriendRequests;
-    this.emit('playerFriendRequestsChanged', newPlayerFriendRequests);
+    // Only update the list if the new list is not the same as the current one
+    if (
+      !(
+        this._playerFriendRequestsInternal.length === newPlayerFriendRequests.length &&
+        this._playerFriendRequestsInternal.every(
+          (val, index) => val === newPlayerFriendRequests[index],
+        )
+      )
+    ) {
+      this._playerFriendRequestsInternal = newPlayerFriendRequests;
+      this.emit('playerFriendRequestsChanged', newPlayerFriendRequests);
+    }
   }
 
   public get interactableEmitter() {
@@ -859,7 +879,8 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
  *
  * This hook relies on the TownControllerContext.
  *
- * @returns the list of conversation area requests that are currently un-answered
+ * @returns the list of conversation area requests that are currently un-answered (i.e.,
+ * TownController.ourPlayer hasn't accepted or declined them yet)
  */
 export function usePendingConversationAreaInvites(): TeleportInviteSingular[] {
   const townController = useTownController();
@@ -868,14 +889,14 @@ export function usePendingConversationAreaInvites(): TeleportInviteSingular[] {
   );
 
   useEffect(() => {
-    const updater = (currentConvAreaInvites: TeleportInviteSingular[]) => {
+    const updateInvites = (currentConvAreaInvites: TeleportInviteSingular[]) => {
       setConversationAreaInvites(currentConvAreaInvites);
     };
-    townController.addListener('conversationAreaInvitesChanged', updater);
+    townController.addListener('conversationAreaInvitesChanged', updateInvites);
     return () => {
-      townController.removeListener('conversationAreaInvitesChanged', updater);
+      townController.removeListener('conversationAreaInvitesChanged', updateInvites);
     };
-  }, [townController, setConversationAreaInvites]);
+  }, [townController]);
   return conversationAreaInvites;
 }
 
@@ -895,14 +916,14 @@ export function useCurrentPlayerFriendRequests(): PlayerToPlayerUpdate[] {
   );
 
   useEffect(() => {
-    const updater = (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => {
+    const updateFriendRequests = (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => {
       setPlayerFriendRequests(currentPlayerFriendRequests);
     };
-    townController.addListener('playerFriendRequestsChanged', updater);
+    townController.addListener('playerFriendRequestsChanged', updateFriendRequests);
     return () => {
-      townController.removeListener('playerFriendRequestsChanged', updater);
+      townController.removeListener('playerFriendRequestsChanged', updateFriendRequests);
     };
-  }, [townController, setPlayerFriendRequests]);
+  }, [townController]);
   return playerFriendRequests;
 }
 

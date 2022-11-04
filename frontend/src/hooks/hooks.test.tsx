@@ -30,7 +30,15 @@ import * as useTownController from './useTownController';
 describe('[T3] TownController-Dependent Hooks', () => {
   let useTownControllerSpy: jest.SpyInstance<TownController, []>;
   let townController: MockProxy<TownController>;
+
+  // Data to test some of our Final Project hooks:
   let players: PlayerController[];
+  let player1: Player;
+  let player2: Player;
+  let player3: Player;
+  let playerTestData1: MockedPlayer;
+  let playerTestData2: MockedPlayer;
+  let playerTestData3: MockedPlayer;
 
   beforeAll(() => {
     useTownControllerSpy = jest.spyOn(useTownController, 'default');
@@ -234,12 +242,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
     let hookReturnValue: TeleportInviteSingular[] = [];
     let renderData: RenderResult;
 
-    let player1: Player;
-    let player2: Player;
-    let player3: Player;
-    let playerTestData1: MockedPlayer;
-    let playerTestData2: MockedPlayer;
-    let playerTestData3: MockedPlayer;
     let player1Location: PlayerLocation;
     let player2Location: PlayerLocation;
     let player3Location: PlayerLocation;
@@ -365,12 +367,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
     let hookReturnValue: PlayerToPlayerUpdate[] = [];
     let renderData: RenderResult;
 
-    let player1: Player;
-    let player2: Player;
-    let player3: Player;
-    let playerTestData1: MockedPlayer;
-    let playerTestData2: MockedPlayer;
-    let playerTestData3: MockedPlayer;
     let request1: PlayerToPlayerUpdate;
     let request2: PlayerToPlayerUpdate;
 
