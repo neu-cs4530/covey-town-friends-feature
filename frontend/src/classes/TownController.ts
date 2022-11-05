@@ -378,8 +378,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (
       !(
         this._conversationAreaInvitesInternal.length === newConversationAreaInvites.length &&
-        this._conversationAreaInvitesInternal.every(
-          (val, index) => val === newConversationAreaInvites[index],
+        this._conversationAreaInvitesInternal.every(item =>
+          newConversationAreaInvites.includes(item),
+        ) &&
+        newConversationAreaInvites.every(item =>
+          this._conversationAreaInvitesInternal.includes(item),
         )
       )
     ) {
@@ -397,9 +400,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (
       !(
         this._playerFriendRequestsInternal.length === newPlayerFriendRequests.length &&
-        this._playerFriendRequestsInternal.every(
-          (val, index) => val === newPlayerFriendRequests[index],
-        )
+        this._playerFriendRequestsInternal.every(item => newPlayerFriendRequests.includes(item)) &&
+        newPlayerFriendRequests.every(item => this._playerFriendRequestsInternal.includes(item))
       )
     ) {
       this._playerFriendRequestsInternal = newPlayerFriendRequests;
