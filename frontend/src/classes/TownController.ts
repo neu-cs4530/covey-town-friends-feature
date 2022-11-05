@@ -373,7 +373,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._conversationAreaInvitesInternal;
   }
 
-  private set _conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
+  public set _conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
     // Only update the list if the new list is not the same as the current one
     if (
       !(

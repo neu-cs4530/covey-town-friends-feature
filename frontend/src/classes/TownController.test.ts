@@ -13,17 +13,20 @@ import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
+  Player,
   Player as PlayerModel,
   PlayerLocation,
   PlayerToPlayerUpdate,
   ServerToClientEvents,
   TeleportAction,
+  TeleportInviteSingular,
   TownJoinResponse,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
 import TownController, { TownEvents } from './TownController';
 import ViewingAreaController from './ViewingAreaController';
+import TextMessage from '../components/VideoCall/VideoFrontend/components/ChatWindow/MessageList/TextMessage/TextMessage';
 
 /**
  * Mocks the socket-io client constructor such that it will always return the same
@@ -49,8 +52,13 @@ describe('TownController', () => {
     process.env.REACT_APP_TOWNS_SERVICE_URL = 'test';
   });
   let testController: TownController;
+  let player1: Player;
+  let player2: Player;
+  let player3: Player;
   let playerTestData: MockedPlayer;
   let playerTestData2: MockedPlayer;
+  let playerTestData3: MockedPlayer;
+  const mockListeners = mock<TownEvents>();
 
   /**
    * Testing harness that mocks the arrival of an event from the CoveyTownSocket and expects that
@@ -92,6 +100,86 @@ describe('TownController', () => {
     testController = new TownController({ userName, townID, loginController: mockLoginController });
     playerTestData = mockPlayer(townID);
     playerTestData2 = mockPlayer(townID);
+    playerTestData3 = mockPlayer(townID);
+    player1 = playerTestData.player as Player;
+    player2 = playerTestData2.player as Player;
+    player3 = playerTestData3.player as Player;
+  });
+  describe('Setting the conversation area invites property', () => {
+    let player1Location: PlayerLocation;
+    let player2Location: PlayerLocation;
+    let teleportInvite1: TeleportInviteSingular;
+    let teleportInvite2: TeleportInviteSingular;
+    let newInvites: TeleportInviteSingular[];
+    beforeEach(() => {
+      player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
+      player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
+      teleportInvite1 = {
+        requester: player1,
+        requested: player3,
+        requesterLocation: player1Location,
+      };
+      teleportInvite2 = {
+        requester: player2,
+        requested: player3,
+        requesterLocation: player2Location,
+      };
+      newInvites = [teleportInvite1, teleportInvite2];
+      mockClear(mockListeners.conversationAreaInvitesChanged);
+      testController.addListener(
+        'conversationAreaInvitesChanged',
+        mockListeners.conversationAreaInvitesChanged,
+      );
+    });
+    it('does not update if the new conv area invites are the same as the old', () => {
+      expect(testController.conversationAreaInvites).toEqual([]);
+      testController._conversationAreaInvites = newInvites;
+      expect(testController.conversationAreaInvites).toEqual(newInvites);
+      testController._conversationAreaInvites = [teleportInvite2, teleportInvite1];
+      expect(mockListeners.conversationAreaInvitesChanged).toBeCalledTimes(1);
+    });
+    it('emits the conversationAreaInvitesChanged event when setting and updates the param', () => {
+      expect(testController.conversationAreaInvites).toEqual([]);
+      testController._conversationAreaInvites = newInvites;
+      expect(testController.conversationAreaInvites).toEqual(newInvites);
+      expect(mockListeners.conversationAreaInvitesChanged).toBeCalledTimes(1);
+      expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith(newInvites);
+    });
+  });
+  describe('Setting the friend requests property', () => {
+    let request1: PlayerToPlayerUpdate;
+    let request2: PlayerToPlayerUpdate;
+    let newFriendRequests: PlayerToPlayerUpdate[];
+    beforeEach(() => {
+      request1 = {
+        actor: player1,
+        affected: player3,
+      };
+      request2 = {
+        actor: player3,
+        affected: player2,
+      };
+      newFriendRequests = [request1, request2];
+      mockClear(mockListeners.playerFriendRequestsChanged);
+      testController.addListener(
+        'playerFriendRequestsChanged',
+        mockListeners.playerFriendRequestsChanged,
+      );
+    });
+    it('does not update if the new friend requests param is the same as the old', () => {
+      expect(testController.playerFriendRequests).toEqual([]);
+      testController._playerFriendRequests = newFriendRequests;
+      expect(testController.playerFriendRequests).toEqual(newFriendRequests);
+      testController._playerFriendRequests = [request2, request1];
+      expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(1);
+    });
+    it('emits the playerFriendRequestsChanged event when setting and updates the param', () => {
+      expect(testController.playerFriendRequests).toEqual([]);
+      testController._playerFriendRequests = newFriendRequests;
+      expect(testController.playerFriendRequests).toEqual(newFriendRequests);
+      expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(1);
+      expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith(newFriendRequests);
+    });
   });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {
