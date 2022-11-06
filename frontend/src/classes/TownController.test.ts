@@ -13,7 +13,6 @@ import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
-  Player,
   Player as PlayerModel,
   PlayerLocation,
   PlayerToPlayerUpdate,
