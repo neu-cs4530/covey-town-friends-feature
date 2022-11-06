@@ -709,6 +709,7 @@ describe('Town', () => {
       });
       it('Should teleport the requested Player to the requesterLocation', () => {
         expect(townEmitter.emit).toBeCalledWith('playerMoved', player2.toPlayerModel());
+        expect(player2.location).toBe(playerLocation);
       });
       it('TownService should emit a conversationAreaRequestAccepted event', () => {
         expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestAccepted', {
