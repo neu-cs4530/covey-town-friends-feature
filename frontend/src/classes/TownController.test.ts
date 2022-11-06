@@ -51,9 +51,6 @@ describe('TownController', () => {
     process.env.REACT_APP_TOWNS_SERVICE_URL = 'test';
   });
   let testController: TownController;
-  let player1: Player;
-  let player2: Player;
-  let player3: Player;
   let playerTestData: MockedPlayer;
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
