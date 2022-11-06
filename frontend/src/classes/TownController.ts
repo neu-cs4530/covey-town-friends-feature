@@ -764,7 +764,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * friend request was declined
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
@@ -782,7 +781,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * who is being requested
    */
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('sendFriendRequest', sentRequest);
   }
 
@@ -792,7 +790,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * who is being requested
    */
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
