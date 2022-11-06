@@ -357,10 +357,8 @@ describe('Town', () => {
   let playerTestData3: MockedPlayer;
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
-  let player3Location: PlayerLocation;
   let playerFriends: Player[];
   let player2Friends: Player[];
-  let player3Friends: Player[];
   let teleportRequest: TeleportInviteSingular;
   let conversationRequest: ConversationAreaInvite;
 
