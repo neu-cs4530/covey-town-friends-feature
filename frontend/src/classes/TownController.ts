@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
-import Player from '../../../townService/src/lib/Player';
 import Interactable from '../components/Town/Interactable';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';

@@ -93,6 +93,7 @@ type MockedTownControllerProperties = {
   viewingAreas?: ViewingAreaController[];
   conversationAreaInvites?: TeleportInviteSingular[];
   playerFriendRequests?: PlayerToPlayerUpdate[];
+  playerFriends?: PlayerController[];
 };
 export function mockTownController({
   friendlyName,
@@ -105,6 +106,7 @@ export function mockTownController({
   viewingAreas,
   conversationAreaInvites,
   playerFriendRequests,
+  playerFriends,
 }: MockedTownControllerProperties) {
   const mockedController = mock<TownController>();
   if (friendlyName) {
@@ -141,6 +143,11 @@ export function mockTownController({
   if (playerFriendRequests) {
     Object.defineProperty(mockedController, 'playerFriendRequests', {
       value: playerFriendRequests,
+    });
+  }
+  if (playerFriends) {
+    Object.defineProperty(mockedController, 'playerFriends', {
+      value: playerFriends,
     });
   }
   return mockedController;

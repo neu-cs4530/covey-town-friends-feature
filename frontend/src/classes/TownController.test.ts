@@ -176,6 +176,52 @@ describe('TownController', () => {
       expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith(newFriendRequests);
     });
   });
+  describe('Setting the player friends property', () => {
+    let testPlayer: PlayerModel;
+    let testPlayer2: PlayerModel;
+    beforeEach(() => {
+      testPlayer = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      testPlayer2 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      mockClear(mockListeners.playerFriendsChanged);
+      testController.addListener('playerFriendsChanged', mockListeners.playerFriendsChanged);
+    });
+    it('does not update if the new friends param is the same as the old and empty', () => {
+      expect(testController.playerFriends).toEqual([]);
+      testController._playerFriends = [];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(0);
+    });
+    it('does not update if the new friends param is the same as the old and non-empty', () => {
+      expect(testController.playerFriends).toEqual([]);
+      const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
+      const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
+      testController._playerFriends = [testSamePlayer];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController._playerFriends = [testSamePlayer];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController._playerFriends = [testSamePlayer, testSamePlayer2];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+      testController._playerFriends = [testSamePlayer, testSamePlayer2];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+    });
+    it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
+      expect(testController.playerFriends).toEqual([]);
+      testController._playerFriends = [
+        PlayerController.fromPlayerModel(testPlayer),
+        PlayerController.fromPlayerModel(testPlayer2),
+      ];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController._playerFriends = [PlayerController.fromPlayerModel(testPlayer)];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+    });
+  });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {
       mockSocket.on.mockImplementation((eventName, eventListener) => {
