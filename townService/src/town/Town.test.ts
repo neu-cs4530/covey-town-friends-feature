@@ -421,7 +421,11 @@ describe('Town', () => {
         'interactableUpdate',
         'acceptFriendRequest',
         'declineFriendRequest',
+        'cancelFriendRequest',
+        'sendFriendRequest',
         'removeFriend',
+        'acceptConvAreaInvite',
+        'declineConvAreaInvite',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -689,6 +693,51 @@ describe('Town', () => {
         expect(townEmitter.emit).toHaveBeenCalledWith('friendRemoved', {
           actor: player,
           affected: player3,
+        });
+      });
+    });
+    describe('acceptConvAreaInvite (listener)', () => {
+      beforeEach(() => {
+        playerTestData.acceptedConvAreaInvite(player, player2, playerLocation);
+      });
+      it('Should remove the invite from the requested Player list of conv area invites', () => {
+        expect(
+          player2.conversationAreaInvites.includes({
+            requester: player,
+            requested: player2,
+            requesterLocation: playerLocation,
+          }),
+        ).toBeFalsy();
+      });
+      it('Should teleport the requested Player to the requesterLocation', () => {
+        expect(townEmitter.emit).toBeCalledWith('playerMoved', player2.toPlayerModel());
+      });
+      it('TownService should emit a conversationAreaRequestAccepted event', () => {
+        expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestAccepted', {
+          requester: player,
+          requested: player2,
+          requesterLocation: playerLocation,
+        });
+      });
+    });
+    describe('declineConvAreaInvite (listener)', () => {
+      beforeEach(() => {
+        playerTestData.declinedConvAreaInvite(player, player2, playerLocation);
+      });
+      it('Should remove the invite from the requested Player list of conv area invites', () => {
+        expect(
+          player2.conversationAreaInvites.includes({
+            requester: player,
+            requested: player2,
+            requesterLocation: playerLocation,
+          }),
+        ).toBeFalsy();
+      });
+      it('TownService should emit a conversationAreaRequestDeclined event', () => {
+        expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestDeclined', {
+          requester: player,
+          requested: player2,
+          requesterLocation: playerLocation,
         });
       });
     });

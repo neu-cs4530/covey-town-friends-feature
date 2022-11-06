@@ -359,12 +359,6 @@ export default class Town {
    */
   public declineConversationAreaInvite(teleportInvite: TeleportInviteSingular): void {
     const { requested } = teleportInvite;
-    // const instigatorLocation: PlayerLocation = instigator.location;
-    // const declinedInvite: TeleportInviteSingular = {
-    //   requester: instigator,
-    //   requested: decliner,
-    //   requesterLocation: instigatorLocation,
-    // };
     requested.removeConversationAreaInvite(teleportInvite);
     this._broadcastEmitter.emit('conversationAreaRequestDeclined', teleportInvite);
   }
