@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
+import Player from '../../../townService/src/lib/Player';
 import Interactable from '../components/Town/Interactable';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
@@ -78,6 +79,13 @@ export type TownEvents = {
    * after updating the town controller's record of conversation areas.
    */
   conversationAreasChanged: (currentConversationAreas: ConversationAreaController[]) => void;
+  /**
+   * An event that indicated that the set of this player's friends have changed. This event is
+   * dispatched when a player accepts a friend request that has been sent to them, a player has accepted
+   * one of this players requests, or if this player choses to remove a friend from their friends list.
+   * This event is dispatced after updating the town controller's record of this player's friends.
+   */
+  playerFriendsChanged: (currentPlayerFriends: PlayerController[]) => void;
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
    * the town controller's record of viewing areas.
@@ -198,6 +206,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * replace the array with a new one; clients should take note not to retain stale references.
    */
   private _conversationAreaInvitesInternal: TeleportInviteSingular[] = [];
+
+  /**
+   * The current list of this players friends in this town. Adding or removing friends might
+   * replace the array with a new one. clients should take note not to retain stale references.
+   */
+  private _playerFriendsInternal: PlayerController[] = [];
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -406,6 +420,23 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     ) {
       this._playerFriendRequestsInternal = newPlayerFriendRequests;
       this.emit('playerFriendRequestsChanged', newPlayerFriendRequests);
+    }
+  }
+
+  public get playerFriends() {
+    return this._playerFriendsInternal;
+  }
+
+  public set _playerFriends(newPlayerFriends: PlayerController[]) {
+    if (
+      !(
+        this._playerFriendsInternal.length === newPlayerFriends.length &&
+        this._playerFriendsInternal.every(friend => newPlayerFriends.includes(friend)) &&
+        newPlayerFriends.every(friend => this._playerFriendsInternal.includes(friend))
+      )
+    ) {
+      this._playerFriendsInternal = newPlayerFriends;
+      this.emit('playerFriendsChanged', newPlayerFriends);
     }
   }
 
@@ -655,6 +686,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._viewingAreas = [];
         this._conversationAreaInvites = [];
         this._playerFriendRequests = [];
+        this._playerFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -924,6 +956,33 @@ export function useCurrentPlayerFriendRequests(): PlayerToPlayerUpdate[] {
     };
   }, [townController]);
   return playerFriendRequests;
+}
+
+/**
+ * A react hook to retrieve the current friends for this town controller's player.
+ * This hook will re-render any components that use it when the set of friends
+ * changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of player friend requests that have been sent/received (but not answered).
+ */
+export function useCurrentPlayerFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [playerFriends, setPlayerFriends] = useState<PlayerController[]>(
+    townController.playerFriends,
+  );
+
+  useEffect(() => {
+    const updateFriends = (currentPlayerFriends: PlayerController[]) => {
+      setPlayerFriends(currentPlayerFriends);
+    };
+    townController.addListener('playerFriendsChanged', updateFriends);
+    return () => {
+      townController.removeListener('playerFriendsChanged', updateFriends);
+    };
+  }, [townController]);
+  return playerFriends;
 }
 
 /**
