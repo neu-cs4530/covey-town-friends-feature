@@ -1054,25 +1054,25 @@ describe('Town', () => {
   describe('declineConversationAreaInvite', () => {
     it('Emits a conversationAreaRequestDeclined when called.', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
-      town.declineConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.declineConversationAreaInvite(teleportRequest);
       expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestDeclined', teleportRequest);
     });
     it('Does not transport the requested player to the requesters location', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player2.location).toEqual(player2Location);
-      town.declineConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.declineConversationAreaInvite(teleportRequest);
       expect(player2.location).toEqual(player2Location);
     });
     it('Does not move the requester', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player.location).toEqual(playerLocation);
-      town.declineConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.declineConversationAreaInvite(teleportRequest);
       expect(player.location).toEqual(playerLocation);
     });
     it('Removes the request from the requested players conversation area requests list.', () => {
       town.inviteToConversationArea(conversationRequest.requester, conversationRequest.requested);
       expect(player2.conversationAreaInvites.length).toEqual(1);
-      town.declineConversationAreaInvite(teleportRequest.requester, teleportRequest.requested);
+      town.declineConversationAreaInvite(teleportRequest);
       expect(player2.conversationAreaInvites.length).toEqual(0);
     });
   });

@@ -280,6 +280,30 @@ describe('TownController', () => {
       testController.clickedAcceptFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('acceptFriendRequest', testRequest);
     });
+    it('Emits declineFriendRequest when clickedDeclineFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedDeclineFriendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
+    });
+    it('Emits sendFriendRequest event when clickedSendFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedSendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('sendFriendRequest', testRequest);
+    });
+    it('Emits cancelFriendRequest event when clickedCancelFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedCancelRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('cancelFriendRequest', testRequest);
+    });
     it('Emits a playerMovement when clickedTeleportToFriend is called', () => {
       const testPlayerLocation: PlayerLocation = {
         moving: false,

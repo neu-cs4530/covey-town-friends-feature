@@ -197,6 +197,20 @@ export default class Town {
       this.removeFriend(removeFriend.actor, removeFriend.affected);
     });
 
+    // Set up a listener to process accepted conv area invites.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('acceptConvAreaInvite', (convAreaInvite: TeleportInviteSingular) => {
+      this.acceptConversationAreaInvite(convAreaInvite);
+    });
+
+    // Set up a listener to process declined conv area invites.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('declineConvAreaInvite', (convAreaInvite: TeleportInviteSingular) => {
+      this.declineConversationAreaInvite(convAreaInvite);
+    });
+
     return newPlayer;
   }
 
@@ -220,7 +234,7 @@ export default class Town {
    * @param recipient Player who is the intended recipient of the friend request.
    */
   public inviteFriend(sender: Player, recipient: Player): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestSent', { actor: sender, affected: recipient });
   }
 
@@ -231,7 +245,7 @@ export default class Town {
    * @param recipient Player who is the intended recipient of the original friend request that is being canceled.
    */
   public cancelFriendRequest(sender: Player, recipient: Player): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestCanceled', { actor: sender, affected: recipient });
   }
 
@@ -245,7 +259,7 @@ export default class Town {
   public acceptFriendRequest(acceptor: Player, accepted: Player): void {
     acceptor.addFriend(accepted);
     accepted.addFriend(acceptor);
-    // TODO this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestAccepted', { actor: acceptor, affected: accepted });
   }
 
@@ -259,7 +273,7 @@ export default class Town {
   public removeFriend(instigator: Player, affected: Player): void {
     instigator.removeFriend(affected);
     affected.removeFriend(instigator);
-    // TODO this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRemoved', { actor: instigator, affected });
   }
 
@@ -271,7 +285,7 @@ export default class Town {
    * @param declined the sender of the initial friend request.
    */
   public declineFriendRequest(decliner: Player, declined: Player): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestDeclined', { actor: decliner, affected: declined });
   }
 
@@ -341,18 +355,18 @@ export default class Town {
    * Declines the instigator's invite to join a ConversationArea.
    * Removes the invite from the decliner's list of invites.
    *
-   * @param instigator the player that sent out the invite.
-   * @param decliner the player who declined the invite.
+   * @param teleportInvite the teleport invite request that is being declined.
    */
-  public declineConversationAreaInvite(instigator: Player, decliner: Player): void {
-    const instigatorLocation: PlayerLocation = instigator.location;
-    const declinedInvite: TeleportInviteSingular = {
-      requester: instigator,
-      requested: decliner,
-      requesterLocation: instigatorLocation,
-    };
-    decliner.removeConversationAreaInvite(declinedInvite);
-    this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+  public declineConversationAreaInvite(teleportInvite: TeleportInviteSingular): void {
+    const { requested } = teleportInvite;
+    // const instigatorLocation: PlayerLocation = instigator.location;
+    // const declinedInvite: TeleportInviteSingular = {
+    //   requester: instigator,
+    //   requested: decliner,
+    //   requesterLocation: instigatorLocation,
+    // };
+    requested.removeConversationAreaInvite(teleportInvite);
+    this._broadcastEmitter.emit('conversationAreaRequestDeclined', teleportInvite);
   }
 
   /**
