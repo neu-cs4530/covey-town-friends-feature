@@ -100,9 +100,9 @@ describe('TownController', () => {
     playerTestData = mockPlayer(townID);
     playerTestData2 = mockPlayer(townID);
     playerTestData3 = mockPlayer(townID);
-    player1 = playerTestData.player as Player;
-    player2 = playerTestData2.player as Player;
-    player3 = playerTestData3.player as Player;
+    playerTestData.userName = 'player1';
+    playerTestData2.userName = 'player2';
+    playerTestData3.userName = 'player3';
   });
   describe('Setting the conversation area invites property', () => {
     let player1Location: PlayerLocation;
@@ -114,13 +114,13 @@ describe('TownController', () => {
       player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
       player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
       teleportInvite1 = {
-        requester: player1,
-        requested: player3,
+        requester: playerTestData,
+        requested: playerTestData3,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: player2,
-        requested: player3,
+        requester: playerTestData2,
+        requested: playerTestData3,
         requesterLocation: player2Location,
       };
       newInvites = [teleportInvite1, teleportInvite2];
@@ -151,12 +151,12 @@ describe('TownController', () => {
     let newFriendRequests: PlayerToPlayerUpdate[];
     beforeEach(() => {
       request1 = {
-        actor: player1,
-        affected: player3,
+        actor: playerTestData,
+        affected: playerTestData3,
       };
       request2 = {
-        actor: player3,
-        affected: player2,
+        actor: playerTestData3,
+        affected: playerTestData2,
       };
       newFriendRequests = [request1, request2];
       mockClear(mockListeners.playerFriendRequestsChanged);
