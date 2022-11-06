@@ -208,8 +208,13 @@ describe('TownController', () => {
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
       testController._playerFriends = [testSamePlayer, testSamePlayer2];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      testController._playerFriends = [testSamePlayer, testSamePlayer2];
+      testController._playerFriends = [testSamePlayer2, testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
+      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
+        testSamePlayer,
+        testSamePlayer2,
+      ]);
     });
     it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
       expect(testController.playerFriends).toEqual([]);

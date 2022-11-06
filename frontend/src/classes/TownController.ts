@@ -79,10 +79,10 @@ export type TownEvents = {
    */
   conversationAreasChanged: (currentConversationAreas: ConversationAreaController[]) => void;
   /**
-   * An event that indicated that the set of this player's friends have changed. This event is
+   * An event that indicated that the set of TownController.ourPlayer's friends have changed. This event is
    * dispatched when a player accepts a friend request that has been sent to them, a player has accepted
    * one of this players requests, or if this player choses to remove a friend from their friends list.
-   * This event is dispatced after updating the town controller's record of this player's friends.
+   * This event is dispatched after updating the town controller's record of TownController.ourPlayer's friends.
    */
   playerFriendsChanged: (currentPlayerFriends: PlayerController[]) => void;
   /**
@@ -207,8 +207,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _conversationAreaInvitesInternal: TeleportInviteSingular[] = [];
 
   /**
-   * The current list of this players friends in this town. Adding or removing friends might
-   * replace the array with a new one. clients should take note not to retain stale references.
+   * The current list of this TownController.ourPlayer's friends in this town. Adding or removing
+   * friends might replace the array with a new one. clients should take note not to retain stale references.
    */
   private _playerFriendsInternal: PlayerController[] = [];
 
