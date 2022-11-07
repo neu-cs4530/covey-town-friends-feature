@@ -137,4 +137,6 @@ export interface ClientToServerEvents {
   cancelFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is the Player who clicked remove friend
   removeFriend(removeFriend: PlayerToPlayerUpdate);
+  // requester is the Player who clicked to invite selected friends 
+  inviteAllToConvArea(invite: ConversationAreaInvite);
 }

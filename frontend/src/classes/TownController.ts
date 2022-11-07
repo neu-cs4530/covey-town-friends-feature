@@ -18,6 +18,7 @@ import {
   TeleportAction,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  ConversationAreaInvite,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -151,6 +152,14 @@ export type TownEvents = {
    * being un-friended.
    */
   clickedRemoveFriend: (removeFriend: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player has requested the list of players to
+   * join them in a given conversation area. The request contains a requester Player
+   * a list of requested Players, as well as a PlayerLocation that the requested
+   * will be transported to upon accepting the request.
+   */
+  clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
 };
 
 /**
@@ -771,6 +780,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * friend request was accepted.
    */
   public clickedAcceptFriendRequest(acceptedRequest: PlayerToPlayerUpdate): void {
+    this._playerFriendRequestsInternal = this.playerFriendRequests.filter(
+      req => !(req.actor === acceptedRequest.actor && req.affected === acceptedRequest.affected),
+    );
     this._socket.emit('acceptFriendRequest', acceptedRequest);
   }
 
@@ -781,6 +793,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
     // TODO: emit special event
+    this._playerFriendRequestsInternal = this.playerFriendRequests.filter(
+      req => !(req.actor === declinedRequest.actor && req.affected === declinedRequest.affected),
+    );
     this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
@@ -819,6 +834,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedRemoveFriend(removeFriend: PlayerToPlayerUpdate): void {
     this._socket.emit('removeFriend', removeFriend);
+  }
+
+  /**
+   * Emits a inviteAllToConvArea event to the townService
+   * @param invite holds the requester, list of requested, and destination location
+   * of the invite to the conversation area.
+   */
+  public clickedInviteAllToConvArea(invite: ConversationAreaInvite): void {
+    this._socket.emit('inviteAllToConvArea', invite);
   }
 }
 
