@@ -732,6 +732,9 @@ describe('Town', () => {
           }),
         ).toBeFalsy();
       });
+      it('Should not move the invited Player', () => {
+        expect(townEmitter.emit).not.toBeCalledWith('playerMoved', player2.toPlayerModel());
+      });
       it('TownService should emit a conversationAreaRequestDeclined event', () => {
         expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestDeclined', {
           requester: player,
