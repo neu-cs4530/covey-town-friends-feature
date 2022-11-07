@@ -785,7 +785,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a canceleFriendRequest event to the townService
+   * Emits a cancelFriendRequest event to the townService
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
    * who is being requested
    */
