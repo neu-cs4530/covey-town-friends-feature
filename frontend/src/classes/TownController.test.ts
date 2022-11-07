@@ -179,6 +179,8 @@ describe('TownController', () => {
   describe('Setting the player friends property', () => {
     let testPlayer: PlayerModel;
     let testPlayer2: PlayerModel;
+    // Sets up two testPlayers to become friends with each other as well as clearing the mock listeners
+    // that are set up to catch the 'playerFriendsChanged' events.
     beforeEach(() => {
       testPlayer = {
         id: nanoid(),
