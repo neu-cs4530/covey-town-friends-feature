@@ -389,6 +389,7 @@ describe('TownController', () => {
       };
       testController.clickedInviteAllToConvArea(testInvite);
       expect(mockSocket.emit).toBeCalledWith('inviteAllToConvArea', testInvite);
+    });
     it('Emits acceptConvAreaInvite when clickedAcceptConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
         requester: playerTestData.player,

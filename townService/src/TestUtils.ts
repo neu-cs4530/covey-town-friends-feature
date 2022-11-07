@@ -191,7 +191,7 @@ export class MockedPlayer {
     const onInviteAllToConvAreaListener = getEventListener(this.socket, 'inviteAllToConvArea');
     onInviteAllToConvAreaListener(invite);
   }
-  
+
   acceptedConvAreaInvite(
     requester: Player,
     requested: Player,

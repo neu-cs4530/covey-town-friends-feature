@@ -160,6 +160,8 @@ export type TownEvents = {
    * will be transported to upon accepting the request.
    */
   clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
+
+  /**
    * An event that indicates that the player has accepted a conversation area invite.
    * The request object contains the player who originally sent the request (requester), the
    * player who received it and is now accepting it (requested), and the requester's location

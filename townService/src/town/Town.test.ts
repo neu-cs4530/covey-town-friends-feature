@@ -729,6 +729,10 @@ describe('Town', () => {
         expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestSent', {
           requester: player,
           requested: [player2],
+          requesterLocation: playerLocation,
+        });
+      });
+    });
     describe('acceptConvAreaInvite (listener)', () => {
       beforeEach(() => {
         playerTestData.acceptedConvAreaInvite(player, player2, playerLocation);
