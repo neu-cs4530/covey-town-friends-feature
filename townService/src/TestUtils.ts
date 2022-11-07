@@ -185,6 +185,24 @@ export class MockedPlayer {
     const onRemoveFriendListener = getEventListener(this.socket, 'removeFriend');
     onRemoveFriendListener({ actor, affected });
   }
+
+  acceptedConvAreaInvite(
+    requester: Player,
+    requested: Player,
+    requesterLocation: PlayerLocation,
+  ): void {
+    const onAcceptConvAreaInviteListener = getEventListener(this.socket, 'acceptConvAreaInvite');
+    onAcceptConvAreaInviteListener({ requester, requested, requesterLocation });
+  }
+
+  declinedConvAreaInvite(
+    requester: Player,
+    requested: Player,
+    requesterLocation: PlayerLocation,
+  ): void {
+    const onDeclineConcAreaInviteListener = getEventListener(this.socket, 'declineConvAreaInvite');
+    onDeclineConcAreaInviteListener({ requester, requested, requesterLocation });
+  }
 }
 
 /**

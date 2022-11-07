@@ -333,6 +333,30 @@ describe('TownController', () => {
       testController.clickedAcceptFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('acceptFriendRequest', testRequest);
     });
+    it('Emits declineFriendRequest when clickedDeclineFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedDeclineFriendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
+    });
+    it('Emits sendFriendRequest event when clickedSendFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedSendRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('sendFriendRequest', testRequest);
+    });
+    it('Emits cancelFriendRequest event when clickedCancelFriendRequest is called', () => {
+      const testRequest: PlayerToPlayerUpdate = {
+        actor: playerTestData.player,
+        affected: playerTestData2.player,
+      };
+      testController.clickedCancelRequest(testRequest);
+      expect(mockSocket.emit).toBeCalledWith('cancelFriendRequest', testRequest);
+    });
     it('Emits a playerMovement when clickedTeleportToFriend is called', () => {
       const testPlayerLocation: PlayerLocation = {
         moving: false,
@@ -355,6 +379,24 @@ describe('TownController', () => {
       };
       testController.clickedRemoveFriend(testRemoveFriend);
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
+    });
+    it('Emits acceptConvAreaInvite when clickedAcceptConvAreaInvite is called', () => {
+      const testInvite: TeleportInviteSingular = {
+        requester: playerTestData.player,
+        requested: playerTestData2.player,
+        requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
+      };
+      testController.clickedAcceptConvAreaInvite(testInvite);
+      expect(mockSocket.emit).toBeCalledWith('acceptConvAreaInvite', testInvite);
+    });
+    it('Emits declineConvAreaInvite when clickedDeclineConvAreaInvite is called', () => {
+      const testInvite: TeleportInviteSingular = {
+        requester: playerTestData.player,
+        requested: playerTestData2.player,
+        requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
+      };
+      testController.clickedDeclineConvAreaInvite(testInvite);
+      expect(mockSocket.emit).toBeCalledWith('declineConvAreaInvite', testInvite);
     });
     describe('[T2] interactableUpdate events', () => {
       describe('Conversation Area updates', () => {
