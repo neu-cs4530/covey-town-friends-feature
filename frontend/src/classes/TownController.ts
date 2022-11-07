@@ -160,6 +160,19 @@ export type TownEvents = {
    * will be transported to upon accepting the request.
    */
   clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
+   * An event that indicates that the player has accepted a conversation area invite.
+   * The request object contains the player who originally sent the request (requester), the
+   * player who received it and is now accepting it (requested), and the requester's location
+   * (the destination the requested will be teleported to).
+   */
+  clickedAcceptConvAreaInvite: (acceptedInvite: TeleportInviteSingular) => void;
+
+  /**
+   * An event that indicates that the player has declined a conversation area invite.
+   * The request object contains the player who originally sent the request (requester), the
+   * player who received it and is now declining it (requested), and the requester's location.
+   */
+  clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
 };
 
 /**
@@ -775,7 +788,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a friend accepted event to the townService
+   * Emits a acceptFriendRequest event to the townService
    * @param acceptedRequest the friend request - holds the current player and the player whose
    * friend request was accepted.
    */
@@ -787,7 +800,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a friend declined event to the townService
+   * Emits a declineFriendRequest event to the townService
    * @param declinedRequest the friend reqeust - holds the current player and the player whose
    * friend request was declined
    */
@@ -800,7 +813,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a teleport event to the TownService
+   * Emits a playerMovement event to the TownService
    * @param teleportAction the teleport action to complete - whom to teleport and to where
    */
   public clickedTeleportToFriend(teleportAction: TeleportAction): void {
@@ -808,32 +821,48 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a sent friend request event to the townService
+   * Emits a sendFriendRequest event to the townService
    * @param sentRequest the friend request - holds the current player and the player whose
    * who is being requested
    */
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
-   * Emits a canceled friend request event to the townService
+   * Emits a cancelFriendRequest event to the townService
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
    * who is being requested
    */
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
-   * Emits a friend removed event to the townService
-   * @param removeFriend holds the current player and the player who
+   * Emits a removeFriend event to the townService
+   * @param removedFriend holds the current player and the player who
    * is being unfriended.
    */
-  public clickedRemoveFriend(removeFriend: PlayerToPlayerUpdate): void {
-    this._socket.emit('removeFriend', removeFriend);
+  public clickedRemoveFriend(removedFriend: PlayerToPlayerUpdate): void {
+    this._socket.emit('removeFriend', removedFriend);
+  }
+
+  /**
+   * Emits a acceptConvAreaInvite event to the townService
+   * @param acceptedInvite the conv area invite - holds the player who accepted, the player whose
+   * conv area invite was accepted, and the teleport destination.
+   */
+  public clickedAcceptConvAreaInvite(acceptedInvite: TeleportInviteSingular): void {
+    this._socket.emit('acceptConvAreaInvite', acceptedInvite);
+  }
+
+  /**
+   * Emits a declineConvAreaInvite event to the townService
+   * @param declinedInvite the friend reqeust - holds the player who declined, the player whose
+   * conv area invite was declined, and what would have been the teleport destination.
+   */
+  public clickedDeclineConvAreaInvite(declinedInvite: TeleportInviteSingular): void {
+    this._socket.emit('declineConvAreaInvite', declinedInvite);
   }
 
   /**

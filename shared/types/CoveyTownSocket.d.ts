@@ -139,4 +139,8 @@ export interface ClientToServerEvents {
   removeFriend(removeFriend: PlayerToPlayerUpdate);
   // requester is the Player who clicked to invite selected friends 
   inviteAllToConvArea(invite: ConversationAreaInvite);
+  // requester is the Player who originally sent the invite
+  acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
+  // requester is the Player who originally sent the invite 
+  declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
 }

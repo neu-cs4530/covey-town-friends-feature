@@ -204,6 +204,20 @@ export default class Town {
       this.inviteToConversationArea(invite);
     });
 
+    // Set up a listener to process accepted conv area invites.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('acceptConvAreaInvite', (convAreaInvite: TeleportInviteSingular) => {
+      this.acceptConversationAreaInvite(convAreaInvite);
+    });
+
+    // Set up a listener to process declined conv area invites.
+    // Makes the necessary backend changes & then emits an event to let the TownController know
+    // the changes have been made.
+    socket.on('declineConvAreaInvite', (convAreaInvite: TeleportInviteSingular) => {
+      this.declineConversationAreaInvite(convAreaInvite);
+    });
+
     return newPlayer;
   }
 
@@ -344,8 +358,7 @@ export default class Town {
    * Declines the instigator's invite to join a ConversationArea.
    * Removes the invite from the decliner's list of invites.
    *
-   * @param instigator the player that sent out the invite.
-   * @param decliner the player who declined the invite.
+   * @param teleportInvite the teleport invite request that is being declined.
    */
   public declineConversationAreaInvite(declinedInvite: TeleportInviteSingular): void {
     declinedInvite.requested.removeConversationAreaInvite(declinedInvite);
