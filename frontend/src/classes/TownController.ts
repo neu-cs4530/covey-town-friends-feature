@@ -795,11 +795,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   /**
    * Emits a removeFriend event to the townService
-   * @param removeFriend holds the current player and the player who
+   * @param removedFriend holds the current player and the player who
    * is being unfriended.
    */
-  public clickedRemoveFriend(removeFriend: PlayerToPlayerUpdate): void {
-    this._socket.emit('removeFriend', removeFriend);
+  public clickedRemoveFriend(removedFriend: PlayerToPlayerUpdate): void {
+    this._socket.emit('removeFriend', removedFriend);
   }
 
   /**
