@@ -612,25 +612,45 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     /**
      * When a conversation area invidiual invite is accepted, check to see if our player was the
-     * person who accepted it. If so, remove this invite from the exisitng list of invites,
+     * person who accepted it. If so, remove this invite from the current list of invites,
      * if it exisits in the list.
      *
      * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
     this._socket.on('conversationAreaRequestAccepted', conversationAreaInviteRequest => {
-      const requested = conversationAreaInviteRequest.requested;
-      if (requested === this.ourPlayer) {
-        const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
-          invite =>
-            !(
-              invite.requesterLocation.x === conversationAreaInviteRequest.requesterLocation.x &&
-              invite.requesterLocation.y === conversationAreaInviteRequest.requesterLocation.y &&
-              invite.requester.id === conversationAreaInviteRequest.requester.id
-            ),
-        );
-        this._conversationAreaInvites = newInvitesFiltered;
-      }
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
     });
+
+    /**
+     * When a conversation area invidiual invite is declined, check to see if our player was the
+     * person who declined it. If so, remove this invite from the current list of invites,
+     * if it exisits in the list.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestDeclined', conversationAreaInviteRequest => {
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
+    });
+  }
+
+  /**
+   * Filters the current list of conversation area invites based on the given invidiual invite,
+   * if our player is the requested person in the invite.
+   *
+   * @param teleportInviteToRemove the teleport invite to remove, if found
+   */
+  private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
+    if (teleportInviteToRemove.requested === this.ourPlayer) {
+      const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
+        invite =>
+          !(
+            invite.requesterLocation.x === teleportInviteToRemove.requesterLocation.x &&
+            invite.requesterLocation.y === teleportInviteToRemove.requesterLocation.y &&
+            invite.requester.id === teleportInviteToRemove.requester.id
+          ),
+      );
+      this._conversationAreaInvites = newInvitesFiltered;
+    }
   }
 
   /**
