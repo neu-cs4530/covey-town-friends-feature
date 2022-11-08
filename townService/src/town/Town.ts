@@ -14,7 +14,7 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
-  ConversationAreaInvite,
+  ConversationAreaGroupInvite,
   TeleportInviteSingular,
   PlayerToPlayerUpdate,
 } from '../types/CoveyTownSocket';
@@ -311,7 +311,7 @@ export default class Town {
    */
   public inviteToConversationArea(instigator: Player, invitedFriends: Player[]): void {
     const instigatorLocation: PlayerLocation = instigator.location;
-    const inviteToAll: ConversationAreaInvite = {
+    const inviteToAll: ConversationAreaGroupInvite = {
       requester: instigator,
       requested: invitedFriends,
       requesterLocation: instigatorLocation,
