@@ -619,6 +619,98 @@ describe('TownController', () => {
         });
       });
     });
+
+    describe('Friend events', () => {
+      let eventListener: (update: PlayerToPlayerUpdate) => void;
+      let testRequestFromOurPlayer: PlayerToPlayerUpdate;
+      let testRequestToOurPlayer: PlayerToPlayerUpdate;
+      beforeEach(() => {
+        mockClear(mockListeners.playerFriendRequestsChanged);
+        testController.addListener(
+          'playerFriendRequestsChanged',
+          mockListeners.playerFriendRequestsChanged,
+        );
+
+        mockClear(mockListeners.playerFriendsChanged);
+        testController.addListener('playerFriendsChanged', mockListeners.playerFriendsChanged);
+
+        testRequestFromOurPlayer = {
+          actor: testController.ourPlayer.toPlayerModel(),
+          affected: playerTestData2.player,
+        };
+        testRequestToOurPlayer = {
+          actor: playerTestData2.player,
+          affected: testController.ourPlayer.toPlayerModel(),
+        };
+      });
+      describe('friendRequestSent events', () => {
+        beforeEach(() => {
+          eventListener = getEventListener(mockSocket, 'friendRequestSent');
+        });
+        it('Emits a playerFriendRequestsChanged event', () => {
+          eventListener(testRequestFromOurPlayer);
+
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith([
+            testRequestFromOurPlayer,
+          ]);
+        });
+        it('Does not emit a playerFriendsChanged event', () => {
+          eventListener(testRequestFromOurPlayer);
+          expect(mockListeners.playerFriendsChanged).not.toBeCalled();
+        });
+        it('Updates the controllers list of requests if we are the actor', () => {
+          expect(testController.playerFriendRequests).toEqual([]);
+
+          eventListener(testRequestFromOurPlayer);
+
+          expect(testController.playerFriendRequests).toEqual([testRequestFromOurPlayer]);
+        });
+        it('Updates the controllers list of requests if we are the affected', () => {
+          expect(testController.playerFriendRequests).toEqual([]);
+
+          eventListener(testRequestToOurPlayer);
+
+          expect(testController.playerFriendRequests).toEqual([testRequestToOurPlayer]);
+        });
+        it('Does nothing if the request doesnt include ourPlayer', () => {
+          const testRequest: PlayerToPlayerUpdate = {
+            actor: playerTestData2.player,
+            affected: playerTestData.player,
+          };
+
+          expect(testController.playerFriendRequests).toEqual([]);
+          eventListener(testRequest);
+          expect(testController.playerFriendRequests).toEqual([]);
+          expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
+        });
+      });
+
+      describe('friendRequestDeclined events', () => {
+        it('Emits a playerFriendRequestsChanged event', () => {});
+        it('Does not emit a playerFriendsChanged event', () => {});
+        it('Updates the controllers list of requests if we are the actor', () => {});
+        it('Updates the controllers list of requests if we are the affected', () => {});
+        it('Does nothing if the request doesnt include ourPlayer', () => {});
+      });
+
+      describe('friendRequestAccepted events', () => {
+        it('Emits a playerFriendRequestsChanged event', () => {});
+        it('Emits a playerFriendsChanged event', () => {});
+        it('Updates the controllers list of requests if we are the actor', () => {});
+        it('Updates the controllers list of requests if we are the affected', () => {});
+        it('Updates the controllers list of friends if we are the actor', () => {});
+        it('Updates the controllers list of friends if we are the affected', () => {});
+        it('Does nothing if the request doesnt include ourPlayer', () => {});
+      });
+
+      describe('friendRemoved events', () => {
+        it('Does not emit a playerFriendRequestsChanged event', () => {});
+        it('Emits a playerFriendsChanged event', () => {});
+        it('Updates the controllers list of friends if we are the actor', () => {});
+        it('Updates the controllers list of friends if we are the affected', () => {});
+        it('Does nothing if the request doesnt include ourPlayer', () => {});
+      });
+    });
   });
   describe('Processing events that are received over the socket from the townService', () => {
     let testPlayer: PlayerModel;

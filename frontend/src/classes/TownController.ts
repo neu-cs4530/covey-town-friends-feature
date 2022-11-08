@@ -607,7 +607,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       // if our player is involved in the incoming request, save it
       if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
-        const updatedFriendRequests = this.playerFriendRequests;
+        const updatedFriendRequests = [...this.playerFriendRequests];
         updatedFriendRequests.push(friendRequest);
         // use setter because it emits necessary event
         this._playerFriendRequests = updatedFriendRequests;
