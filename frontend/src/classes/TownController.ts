@@ -670,13 +670,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
 
       // update friends list
-      const updatedFriendsList = this.playerFriends;
+      const updatedFriendsList = [...this.playerFriends];
       if (actor.id === ourPlayerID) {
         updatedFriendsList.push(affected);
       } else if (affected.id === ourPlayerID) {
         updatedFriendsList.push(actor);
       }
-      this._playerFriends = [...updatedFriendsList];
+      this._playerFriends = updatedFriendsList;
     });
 
     /**
