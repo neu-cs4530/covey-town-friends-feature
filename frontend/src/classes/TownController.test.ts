@@ -917,7 +917,6 @@ describe('TownController', () => {
         PlayerController.fromPlayerModel(testPlayer),
       ]);
     });
-
     it('Emits playersChanged events when players leave', () => {
       emitEventAndExpectListenerFiring('playerDisconnect', testPlayer, 'playersChanged', []);
     });
