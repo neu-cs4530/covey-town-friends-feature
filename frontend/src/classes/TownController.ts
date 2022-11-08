@@ -613,6 +613,37 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._playerFriendRequests = updatedFriendRequests;
       }
     });
+
+    /**
+     *
+     * When any player declines a friend request, we check to see if the original request was sent to or from us.
+     * In either of those cases, we remove the request from our list of stored friend requests, for the UI to know
+     * what to render. Otherwise ignore the request.
+     *
+     * TODO Remove when discussed:
+     * Note- Possible refactor:
+     * Right now, when the backend emits a friendRequestDeclined event, the actor is the decliner and the affected is
+     * the initial sender. However, this means that when looking for the request we have to flip the actor and affected.
+     * The proposed refactor is to make is so that friendRequestDeclined is emitted with the original friend request that
+     * is being declined.
+     *
+     * */
+    this._socket.on('friendRequestDeclined', friendRequest => {
+      // actor is decliner, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // looking for a request from affected to actor, but only if one of them is our player
+      // otherwise we shouldn't even have the request saved
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedRequestList = this.playerFriendRequests.filter(
+          // the person being declined (affected) is the sender of the original request (request.actor)
+          // the decliner (actor) is the recipient (request.affected) of the request we want to remove
+          request => !(request.actor.id === affected.id && request.affected.id === actor.id),
+        );
+        this._playerFriendRequests = updatedRequestList;
+      }
+    });
   }
 
   /**
