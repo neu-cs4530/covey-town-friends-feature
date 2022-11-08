@@ -624,6 +624,7 @@ describe('TownController', () => {
       let friendRequestSentEventListener: (update: PlayerToPlayerUpdate) => void;
       let friendRequestDeclinedEventListener: (update: PlayerToPlayerUpdate) => void;
       let friendRequestAcceptedEventListener: (update: PlayerToPlayerUpdate) => void;
+      let friendRequestCanceledListener: (update: PlayerToPlayerUpdate) => void;
       let friendRemovedEventListener: (update: PlayerToPlayerUpdate) => void;
       let updateFromOurPlayerTo2: PlayerToPlayerUpdate;
       let updateFrom2ToOurPlayer: PlayerToPlayerUpdate;
@@ -631,6 +632,7 @@ describe('TownController', () => {
         friendRequestSentEventListener = getEventListener(mockSocket, 'friendRequestSent');
         friendRequestDeclinedEventListener = getEventListener(mockSocket, 'friendRequestDeclined');
         friendRequestAcceptedEventListener = getEventListener(mockSocket, 'friendRequestAccepted');
+        friendRequestCanceledListener = getEventListener(mockSocket, 'friendRequestCanceled');
         friendRemovedEventListener = getEventListener(mockSocket, 'friendRemoved');
 
         mockClear(mockListeners.playerFriendRequestsChanged);
@@ -840,6 +842,64 @@ describe('TownController', () => {
           ]);
           expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
           expect(mockListeners.playerFriendsChanged).not.toBeCalled();
+        });
+      });
+
+      describe('friendRequestCanceled events', () => {
+        it('Emits a playerFriendRequestsChanged event', () => {
+          // add friend request from our player
+          friendRequestSentEventListener(updateFromOurPlayerTo2);
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith([
+            updateFromOurPlayerTo2,
+          ]);
+
+          // our player cancels the request
+          friendRequestCanceledListener(updateFromOurPlayerTo2);
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith([]);
+        });
+        it('Does not emit a playerFriendsChanged event', () => {
+          // add friend request from our player
+          friendRequestSentEventListener(updateFromOurPlayerTo2);
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith([
+            updateFromOurPlayerTo2,
+          ]);
+
+          // ourplayer cancels the request
+          friendRequestCanceledListener(updateFromOurPlayerTo2);
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith([]);
+          expect(mockListeners.playerFriendsChanged).not.toBeCalled();
+        });
+        it('Updates the controllers list of requests if we are the actor', () => {
+          // add friend request from our player
+          friendRequestSentEventListener(updateFromOurPlayerTo2);
+          expect(testController.playerFriendRequests).toEqual([updateFromOurPlayerTo2]);
+
+          // ourPlayer cancels the request
+          friendRequestCanceledListener(updateFromOurPlayerTo2);
+          expect(testController.playerFriendRequests).toEqual([]);
+        });
+        it('Updates the controllers list of requests if we are the affected', () => {
+          // add friend request from player2
+          friendRequestSentEventListener(updateFrom2ToOurPlayer);
+          expect(testController.playerFriendRequests).toEqual([updateFrom2ToOurPlayer]);
+
+          // player2 cancels the request
+          friendRequestCanceledListener(updateFrom2ToOurPlayer);
+          expect(testController.playerFriendRequests).toEqual([]);
+        });
+        it('Does nothing if the request doesnt include ourPlayer', () => {
+          const testRequest: PlayerToPlayerUpdate = {
+            actor: playerTestData2,
+            affected: playerTestData,
+          };
+
+          expect(testController.playerFriendRequests).toEqual([]);
+          friendRequestSentEventListener(testRequest);
+          expect(testController.playerFriendRequests).toEqual([]);
+          friendRequestCanceledListener(testRequest);
+          expect(testController.playerFriendRequests).toEqual([]);
+
+          expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
         });
       });
 

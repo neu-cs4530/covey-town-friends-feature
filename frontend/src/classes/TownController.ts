@@ -680,6 +680,26 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
+     * Whenever a player cancels a friend request, if we are either the remover or the removed,
+     * remove that friend request from our list of requests
+     */
+    this._socket.on('friendRequestCanceled', playerToPlayerUpdate => {
+      // actor is sender / canceler, affected is original recipient
+      const { actor, affected } = playerToPlayerUpdate;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the canceled request
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedRequestList = this.playerFriendRequests.filter(
+          // actor is the original sender, affected is original intended recipient
+          request => !(request.actor.id === actor.id && request.affected.id === affected.id),
+        );
+
+        this._playerFriendRequests = [...updatedRequestList];
+      }
+    });
+
+    /**
      * Whenever a player removes a friend, if we are either the remover or the removed,
      * remove the other player from our friends list.
      */
