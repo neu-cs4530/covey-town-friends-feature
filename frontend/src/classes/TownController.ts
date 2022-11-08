@@ -587,6 +587,28 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    /**
+     * When a conversation area mass invite is sent out, check to see if our player was among
+     * the list of invitees. If so, add this new teleport invite to the exisitng list of invites,
+     * if there isn't already an indentical invite present.
+     *
+     * If the invite was unique, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
+      const affectedPlayers = conversationAreaInviteRequest.requested;
+
+      if (affectedPlayers.indexOf(this._ourPlayer) > -1) {
+        const newInvite: TeleportInviteSingular = {
+          requester: conversationAreaInviteRequest.requester,
+          requested: this.ourPlayer,
+          requesterLocation: conversationAreaInviteRequest.requesterLocation,
+        };
+        const newConvoAreaInvites: TeleportInviteSingular[] =
+          this._conversationAreaInvitesInternal.concat([newInvite]);
+        this._conversationAreaInvites = newConvoAreaInvites;
+      }
+    });
   }
 
   /**
