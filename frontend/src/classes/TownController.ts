@@ -679,6 +679,31 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._playerFriends = updatedFriendsList;
       }
     });
+
+    /**
+     * Whenever a player removes a friend, if we are either the remover or the removed,
+     * remove the other player from our friends list.
+     */
+    this._socket.on('friendRemoved', playerToPlayerUpdate => {
+      // actor is remover, affected is the removed friend
+      const { actor, affected } = playerToPlayerUpdate;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the removal
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        // update friends list
+        const updatedFriendsList = this.playerFriends;
+        if (actor.id === ourPlayerID) {
+          // if we are the actor, remove affected
+          updatedFriendsList.filter(friend => friend.id !== affected.id);
+          this._playerFriends = updatedFriendsList;
+        } else if (affected.id === ourPlayerID) {
+          // if we are the affected, remove actor
+          updatedFriendsList.filter(friend => friend.id !== actor.id);
+          this._playerFriends = updatedFriendsList;
+        }
+      }
+    });
   }
 
   /**
