@@ -358,6 +358,7 @@ describe('Town', () => {
   let playerTestData3: MockedPlayer;
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
+  let player3Location: PlayerLocation;
   let playerFriends: Player[];
   let player2Friends: Player[];
   let friendRequest: PlayerToPlayerUpdate;
@@ -395,6 +396,7 @@ describe('Town', () => {
     };
     playerLocation = player.location;
     player2Location = player2.location;
+    player3Location = player3.location;
     playerFriends = player.friends;
     player2Friends = player2.friends;
     mockReset(townEmitter);
@@ -703,33 +705,56 @@ describe('Town', () => {
     });
     describe('inviteAllToConvArea (listener)', () => {
       beforeEach(() => {
+        // Set up all of the invites between players
         playerTestData.invitedAllToConvArea({
           requester: player,
-          requested: [player2],
+          requested: [player2, player3],
           requesterLocation: playerLocation,
+        });
+        playerTestData2.invitedAllToConvArea({
+          requester: player2,
+          requested: [player3, player],
+          requesterLocation: player2Location,
+        });
+        playerTestData3.invitedAllToConvArea({
+          requester: player3,
+          requested: [player2],
+          requesterLocation: player3.location,
         });
       });
       it('Should add the invite from the requester to the list of conv area invites in the requested', () => {
+        expect(player2.conversationAreaInvites.length).toBe(2);
         expect(
           player2.conversationAreaInvites.find(
             invite => invite.requester === player && invite.requesterLocation === playerLocation,
           ),
         ).toBeTruthy();
       });
-      it('Should not move either player from their current location', () => {
+      it('Should not move any players from their current location', () => {
         expect(townEmitter.emit).not.toBeCalledWith('inviteAllToConvArea', {
           requester: player,
           requested: [player2],
           requesterLocation: playerLocation,
         });
+        expect(player3.location).toBe(player3Location);
         expect(player2.location).toBe(player2Location);
         expect(player.location).toBe(playerLocation);
       });
       it('TownService should emit a conversationAreaRequestSent event', () => {
-        expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestSent', {
+        expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
           requester: player,
-          requested: [player2],
+          requested: [player2, player3],
           requesterLocation: playerLocation,
+        });
+        expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
+          requester: player2,
+          requested: [player3, player],
+          requesterLocation: player2Location,
+        });
+        expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
+          requester: player3,
+          requested: [player2],
+          requesterLocation: player3.location,
         });
       });
     });

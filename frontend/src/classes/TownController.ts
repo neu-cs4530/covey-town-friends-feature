@@ -157,7 +157,7 @@ export type TownEvents = {
    * An event that indicates that the player has requested the list of players to
    * join them in a given conversation area. The request contains a requester Player
    * a list of requested Players, as well as a PlayerLocation that the requested
-   * will be transported to upon accepting the request.
+   * will be transported to if they accept the request.
    */
   clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
 
@@ -807,7 +807,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * friend request was declined
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._playerFriendRequestsInternal = this.playerFriendRequests.filter(
       req => !(req.actor === declinedRequest.actor && req.affected === declinedRequest.affected),
     );
@@ -869,8 +868,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   /**
    * Emits a inviteAllToConvArea event to the townService
-   * @param invite holds the requester, list of requested, and destination location
-   * of the invite to the conversation area.
+   * @param invite holds the requester, list of requested, and destination location,
+   * within the conversation area, that the requested would be transported to if
+   * they accepted the invite.
    */
   public clickedInviteAllToConvArea(invite: ConversationAreaInvite): void {
     this._socket.emit('inviteAllToConvArea', invite);

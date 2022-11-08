@@ -241,7 +241,7 @@ export default class Town {
    * their friend and Player who is the intended recipient of the friend request.
    */
   public inviteFriend(currentFriendRequest: PlayerToPlayerUpdate): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestSent', currentFriendRequest);
   }
 
@@ -253,7 +253,7 @@ export default class Town {
    * original friend request that is being canceled.
    */
   public cancelFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestCanceled', currentFriendRequest);
   }
 
@@ -267,7 +267,6 @@ export default class Town {
   public acceptFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
     currentFriendRequest.actor.addFriend(currentFriendRequest.affected);
     currentFriendRequest.affected.addFriend(currentFriendRequest.actor);
-    // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
   }
 
@@ -281,7 +280,6 @@ export default class Town {
   public removeFriend(currentFriends: PlayerToPlayerUpdate): void {
     currentFriends.actor.removeFriend(currentFriends.affected);
     currentFriends.affected.removeFriend(currentFriends.actor);
-    // TODO this should be caught by TownController
     this._broadcastEmitter.emit('friendRemoved', currentFriends);
   }
 
@@ -293,7 +291,7 @@ export default class Town {
    * the sender of the initial friend request.
    */
   public declineFriendRequest(currentRequest: PlayerToPlayerUpdate): void {
-    // this should be caught by TownController
+    // This should be caught by TownController
     this._broadcastEmitter.emit('friendRequestDeclined', currentRequest);
   }
 
