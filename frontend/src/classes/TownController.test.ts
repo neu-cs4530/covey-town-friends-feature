@@ -731,7 +731,6 @@ describe('TownController', () => {
             actor: playerTestData2.player,
             affected: playerTestData.player,
           };
-
           const testDecline: PlayerToPlayerUpdate = {
             actor: playerTestData.player,
             affected: playerTestData2.player,
