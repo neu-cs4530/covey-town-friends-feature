@@ -609,6 +609,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._conversationAreaInvites = newConvoAreaInvites;
       }
     });
+
+    /**
+     * Fill in
+     */
+    this._socket.on('conversationAreaRequestAccepted', conversationAreaInviteRequest => {
+      // If you’re the affected remove this request from your list of conv area requests
+    });
   }
 
   /**
