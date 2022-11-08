@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
@@ -642,6 +642,41 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           request => !(request.actor.id === affected.id && request.affected.id === actor.id),
         );
         this._playerFriendRequests = updatedRequestList;
+      }
+    });
+
+    /**
+     *
+     * When a friend request is accepted, if we are one of the players in the accepted request,
+     * update our list of requests by removing it, and add the other player into our friends list.
+     *
+     * TODO Remove when discussed:
+     * Same refactor suggestion as above- since actor is the receiver of the intiial request, we need to flip
+     * the actor and affected to find the original request.
+     */
+    this._socket.on('friendRequestAccepted', friendRequest => {
+      // actor is accepter, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the accepted request, remove it
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedRequestList = this.playerFriendRequests.filter(
+          // the person being accepted (affected) is the sender of the original request (request.actor)
+          // the accepter (actor) is the recipient (request.affected) of the request we want to remove
+          request => !(request.actor.id === affected.id && request.affected.id === actor.id),
+        );
+        this._playerFriendRequests = updatedRequestList;
+      }
+
+      // update friends list
+      const updatedFriendsList = this.playerFriends;
+      if (actor.id === ourPlayerID) {
+        updatedFriendsList.push(affected);
+        this._playerFriends = updatedFriendsList;
+      } else if (affected.id === ourPlayerID) {
+        updatedFriendsList.push(actor);
+        this._playerFriends = updatedFriendsList;
       }
     });
   }
