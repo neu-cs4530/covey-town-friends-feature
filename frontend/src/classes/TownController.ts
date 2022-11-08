@@ -587,6 +587,32 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    /**
+     *
+     * When any player sends a friend request to another player, we check if that friend request was sent BY or TO us.
+     * In either of those cases, we store those friend requests for the UI to render and emit an event for the hook
+     * to catch. Otherwise we can ignore the request.
+     *
+     * Assumes a player cannot send a friend request to themself. (UI
+     * will not allow this)
+     *
+     * Assumes a player cannot receive duplicate friend requests. (UI
+     * will not allow this)
+     *
+     * */
+    this._socket.on('friendRequestSent', friendRequest => {
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the incoming request, save it
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedFriendRequests = this.playerFriendRequests;
+        updatedFriendRequests.push(friendRequest);
+        // use setter because it emits necessary event
+        this._playerFriendRequests = updatedFriendRequests;
+      }
+    });
   }
 
   /**
