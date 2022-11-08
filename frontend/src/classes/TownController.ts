@@ -611,10 +611,25 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * Fill in
+     * When a conversation area invidiual invite is accepted, check to see if our player was the
+     * person who accepted it. If so, remove this invite from the exisitng list of invites,
+     * if it exisits in the list.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
     this._socket.on('conversationAreaRequestAccepted', conversationAreaInviteRequest => {
-      // If you’re the affected remove this request from your list of conv area requests
+      const requested = conversationAreaInviteRequest.requested;
+      if (requested === this.ourPlayer) {
+        const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
+          invite =>
+            !(
+              invite.requesterLocation.x === conversationAreaInviteRequest.requesterLocation.x &&
+              invite.requesterLocation.y === conversationAreaInviteRequest.requesterLocation.y &&
+              invite.requester.id === conversationAreaInviteRequest.requester.id
+            ),
+        );
+        this._conversationAreaInvites = newInvitesFiltered;
+      }
     });
   }
 
