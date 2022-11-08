@@ -796,6 +796,7 @@ describe('TownController', () => {
           friendRequestAcceptedEventListener(ourPlayerAcceptPlayer1);
           expect(mockListeners.playerFriendsChanged).toBeCalledWith([playerTestData]);
         });
+
         it('Updates the controllers list of requests if we are the actor', () => {
           expect(testController.playerFriendRequests).toEqual([
             player1ToOurPlayer,
