@@ -594,11 +594,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * In either of those cases, we store those friend requests for the UI to render and emit an event for the hook
      * to catch. Otherwise we can ignore the request.
      *
-     * Assumes a player cannot send a friend request to themself. (UI
-     * will not allow this)
+     * Assumes a player cannot send a friend request to themself. (UI will not allow this)
      *
-     * Assumes a player cannot receive duplicate friend requests. (UI
-     * will not allow this)
+     * Assumes a player cannot receive duplicate friend requests. (UI will not allow this)
      *
      * */
     this._socket.on('friendRequestSent', friendRequest => {
@@ -620,12 +618,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * In either of those cases, we remove the request from our list of stored friend requests, for the UI to know
      * what to render. Otherwise ignore the request.
      *
-     * TODO Remove when discussed:
-     * Note- Possible refactor:
      * Right now, when the backend emits a friendRequestDeclined event, the actor is the decliner and the affected is
      * the initial sender. However, this means that when looking for the request we have to flip the actor and affected.
      * The proposed refactor is to make is so that friendRequestDeclined is emitted with the original friend request that
-     * is being declined.
+     * is being declined. (Backlog refactor)
      *
      * */
     this._socket.on('friendRequestDeclined', friendRequest => {
@@ -650,9 +646,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * When a friend request is accepted, if we are one of the players in the accepted request,
      * update our list of requests by removing it, and add the other player into our friends list.
      *
-     * TODO Remove when discussed:
-     * Same refactor suggestion as above- since actor is the receiver of the intiial request, we need to flip
-     * the actor and affected to find the original request.
+     * Since actor is the receiver of the intiial request, we need to flip
+     * the actor and affected to find the original request. (Backlog refactor)
      */
     this._socket.on('friendRequestAccepted', friendRequest => {
       // actor is accepter, affected is the initial sender of the request
@@ -670,6 +665,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
 
       // update friends list
+      // only needs to be done on this controller because the other controller will also receive this event
       const updatedFriendsList = [...this.playerFriends];
       if (actor.id === ourPlayerID) {
         updatedFriendsList.push(affected);
