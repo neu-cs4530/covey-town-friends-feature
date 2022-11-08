@@ -721,7 +721,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           updatedFriendsList.filter(friend => friend.id !== actor.id);
         }
 
-        this._playerFriends = updatedFriendsList;
+        this._playerFriends = [...updatedFriendsList];
       }
     });
   }
