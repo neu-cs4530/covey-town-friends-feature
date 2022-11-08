@@ -641,7 +641,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           // the decliner (actor) is the recipient (request.affected) of the request we want to remove
           request => !(request.actor.id === affected.id && request.affected.id === actor.id),
         );
-        this._playerFriendRequests = updatedRequestList;
+        this._playerFriendRequests = [...updatedRequestList];
       }
     });
 
@@ -666,18 +666,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           // the accepter (actor) is the recipient (request.affected) of the request we want to remove
           request => !(request.actor.id === affected.id && request.affected.id === actor.id),
         );
-        this._playerFriendRequests = updatedRequestList;
+        this._playerFriendRequests = [...updatedRequestList];
       }
 
       // update friends list
       const updatedFriendsList = this.playerFriends;
       if (actor.id === ourPlayerID) {
         updatedFriendsList.push(affected);
-        this._playerFriends = updatedFriendsList;
       } else if (affected.id === ourPlayerID) {
         updatedFriendsList.push(actor);
-        this._playerFriends = updatedFriendsList;
       }
+      this._playerFriends = [...updatedFriendsList];
     });
 
     /**
