@@ -1032,7 +1032,6 @@ describe('TownController', () => {
           // reset testController's friends and requests after each test
           testController._playerFriends = [];
           testController._playerFriendRequests = [];
-          testController._players = [];
         });
         it('Does not emit a playerFriendRequestsChanged event', () => {
           // should be 4 calls from the beforeEach setup
