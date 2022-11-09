@@ -972,16 +972,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playersInternal.filter(eachPlayer => playerIDs.includes(eachPlayer.id));
   }
 
-  private updateSingleFriend(friendToUpdate: PlayerController): void {
-    // update friend if it is in this.players
-    const updatedController = this.players.find(player => player.id === friendToUpdate.id);
-
-    if (updatedController) {
-      friendToUpdate = updatedController;
-    }
-    // remove friends that are no longer in this.players
-  }
-
   /**
    * Emits a acceptFriendRequest event to the townService
    * @param acceptedRequest the friend request - holds the current player and the player whose
