@@ -705,20 +705,24 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const ourPlayerID = this.ourPlayer.id;
 
       // if our player is involved in the removal
-      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
-        // update friends list
-        const updatedFriendsList = [...this.playerFriends];
 
-        if (actor.id === ourPlayerID) {
-          // if we are the actor, remove affected
-          updatedFriendsList.filter(friend => friend.id !== affected.id);
-        } else if (affected.id === ourPlayerID) {
-          // if we are the affected, remove actor
-          updatedFriendsList.filter(friend => friend.id !== actor.id);
+      const updatedFriendsList = [...this.playerFriends];
+
+      if (actor.id === ourPlayerID) {
+        // if we are the actor, remove affected
+        const indexToRemove = updatedFriendsList.indexOf(affected);
+        if (indexToRemove >= 0) {
+          updatedFriendsList.splice(indexToRemove, 1);
         }
-
-        this._playerFriends = [...updatedFriendsList];
+      } else if (affected.id === ourPlayerID) {
+        // if we are the affected, remove actor
+        const indexToRemove = updatedFriendsList.indexOf(actor);
+        if (indexToRemove >= 0) {
+          updatedFriendsList.splice(indexToRemove, 1);
+        }
       }
+
+      this._playerFriends = [...updatedFriendsList];
     });
   }
 
