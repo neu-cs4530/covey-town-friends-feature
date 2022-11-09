@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
@@ -532,6 +532,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
       this._players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+      // remove the disconnectedPlayer from playerFriends if present
+      this._playerFriends = this.playerFriends.filter(
+        eachFriend => eachFriend.id !== disconnectedPlayer.id,
+      );
+      // clear any requests including disconnectedPlayer
+      const updatedRequestList = [...this.playerFriendRequests];
+      this._playerFriendRequests = updatedRequestList.filter(
+        request =>
+          !(
+            request.actor.id === disconnectedPlayer.id ||
+            request.affected.id === disconnectedPlayer.id
+          ),
+      );
     });
     /**
      * When a player moves, update local state and emit an event to the controller's event listeners
@@ -547,6 +560,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           playerToUpdate.location.interactableID = movedPlayer.location.interactableID;
         } else {
           playerToUpdate.location = movedPlayer.location;
+          // find the player in our friends list to also update
+          const friendToUpdate = this.playerFriends.find(
+            eachFriend => eachFriend.id === movedPlayer.id,
+          );
+          // if they are present
+          if (friendToUpdate) {
+            friendToUpdate.location = movedPlayer.location;
+          }
         }
         this.emit('playerMoved', playerToUpdate);
       } else {
@@ -949,6 +970,16 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _playersByIDs(playerIDs: string[]): PlayerController[] {
     return this._playersInternal.filter(eachPlayer => playerIDs.includes(eachPlayer.id));
+  }
+
+  private updateSingleFriend(friendToUpdate: PlayerController): void {
+    // update friend if it is in this.players
+    const updatedController = this.players.find(player => player.id === friendToUpdate.id);
+
+    if (updatedController) {
+      friendToUpdate = updatedController;
+    }
+    // remove friends that are no longer in this.players
   }
 
   /**

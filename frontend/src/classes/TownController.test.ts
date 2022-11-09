@@ -25,6 +25,7 @@ import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
 import TownController, { TownEvents } from './TownController';
 import ViewingAreaController from './ViewingAreaController';
+import Player from '../../../townService/src/lib/Player';
 
 /**
  * Mocks the socket-io client constructor such that it will always return the same
@@ -1099,21 +1100,36 @@ describe('TownController', () => {
   });
   describe('Processing events that are received over the socket from the townService', () => {
     let testPlayer: PlayerModel;
+    let testPlayer2: PlayerModel;
+    let testPlayerController: PlayerController;
+    let testPlayerController2: PlayerController;
     let testPlayerPlayersChangedFn: jest.MockedFunction<TownEvents['playersChanged']>;
 
     beforeEach(() => {
-      //Create a new PlayerModel
+      //Create a new PlayerModel and controller
       testPlayer = {
         id: nanoid(),
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
       };
-      //Add that player to the test town
+      testPlayerController = PlayerController.fromPlayerModel(testPlayer);
+      // Create second player and controller
+      testPlayer2 = {
+        id: 'player2id',
+        location: { moving: false, rotation: 'back', x: 10, y: 11, interactableID: nanoid() },
+        userName: 'player2',
+      };
+      testPlayerController2 = PlayerController.fromPlayerModel(testPlayer2);
+
+      //Add the player to the test town
       testPlayerPlayersChangedFn = emitEventAndExpectListenerFiring(
         'playerJoined',
         testPlayer,
         'playersChanged',
       );
+
+      // make player 1 our friend
+      testController._playerFriends = [testPlayerController];
     });
     it('Emits playersChanged events when players join', () => {
       expect(testPlayerPlayersChangedFn).toBeCalledWith([
@@ -1123,6 +1139,32 @@ describe('TownController', () => {
     it('Emits playersChanged events when players leave', () => {
       emitEventAndExpectListenerFiring('playerDisconnect', testPlayer, 'playersChanged', []);
     });
+    it('Emits playerFriendsChanged events when a friend leaves', () => {
+      emitEventAndExpectListenerFiring(
+        'playerDisconnect',
+        testPlayerController,
+        'playerFriendsChanged',
+        [],
+      );
+    });
+    it('Emits playerFriendRequestsChanged events when player in your current requests leave', () => {
+      // add player 2
+      emitEventAndExpectListenerFiring('playerJoined', testPlayer2, 'playersChanged');
+      // create a request from player 1 to player 2 and store it
+      const requestFromPlayer1ToPlayer2 = {
+        actor: testPlayer,
+        affected: testPlayer2,
+      };
+      testController._playerFriendRequests = [requestFromPlayer1ToPlayer2];
+
+      // disconnect player 2 and expect the request is removed
+      emitEventAndExpectListenerFiring(
+        'playerDisconnect',
+        testPlayerController2,
+        'playerFriendRequestsChanged',
+        [],
+      );
+    });
     it('Emits playerMoved events when players join', async () => {
       emitEventAndExpectListenerFiring(
         'playerJoined',
@@ -1130,6 +1172,28 @@ describe('TownController', () => {
         'playerMoved',
         PlayerController.fromPlayerModel(testPlayer),
       );
+    });
+    it('Updates friends location on playerMoved event', async () => {
+      testPlayer.location = {
+        moving: true,
+        rotation: 'front',
+        x: 10,
+        y: 10,
+        interactableID: nanoid(),
+      };
+
+      emitEventAndExpectListenerFiring(
+        'playerMoved',
+        testPlayer,
+        'playerMoved',
+        PlayerController.fromPlayerModel(testPlayer),
+      );
+
+      const testPlayerInFriendsList = testController.playerFriends.find(
+        friend => friend.id === testPlayer.id,
+      ) as PlayerController;
+
+      expect(testPlayerInFriendsList.location).toEqual(testPlayer.location);
     });
     it('Emits playerMoved events when players move', async () => {
       testPlayer.location = {
