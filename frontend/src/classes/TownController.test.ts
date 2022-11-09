@@ -786,7 +786,26 @@ describe('TownController', () => {
         let ourPlayerToPlayer2: PlayerToPlayerUpdate;
         let ourPlayerAcceptPlayer1: PlayerToPlayerUpdate;
         let player2AcceptOurPlayer: PlayerToPlayerUpdate;
+        let player1PC: PlayerController;
+        let player2PC: PlayerController;
         beforeEach(() => {
+          // Add relevant players
+          player1PC = new PlayerController('id1', 'player1', {
+            x: 0,
+            y: 0,
+            rotation: 'front',
+            moving: true,
+          });
+          player2PC = new PlayerController('id2', 'player2', {
+            x: 10,
+            y: 10,
+            rotation: 'front',
+            moving: false,
+          });
+          testController._players = [player1PC, player2PC];
+          // Set up IDs
+          playerTestData.id = 'id1';
+          playerTestData2.id = 'id2';
           // creates a PlayerToPlayer update from playerTestData to the testController's ourPlayer
           player1ToOurPlayer = {
             actor: playerTestData,
@@ -831,7 +850,7 @@ describe('TownController', () => {
           // ourPlayer accepts the request from player 1
           friendRequestAcceptedEventListener(ourPlayerAcceptPlayer1);
           // expect a playerFriendsChanged event with the updated friends list including player 1
-          expect(mockListeners.playerFriendsChanged).toBeCalledWith([playerTestData]);
+          expect(mockListeners.playerFriendsChanged).toBeCalledWith([player1PC]);
         });
         it('Updates the controllers list of friend requests if we are the actor', () => {
           // check that the requests from the beforeEach are present
@@ -860,21 +879,21 @@ describe('TownController', () => {
           // ourPlayer accepts the request from player 1
           friendRequestAcceptedEventListener(ourPlayerAcceptPlayer1);
           // expect player 1 to be added to the testController's friends list
-          expect(testController.playerFriends).toEqual([playerTestData]);
+          expect(testController.playerFriends).toEqual([player1PC]);
         });
         it('Updates the controllers list of friends if we are the affected', () => {
           expect(testController.playerFriends).toEqual([]);
           // player 2 accepts the request from ourPlayer's
           friendRequestAcceptedEventListener(player2AcceptOurPlayer);
           // expect that player 2 is added to testController's friends list
-          expect(testController.playerFriends).toEqual([playerTestData2]);
+          expect(testController.playerFriends).toEqual([player2PC]);
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           // clear mock counts
           mockClear(mockListeners.playerFriendsChanged);
           mockClear(mockListeners.playerFriendRequestsChanged);
 
-          // check our friends and friend requests before acting
+          // check our players, friends and friend requests before acting
           expect(testController.playerFriends).toEqual([]);
           expect(testController.playerFriendRequests).toEqual([
             player1ToOurPlayer,
@@ -884,7 +903,7 @@ describe('TownController', () => {
           // player 1 accepts a request from player 2
           friendRequestAcceptedEventListener({ actor: playerTestData, affected: playerTestData2 });
 
-          // check our friends and friends requests haven't changed
+          // check our players, friends and friends requests haven't changed
           expect(testController.playerFriends).toEqual([]);
           expect(testController.playerFriendRequests).toEqual([
             player1ToOurPlayer,
@@ -969,7 +988,26 @@ describe('TownController', () => {
         let ourPlayerToPlayer2: PlayerToPlayerUpdate;
         let ourPlayerAcceptPlayer1: PlayerToPlayerUpdate;
         let player2AcceptOurPlayer: PlayerToPlayerUpdate;
+        let player1PC: PlayerController;
+        let player2PC: PlayerController;
         beforeEach(() => {
+          // Add relevant players
+          player1PC = new PlayerController('id1', 'player1', {
+            x: 0,
+            y: 0,
+            rotation: 'front',
+            moving: true,
+          });
+          player2PC = new PlayerController('id2', 'player2', {
+            x: 10,
+            y: 10,
+            rotation: 'front',
+            moving: false,
+          });
+          testController._players = [player1PC, player2PC];
+          // Set up IDs
+          playerTestData.id = 'id1';
+          playerTestData2.id = 'id2';
           // define the P2PUpdates
           player1ToOurPlayer = {
             actor: playerTestData,
@@ -988,14 +1026,12 @@ describe('TownController', () => {
           // accept both requests
           friendRequestAcceptedEventListener(ourPlayerAcceptPlayer1);
           friendRequestAcceptedEventListener(player2AcceptOurPlayer);
-
-          // mockClear(mockListeners.playerFriendRequestsChanged);
-          // mockClear(mockListeners.playerFriendsChanged);
         });
         afterEach(() => {
           // reset testController's friends and requests after each test
           testController._playerFriends = [];
           testController._playerFriendRequests = [];
+          testController._players = [];
         });
         it('Does not emit a playerFriendRequestsChanged event', () => {
           // should be 4 calls from the beforeEach setup
@@ -1014,49 +1050,49 @@ describe('TownController', () => {
 
         it('Emits a playerFriendsChanged with the updated list of friends', () => {
           // expect a player friends change from the before each setup
-          expect(mockListeners.playerFriendsChanged).toBeCalledWith([
-            playerTestData,
-            playerTestData2,
-          ]);
+          expect(mockListeners.playerFriendsChanged).toBeCalledWith([player1PC, player2PC]);
 
           // player 1 removes our player as friend
           friendRemovedEventListener(player1ToOurPlayer);
           // should expect testController's friend list to no longer include player 1
-          expect(mockListeners.playerFriendsChanged).toBeCalledWith([playerTestData2]);
+          expect(mockListeners.playerFriendsChanged).toBeCalledWith([player2PC]);
 
           // our player removes player 2 as friend
           friendRemovedEventListener(ourPlayerToPlayer2);
           // should expect testController's player to be empty now
           expect(mockListeners.playerFriendsChanged).toBeCalledWith([]);
         });
+        it('Emits a playersChanged event with the updated list of players', () => {
+          //
+        });
         it('Updates the controllers list of friends if we are the actor', () => {
           // expect player 1 and player 2 in testController's friends
-          expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
+          expect(testController.playerFriends).toEqual([player1PC, player2PC]);
 
           // player 2 removes our player as friend
           friendRemovedEventListener(player2AcceptOurPlayer);
 
-          expect(testController.playerFriends).toEqual([playerTestData]);
+          expect(testController.playerFriends).toEqual([player1PC]);
         });
         it('Updates the controllers list of friends if we are the affected', () => {
           // expect player 1 and player 2 in testController's friends
-          expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
+          expect(testController.playerFriends).toEqual([player1PC, player2PC]);
           // player 2 removes our player as friend
           friendRemovedEventListener(player1ToOurPlayer);
           // testController's friend list shouldn't include player 2 anymore
-          expect(testController.playerFriends).toEqual([playerTestData2]);
+          expect(testController.playerFriends).toEqual([player2PC]);
         });
-
         it('Does nothing if the request doesnt include ourPlayer', () => {
           // should be two from beforeEach
           expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+          expect(testController.playerFriends).toEqual([player1PC, player2PC]);
 
           // player 1 removes player 2 as friend
           friendRemovedEventListener({ actor: playerTestData, affected: playerTestData2 });
 
           // make sure that it doesn't change
           expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-          expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
+          expect(testController.playerFriends).toEqual([player1PC, player2PC]);
         });
       });
     });

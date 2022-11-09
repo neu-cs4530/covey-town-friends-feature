@@ -383,7 +383,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playersInternal;
   }
 
-  private set _players(newPlayers: PlayerController[]) {
+  public set _players(newPlayers: PlayerController[]) {
     this.emit('playersChanged', newPlayers);
     this._playersInternal = newPlayers;
   }
@@ -666,13 +666,31 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       // update friends list
       // only needs to be done on this controller because the other controller will also receive this event
+      // Assume we can find actor/affected in the player list because you can't friend request someone who
+      // isn't a Player in Town (or accept a friend request of someone who isn't a Player).
       const updatedFriendsList = [...this.playerFriends];
       if (actor.id === ourPlayerID) {
-        updatedFriendsList.push(affected);
+        // Get new friend (affected) from player list
+        const affectedPC = this.players.find(
+          controller => controller.id === affected.id,
+        ) as PlayerController;
+        // Add it to the friend List
+        // Should exist by virtue of how the UI works but check in case
+        if (affectedPC) {
+          updatedFriendsList.push(affectedPC);
+        }
       } else if (affected.id === ourPlayerID) {
-        updatedFriendsList.push(actor);
+        // Get new friend (actor) from Player list
+        const actorPC = this.players.find(
+          controller => controller.id === actor.id,
+        ) as PlayerController;
+        // Add it to the friend list
+        // Should exist by virtue of how the UI works but check in case
+        if (actorPC) {
+          updatedFriendsList.push(actorPC);
+        }
       }
-      this._playerFriends = updatedFriendsList;
+      this._playerFriends = [...updatedFriendsList];
     });
 
     /**
@@ -710,15 +728,31 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       if (actor.id === ourPlayerID) {
         // if we are the actor, remove affected
-        const indexToRemove = updatedFriendsList.indexOf(affected);
-        if (indexToRemove >= 0) {
-          updatedFriendsList.splice(indexToRemove, 1);
+        // Find the affected friend to remove
+        const affectedPC = updatedFriendsList.find(
+          controller => controller.id === affected.id,
+        ) as PlayerController;
+        // Remove affected from friends list
+        // Should exist by virtue of how the UI works but check in case
+        if (affectedPC) {
+          const indexToRemove = updatedFriendsList.indexOf(affectedPC);
+          if (indexToRemove >= 0) {
+            updatedFriendsList.splice(indexToRemove, 1);
+          }
         }
       } else if (affected.id === ourPlayerID) {
         // if we are the affected, remove actor
-        const indexToRemove = updatedFriendsList.indexOf(actor);
-        if (indexToRemove >= 0) {
-          updatedFriendsList.splice(indexToRemove, 1);
+        // Find the actor friend to remove
+        const actorPC = updatedFriendsList.find(
+          controller => controller.id === actor.id,
+        ) as PlayerController;
+        // Remove actor from friends list
+        // Should exist by virtue of how the UI works but check in case
+        if (actorPC) {
+          const indexToRemove = updatedFriendsList.indexOf(actorPC);
+          if (indexToRemove >= 0) {
+            updatedFriendsList.splice(indexToRemove, 1);
+          }
         }
       }
 
