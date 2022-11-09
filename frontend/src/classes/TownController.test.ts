@@ -1106,14 +1106,14 @@ describe('TownController', () => {
     let testPlayerPlayersChangedFn: jest.MockedFunction<TownEvents['playersChanged']>;
 
     beforeEach(() => {
-      //Create a new PlayerModel and controller
+      // Create a new PlayerModel and corresponding PlayerController
       testPlayer = {
         id: nanoid(),
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
       };
       testPlayerController = PlayerController.fromPlayerModel(testPlayer);
-      // Create second player and controller
+      // Create second player and corresponding PlayerController
       testPlayer2 = {
         id: 'player2id',
         location: { moving: false, rotation: 'back', x: 10, y: 11, interactableID: nanoid() },
@@ -1121,7 +1121,7 @@ describe('TownController', () => {
       };
       testPlayerController2 = PlayerController.fromPlayerModel(testPlayer2);
 
-      //Add the player to the test town
+      // Add the player to the test town
       testPlayerPlayersChangedFn = emitEventAndExpectListenerFiring(
         'playerJoined',
         testPlayer,
@@ -1148,16 +1148,17 @@ describe('TownController', () => {
       );
     });
     it('Emits playerFriendRequestsChanged events when player in your current requests leave', () => {
-      // add player 2
+      // add player 2 to the town
       emitEventAndExpectListenerFiring('playerJoined', testPlayer2, 'playersChanged');
-      // create a request from player 1 to player 2 and store it
+      // create a request from player 1 to player 2 and store it and store it in the friend request list
       const requestFromPlayer1ToPlayer2 = {
         actor: testPlayer,
         affected: testPlayer2,
       };
       testController._playerFriendRequests = [requestFromPlayer1ToPlayer2];
 
-      // disconnect player 2 and expect the request is removed
+      // disconnect player 2 and expect the request is removed and expect the friend request
+      // involving player 2 to be removed from the friend request list
       emitEventAndExpectListenerFiring(
         'playerDisconnect',
         testPlayerController2,
@@ -1182,6 +1183,7 @@ describe('TownController', () => {
         interactableID: nanoid(),
       };
 
+      // emit an event saying testPlayer was moved
       emitEventAndExpectListenerFiring(
         'playerMoved',
         testPlayer,
@@ -1189,10 +1191,12 @@ describe('TownController', () => {
         PlayerController.fromPlayerModel(testPlayer),
       );
 
+      // get the corresponding PlayerController for testPlayer from our friends list (instead of player list)
       const testPlayerInFriendsList = testController.playerFriends.find(
         friend => friend.id === testPlayer.id,
       ) as PlayerController;
 
+      // expect that the controller in our friend list updated in addition to the one in the player list
       expect(testPlayerInFriendsList.location).toEqual(testPlayer.location);
     });
     it('Emits playerMoved events when players move', async () => {
