@@ -17,6 +17,7 @@ import {
   PlayerLocation,
   PlayerToPlayerUpdate,
   ServerToClientEvents,
+  ConversationAreaGroupInvite,
   TeleportAction,
   TeleportInviteSingular,
   TownJoinResponse,
@@ -617,6 +618,107 @@ describe('TownController', () => {
           eventListener(viewingArea);
           expect(listener).toBeCalledWith(viewingArea.video);
         });
+      });
+    });
+    describe('ConversationAreaInviteRequest events', () => {
+      let conversationAreaRequestSentEventListener: (update: ConversationAreaGroupInvite) => void;
+      let conversationAreaRequestAcceptedEventListener: (update: TeleportInviteSingular) => void;
+      let conversationAreaRequestDeclinedEventListener: (update: TeleportInviteSingular) => void;
+      let player1Location: PlayerLocation;
+      let player2Location: PlayerLocation;
+      let convoAreaGroupInviteOurPlayer: ConversationAreaGroupInvite;
+      let teleportInviteOurPlayer: TeleportInviteSingular;
+      let convoAreaGroupInviteNotOurPlayer: ConversationAreaGroupInvite;
+      let teleportInvite1: TeleportInviteSingular;
+      let teleportInvite2: TeleportInviteSingular;
+      let newInvites: TeleportInviteSingular[];
+      beforeEach(() => {
+        conversationAreaRequestSentEventListener = getEventListener(
+          mockSocket,
+          'conversationAreaRequestSent',
+        );
+        conversationAreaRequestAcceptedEventListener = getEventListener(
+          mockSocket,
+          'conversationAreaRequestAccepted',
+        );
+        conversationAreaRequestDeclinedEventListener = getEventListener(
+          mockSocket,
+          'conversationAreaRequestDeclined',
+        );
+
+        mockClear(mockListeners.conversationAreaInvitesChanged);
+        testController.addListener(
+          'conversationAreaInvitesChanged',
+          mockListeners.conversationAreaInvitesChanged,
+        );
+
+        player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
+        player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
+        convoAreaGroupInviteOurPlayer = {
+          requester: playerTestData,
+          requested: [testController.ourPlayer],
+          requesterLocation: player1Location,
+        };
+        teleportInviteOurPlayer = {
+          requester: playerTestData,
+          requested: testController.ourPlayer,
+          requesterLocation: player1Location,
+        };
+        convoAreaGroupInviteNotOurPlayer = {
+          requester: playerTestData,
+          requested: [playerTestData3],
+          requesterLocation: player1Location,
+        };
+        teleportInvite1 = {
+          requester: playerTestData,
+          requested: playerTestData3,
+          requesterLocation: player1Location,
+        };
+        teleportInvite2 = {
+          requester: playerTestData2,
+          requested: playerTestData3,
+          requesterLocation: player2Location,
+        };
+        newInvites = [teleportInvite1, teleportInvite2];
+      });
+      describe('conversationAreaRequestSent events', () => {
+        it('Emits a conversationAreaInvitesChanged event if a new invite is sent if this player was invited', () => {
+          // send a group invite from player1 to ourPlayer
+          conversationAreaRequestSentEventListener(convoAreaGroupInviteOurPlayer);
+
+          // expect to see it emitted
+          expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([
+            teleportInviteOurPlayer,
+          ]);
+        });
+        it('Adds the corresponding singular invite to internal list if a new group invite is sent and this player was invited', () => {
+          conversationAreaRequestSentEventListener(convoAreaGroupInviteOurPlayer);
+
+          // expect to see the new invite added to conversationAreaInvitesInternal
+          const convoInvitesInternalAfter: TeleportInviteSingular[] = [teleportInviteOurPlayer];
+          expect(testController.conversationAreaInvites).toStrictEqual(convoInvitesInternalAfter);
+        });
+        it('Does not emit a conversationAreaInvitesChanged event if this player was not invited in new invite', () => {
+          conversationAreaRequestSentEventListener(convoAreaGroupInviteNotOurPlayer);
+
+          // expect to not see event emitted
+          expect(mockListeners.conversationAreaInvitesChanged).not.toHaveBeenCalled();
+        });
+        it('Does not add the corresponding invite to the list of invites if this player was not a recipient', () => {
+          const convoInvitesInternalBefore: TeleportInviteSingular[] = [];
+          conversationAreaRequestSentEventListener(convoAreaGroupInviteNotOurPlayer);
+          expect(testController.conversationAreaInvites).toStrictEqual(convoInvitesInternalBefore);
+        });
+      });
+      describe('conversationAreaRequestAccepted events', () => {
+        it('Emits a conversationAreaInvitesChanged event if this player accepted an invite', () => {});
+        it('Removes the corresponding invite if this player accepted an invite', () => {});
+        it('Does not modify invites list if this player was not the acceptor of an invite', () => {});
+      });
+      describe('conversationAreaRequestDeclined events', () => {
+        it('Emits a conversationAreaInvitesChanged event if this player declined an invite', () => {});
+        it('Removes the corresponding invite if this player declined an invite', () => {});
+        it('Does not modify invites list if this player was not the decliner of an invite', () => {});
       });
     });
   });

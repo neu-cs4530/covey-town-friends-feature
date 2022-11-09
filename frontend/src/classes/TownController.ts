@@ -589,7 +589,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * When a conversation area mass invite is sent out, check to see if our player was among
+     * When a conversation area group invite is sent out, check to see if our player was among
      * the list of invitees. If so, add this new teleport invite to the exisitng list of invites,
      * if there isn't already an indentical invite present.
      *
@@ -597,11 +597,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
       const affectedPlayers = conversationAreaInviteRequest.requested;
+      let ourPlayerIndex: number | undefined;
+      for (let index = 0; index < affectedPlayers.length; index++) {
+        if (affectedPlayers[index].id === this.ourPlayer.id) {
+          ourPlayerIndex = index;
+          break;
+        }
+      }
 
-      if (affectedPlayers.indexOf(this._ourPlayer) > -1) {
+      if (ourPlayerIndex !== undefined) {
         const newInvite: TeleportInviteSingular = {
           requester: conversationAreaInviteRequest.requester,
-          requested: this.ourPlayer,
+          requested: affectedPlayers[ourPlayerIndex],
           requesterLocation: conversationAreaInviteRequest.requesterLocation,
         };
         const newConvoAreaInvites: TeleportInviteSingular[] =
@@ -640,7 +647,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param teleportInviteToRemove the teleport invite to remove, if found
    */
   private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
-    if (teleportInviteToRemove.requested === this.ourPlayer) {
+    if (teleportInviteToRemove.requested.id === this.ourPlayer.id) {
       const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
         invite =>
           !(
