@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _, { update } from 'lodash';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';

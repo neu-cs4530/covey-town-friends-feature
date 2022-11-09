@@ -989,41 +989,73 @@ describe('TownController', () => {
           friendRequestAcceptedEventListener(ourPlayerAcceptPlayer1);
           friendRequestAcceptedEventListener(player2AcceptOurPlayer);
 
-          mockClear(mockListeners.playerFriendRequestsChanged);
-          mockClear(mockListeners.playerFriendsChanged);
+          // mockClear(mockListeners.playerFriendRequestsChanged);
+          // mockClear(mockListeners.playerFriendsChanged);
         });
         afterEach(() => {
+          // reset testController's friends and requests after each test
           testController._playerFriends = [];
           testController._playerFriendRequests = [];
         });
         it('Does not emit a playerFriendRequestsChanged event', () => {
+          // should be 4 calls from the beforeEach setup
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(4);
+          // player 1 removes our player as friend
           friendRemovedEventListener(player1ToOurPlayer);
-          expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
+
+          // should not be called any more times
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(4);
+          // our player removes player 2 as friend
           friendRemovedEventListener(ourPlayerToPlayer2);
-          expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
+
+          // should not be called any more times
+          expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(4);
         });
 
         it('Emits a playerFriendsChanged with the updated list of friends', () => {
+          // expect a player friends change from the before each setup
+          expect(mockListeners.playerFriendsChanged).toBeCalledWith([
+            playerTestData,
+            playerTestData2,
+          ]);
+
+          // player 1 removes our player as friend
           friendRemovedEventListener(player1ToOurPlayer);
+          // should expect testController's friend list to no longer include player 1
           expect(mockListeners.playerFriendsChanged).toBeCalledWith([playerTestData2]);
 
+          // our player removes player 2 as friend
           friendRemovedEventListener(ourPlayerToPlayer2);
+          // should expect testController's player to be empty now
           expect(mockListeners.playerFriendsChanged).toBeCalledWith([]);
         });
         it('Updates the controllers list of friends if we are the actor', () => {
+          // expect player 1 and player 2 in testController's friends
           expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
-          friendRemovedEventListener(ourPlayerToPlayer2);
+
+          // player 2 removes our player as friend
+          friendRemovedEventListener(player2AcceptOurPlayer);
+
           expect(testController.playerFriends).toEqual([playerTestData]);
         });
         it('Updates the controllers list of friends if we are the affected', () => {
+          // expect player 1 and player 2 in testController's friends
           expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
+          // player 2 removes our player as friend
           friendRemovedEventListener(player1ToOurPlayer);
+          // testController's friend list shouldn't include player 2 anymore
           expect(testController.playerFriends).toEqual([playerTestData2]);
         });
 
         it('Does nothing if the request doesnt include ourPlayer', () => {
+          // should be two from beforeEach
+          expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+
+          // player 1 removes player 2 as friend
           friendRemovedEventListener({ actor: playerTestData, affected: playerTestData2 });
-          expect(mockListeners.playerFriendsChanged).not.toBeCalled();
+
+          // make sure that it doesn't change
+          expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
           expect(testController.playerFriends).toEqual([playerTestData, playerTestData2]);
         });
       });
