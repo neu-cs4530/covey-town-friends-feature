@@ -722,40 +722,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const ourPlayerID = this.ourPlayer.id;
 
       // if our player is involved in the removal
-
-      const updatedFriendsList = [...this.playerFriends];
-
       if (actor.id === ourPlayerID) {
         // if we are the actor, remove affected
-        // Find the affected friend to remove
-        const affectedPC = updatedFriendsList.find(
-          controller => controller.id === affected.id,
-        ) as PlayerController;
-        // Remove affected from friends list
-        // Should exist by virtue of how the UI works but check in case
-        if (affectedPC) {
-          const indexToRemove = updatedFriendsList.indexOf(affectedPC);
-          if (indexToRemove >= 0) {
-            updatedFriendsList.splice(indexToRemove, 1);
-          }
-        }
+        this._removePlayerControllerFromFriendsList(affected.id);
       } else if (affected.id === ourPlayerID) {
         // if we are the affected, remove actor
-        // Find the actor friend to remove
-        const actorPC = updatedFriendsList.find(
-          controller => controller.id === actor.id,
-        ) as PlayerController;
-        // Remove actor from friends list
-        // Should exist by virtue of how the UI works but check in case
-        if (actorPC) {
-          const indexToRemove = updatedFriendsList.indexOf(actorPC);
-          if (indexToRemove >= 0) {
-            updatedFriendsList.splice(indexToRemove, 1);
-          }
-        }
+        this._removePlayerControllerFromFriendsList(actor.id);
       }
-
-      this._playerFriends = [...updatedFriendsList];
     });
   }
 
@@ -778,6 +751,32 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       );
       this._playerFriendRequests = [...updatedRequestList];
     }
+  }
+
+  /**
+   *
+   * Given the ID of a player in the town, removes the PlayerController matching that ID
+   * from our friends list. Does not do anything if that player is not in our friends list
+   *
+   * @param id the id of the player controller to remove from the friends list
+   */
+  private _removePlayerControllerFromFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // fnid the player controller to remove by matching id
+    const playerControllerToRemove = updatedFriendsList.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Remove that controller from friends list from friends list
+    // (Should exist by virtue of how the UI works but checking in case)
+    if (playerControllerToRemove) {
+      const indexToRemove = updatedFriendsList.indexOf(playerControllerToRemove);
+      if (indexToRemove >= 0) {
+        updatedFriendsList.splice(indexToRemove, 1);
+      }
+    }
+    this._playerFriends = [...updatedFriendsList];
   }
 
   /**
