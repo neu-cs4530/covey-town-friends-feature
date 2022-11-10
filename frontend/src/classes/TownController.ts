@@ -763,6 +763,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedFriendsList.splice(indexToRemove, 1);
       }
     }
+
+    // update the playerFriends list
     this._playerFriends = [...updatedFriendsList];
   }
 
@@ -772,7 +774,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * Assume we can find actor/affected in the player list because you can't friend request someone who
    * isn't a Player in Town (or accept a friend request of someone who isn't a Player).
    *
-   * @param id the id of the player controller to remove from the friends list
+   * @param id the id of the player controller to add to the friends list
    */
   private _addPlayerControllerToFriendsList(id: string) {
     const updatedFriendsList = [...this.playerFriends];
@@ -788,6 +790,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       updatedFriendsList.push(controllerToAdd);
     }
 
+    // update the playerFriends list
     this._playerFriends = [...updatedFriendsList];
   }
 
