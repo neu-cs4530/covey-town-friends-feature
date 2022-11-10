@@ -2,7 +2,12 @@ import { DeepMockProxy, mockDeep, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import Player from './Player';
 import { MockedPlayer, mockPlayer } from '../TestUtils';
-import { PlayerLocation, TeleportInviteSingular, TownEmitter } from '../types/CoveyTownSocket';
+import {
+  ConversationAreaInvite,
+  PlayerLocation,
+  TeleportInviteSingular,
+  TownEmitter,
+} from '../types/CoveyTownSocket';
 import Town from '../town/Town';
 
 describe('Player', () => {
@@ -155,35 +160,70 @@ describe('Player', () => {
   });
   describe('removeConversationAreaInvite', () => {
     it('Removes an invited player from the list of conversation area invites', () => {
+      const invite1: ConversationAreaInvite = {
+        requester: player,
+        requested: [player2],
+        requesterLocation: player.location,
+      };
       player.addFriend(player2);
-      town.inviteToConversationArea(player, [player2]);
+      town.inviteToConversationArea(invite1);
       expect(player2.conversationAreaInvites.length).toEqual(1);
       player2.removeConversationAreaInvite(invite);
       expect(player2.conversationAreaInvites.length).toEqual(0);
     });
     it('Removes the last invited player from the list of conversation area invites', () => {
+      const invite1: ConversationAreaInvite = {
+        requester: player,
+        requested: [player4],
+        requesterLocation: player.location,
+      };
+      const invite3: ConversationAreaInvite = {
+        requester: player2,
+        requested: [player4],
+        requesterLocation: player2.location,
+      };
+      const invite4: ConversationAreaInvite = {
+        requester: player3,
+        requested: [player4],
+        requesterLocation: player3.location,
+      };
       player.addFriend(player4);
       player2.addFriend(player4);
       player3.addFriend(player4);
       expect(player4.conversationAreaInvites.length).toEqual(0);
-      town.inviteToConversationArea(player, [player4]);
-      town.inviteToConversationArea(player2, [player4]);
-      town.inviteToConversationArea(player3, [player4]);
+      town.inviteToConversationArea(invite1);
+      town.inviteToConversationArea(invite3);
+      town.inviteToConversationArea(invite4);
       expect(player4.conversationAreaInvites.length).toEqual(3);
       player4.removeConversationAreaInvite(invite2);
       expect(player4.conversationAreaInvites.length).toEqual(2);
     });
     it('Does nothing if there is no such conversation area invite to remove', () => {
+      const invite4: ConversationAreaInvite = {
+        requester: player3,
+        requested: [player4],
+        requesterLocation: player3.location,
+      };
       player.addFriend(player3);
       player.addFriend(player4);
-      town.inviteToConversationArea(player3, [player4]);
+      town.inviteToConversationArea(invite4);
       expect(player4.conversationAreaInvites.length).toEqual(1);
       player4.removeConversationAreaInvite(invite);
       expect(player4.conversationAreaInvites.length).toEqual(1);
     });
     it('Should see 2 invites from the same location but dif players as a different invite', () => {
-      town.inviteToConversationArea(player4, [player2]);
-      town.inviteToConversationArea(player5, [player2]);
+      const invite1: ConversationAreaInvite = {
+        requester: player4,
+        requested: [player2],
+        requesterLocation: player4.location,
+      };
+      const invite3: ConversationAreaInvite = {
+        requester: player5,
+        requested: [player2],
+        requesterLocation: player5.location,
+      };
+      town.inviteToConversationArea(invite1);
+      town.inviteToConversationArea(invite3);
       expect(player2.conversationAreaInvites.length).toEqual(2);
       player2.removeConversationAreaInvite({
         requester: player4,

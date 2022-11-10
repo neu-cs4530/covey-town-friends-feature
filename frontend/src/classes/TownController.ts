@@ -19,6 +19,7 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
   Player,
+  ConversationAreaInvite,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -152,6 +153,14 @@ export type TownEvents = {
    * being un-friended.
    */
   clickedRemoveFriend: (removeFriend: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player has requested the list of players to
+   * join them in a given conversation area. The request contains a requester Player,
+   * a list of requested Players, as well as a PlayerLocation that the requested
+   * will be transported to if they accept the request.
+   */
+  clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
 
   /**
    * An event that indicates that the player has accepted a conversation area invite.
@@ -1039,6 +1048,16 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedDeclineConvAreaInvite(declinedInvite: TeleportInviteSingular): void {
     this._socket.emit('declineConvAreaInvite', declinedInvite);
+  }
+
+  /**
+   * Emits a inviteAllToConvArea event to the townService
+   * @param invite holds the requester, list of requested, and destination location,
+   *               within the conversation area, that the requested would be transported to if
+   *               they accepted the invite.
+   */
+  public clickedInviteAllToConvArea(invite: ConversationAreaInvite): void {
+    this._socket.emit('inviteAllToConvArea', invite);
   }
 }
 

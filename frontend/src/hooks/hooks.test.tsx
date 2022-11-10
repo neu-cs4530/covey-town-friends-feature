@@ -510,7 +510,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
         playerFriends.push(friend1);
         listener(playerFriends);
       });
-      hookReturnValue.sort((a, b) => (a.id && b.id ? a.id.localeCompare(b.id) : 0));
       expect(hookReturnValue).toEqual([
         playerFriends[0],
         playerFriends[1],
