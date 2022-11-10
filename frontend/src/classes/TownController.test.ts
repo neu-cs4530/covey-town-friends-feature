@@ -12,6 +12,7 @@ import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
+  ConversationAreaInvite,
   CoveyTownSocket,
   Player as PlayerModel,
   PlayerLocation,
@@ -54,6 +55,8 @@ describe('TownController', () => {
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
   const mockListeners = mock<TownEvents>();
+  let player1Location: PlayerLocation;
+  let player2Location: PlayerLocation;
 
   /**
    * Testing harness that mocks the arrival of an event from the CoveyTownSocket and expects that
@@ -101,8 +104,6 @@ describe('TownController', () => {
     playerTestData3.userName = 'player3';
   });
   describe('Setting the conversation area invites property', () => {
-    let player1Location: PlayerLocation;
-    let player2Location: PlayerLocation;
     let teleportInvite1: TeleportInviteSingular;
     let teleportInvite2: TeleportInviteSingular;
     let newInvites: TeleportInviteSingular[];
@@ -379,6 +380,15 @@ describe('TownController', () => {
       };
       testController.clickedRemoveFriend(testRemoveFriend);
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
+    });
+    it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called', () => {
+      const testInvite: ConversationAreaInvite = {
+        requester: playerTestData.player,
+        requested: [playerTestData2.player],
+        requesterLocation: player1Location,
+      };
+      testController.clickedInviteAllToConvArea(testInvite);
+      expect(mockSocket.emit).toBeCalledWith('inviteAllToConvArea', testInvite);
     });
     it('Emits acceptConvAreaInvite when clickedAcceptConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
