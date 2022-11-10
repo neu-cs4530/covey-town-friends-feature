@@ -643,10 +643,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         };
         const newConvoAreaInvites: TeleportInviteSingular[] =
           this._conversationAreaInvitesInternal.concat([newInvite]);
-        this._conversationAreaInvites = newConvoAreaInvites;
+        this.conversationAreaInvites = newConvoAreaInvites;
       }
     });
-
 
     /*
      * When a conversation area individual invite is accepted, use the remover helper to
@@ -735,6 +734,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._addPlayerControllerToFriendsList(affected.id);
       } else if (affected.id === ourPlayerID) {
         this._addPlayerControllerToFriendsList(actor.id);
+      }
     });
 
     /**
@@ -841,7 +841,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     // update the playerFriends list
     this.playerFriends = [...updatedFriendsList];
   }
-  
+
   /*
    * Check to see if our player was the requested person in the given invite. If so, remove
    * this invite from the current list of invites.
@@ -858,7 +858,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             invite.requester.id === teleportInviteToRemove.requester.id
           ),
       );
-      this._conversationAreaInvites = newInvitesFiltered;
+      this.conversationAreaInvites = newInvitesFiltered;
     }
   }
 

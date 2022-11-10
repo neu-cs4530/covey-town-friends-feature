@@ -722,7 +722,6 @@ describe('TownController', () => {
           expect(mockListeners.playerFriendRequestsChanged).not.toBeCalled();
         });
       });
-
       describe('friendRequestDeclined events', () => {
         it('Emits a playerFriendRequestsChanged event with the updated list of friend requests', () => {
           // add friend request from our player to player 2
@@ -1102,6 +1101,9 @@ describe('TownController', () => {
           // make sure that it doesn't change
           expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
           expect(testController.playerFriends).toEqual([player1PC, player2PC]);
+        });
+      });
+    });
     describe('ConversationAreaInviteRequest events', () => {
       let conversationAreaRequestSentEventListener: (update: ConversationAreaGroupInvite) => void;
       let conversationAreaRequestAcceptedEventListener: (update: TeleportInviteSingular) => void;
@@ -1193,7 +1195,7 @@ describe('TownController', () => {
       describe('conversationAreaRequestAccepted events', () => {
         it('Emits a conversationAreaInvitesChanged event if this player accepted the invite', () => {
           // populate conversation area invites with two teleport invites
-          testController._conversationAreaInvites = ourPlayerInvites;
+          testController.conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer);
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([
             teleportInviteOurPlayer2,
@@ -1204,13 +1206,13 @@ describe('TownController', () => {
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
         });
         it('Removes the invite if this player accepted it', () => {
-          testController._conversationAreaInvites = ourPlayerInvites;
+          testController.conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer2);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
         it('Does not modify invites list if this player was not the acceptor of the invite', () => {
-          testController._conversationAreaInvites = [teleportInviteOurPlayer];
+          testController.conversationAreaInvites = [teleportInviteOurPlayer];
           conversationAreaRequestAcceptedEventListener(teleportInviteNotOurPlayer);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
@@ -1219,7 +1221,7 @@ describe('TownController', () => {
       describe('conversationAreaRequestDeclined events', () => {
         it('Emits a conversationAreaInvitesChanged event if this player declined the invite', () => {
           // populate conversation area invites with two teleport invites
-          testController._conversationAreaInvites = ourPlayerInvites;
+          testController.conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer);
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([
             teleportInviteOurPlayer2,
@@ -1230,13 +1232,13 @@ describe('TownController', () => {
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
         });
         it('Removes the invite if this player declined it', () => {
-          testController._conversationAreaInvites = ourPlayerInvites;
+          testController.conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer2);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
         it('Does not modify invites list if this player was not the decliner of the invite', () => {
-          testController._conversationAreaInvites = [teleportInviteOurPlayer];
+          testController.conversationAreaInvites = [teleportInviteOurPlayer];
           conversationAreaRequestDeclinedEventListener(teleportInviteNotOurPlayer);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
