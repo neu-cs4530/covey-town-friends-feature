@@ -617,9 +617,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * When a conversation area individual invite is accepted, check to see if our player was the
-     * person who accepted it using the remove helper. If so, remove this invite from the current
-     * list of invites, if it exisits in the list.
+     * When a conversation area individual invite is accepted, use the remover helper to
+     * deal with removing the invite.
      *
      * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
@@ -628,9 +627,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * When a conversation area individual invite is declined, check to see if our player was the
-     * person who declined it using the remove helper. If so, remove this invite from the current
-     * list of invites, if it exisits in the list.
+     * When a conversation area individual invite is declined, use the remover helper to
+     * deal with removing the invite.
      *
      * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
@@ -640,8 +638,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Filters the current list of conversation area invites based on the given individual invite,
-   * if our player is the requested person in the invite.
+   * Check to see if our player was the requested person in the given invite. If so, remove
+   * this invite from the current list of invites.
    *
    * @param teleportInviteToRemove the teleport invite to remove, if found
    */

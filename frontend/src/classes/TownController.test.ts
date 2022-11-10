@@ -682,7 +682,7 @@ describe('TownController', () => {
         ourPlayerInvites = [teleportInviteOurPlayer, teleportInviteOurPlayer2];
       });
       describe('conversationAreaRequestSent events', () => {
-        it('Emits a conversationAreaInvitesChanged event if a new invite is sent if this player was invited', () => {
+        it('Emits a conversationAreaInvitesChanged event if a new invite is sent that affects this player (i.e. if this player was invited)', () => {
           // send a group invite from player1 to ourPlayer
           conversationAreaRequestSentEventListener(convAreaGroupInviteOurPlayer);
 
@@ -691,27 +691,27 @@ describe('TownController', () => {
             teleportInviteOurPlayer,
           ]);
         });
-        it('Adds the corresponding singular invite to internal list if a new group invite is sent and this player was invited', () => {
+        it('Adds the corresponding singular invite to internal list if a new group invite is sent that affects this player (i.e. this player was invited)', () => {
           conversationAreaRequestSentEventListener(convAreaGroupInviteOurPlayer);
 
           // expect to see the new invite added to conversationAreaInvitesInternal
           const convInvitesInternalAfter: TeleportInviteSingular[] = [teleportInviteOurPlayer];
           expect(testController.conversationAreaInvites).toStrictEqual(convInvitesInternalAfter);
         });
-        it('Does not emit a conversationAreaInvitesChanged event if this player was not invited in new invite', () => {
+        it('Does not emit a conversationAreaInvitesChanged event if this player was not one of the requested in the received group invite', () => {
           conversationAreaRequestSentEventListener(convAreaGroupInviteNotOurPlayer);
 
           // expect to not see event emitted
           expect(mockListeners.conversationAreaInvitesChanged).not.toHaveBeenCalled();
         });
-        it('Does not add the corresponding invite to the list of invites if this player was not a recipient', () => {
+        it('Does not add the corresponding invite to the list of invites if this player was not one of the requested in the received group invite', () => {
           const convInvitesInternalBefore: TeleportInviteSingular[] = [];
           conversationAreaRequestSentEventListener(convAreaGroupInviteNotOurPlayer);
           expect(testController.conversationAreaInvites).toStrictEqual(convInvitesInternalBefore);
         });
       });
       describe('conversationAreaRequestAccepted events', () => {
-        it('Emits a conversationAreaInvitesChanged event if this player accepted an invite', () => {
+        it('Emits a conversationAreaInvitesChanged event if this player accepted the invite', () => {
           // populate conversation area invites with two teleport invites
           testController._conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer);
@@ -722,16 +722,14 @@ describe('TownController', () => {
           // accept second invite
           conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer2);
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
-
-          // test with more than one invite in the list
         });
-        it('Removes the corresponding invite if this player accepted an invite', () => {
+        it('Removes the invite if this player accepted it', () => {
           testController._conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer2);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
-        it('Does not modify invites list if this player was not the acceptor of an invite', () => {
+        it('Does not modify invites list if this player was not the acceptor of the invite', () => {
           testController._conversationAreaInvites = [teleportInviteOurPlayer];
           conversationAreaRequestAcceptedEventListener(teleportInviteNotOurPlayer);
 
@@ -739,7 +737,7 @@ describe('TownController', () => {
         });
       });
       describe('conversationAreaRequestDeclined events', () => {
-        it('Emits a conversationAreaInvitesChanged event if this player declined an invite', () => {
+        it('Emits a conversationAreaInvitesChanged event if this player declined the invite', () => {
           // populate conversation area invites with two teleport invites
           testController._conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer);
@@ -751,13 +749,13 @@ describe('TownController', () => {
           conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer2);
           expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
         });
-        it('Removes the corresponding invite if this player declined an invite', () => {
+        it('Removes the invite if this player declined it', () => {
           testController._conversationAreaInvites = ourPlayerInvites;
           conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer2);
 
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
-        it('Does not modify invites list if this player was not the decliner of an invite', () => {
+        it('Does not modify invites list if this player was not the decliner of the invite', () => {
           testController._conversationAreaInvites = [teleportInviteOurPlayer];
           conversationAreaRequestDeclinedEventListener(teleportInviteNotOurPlayer);
 
