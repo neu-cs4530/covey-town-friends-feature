@@ -238,7 +238,8 @@ export default class Town {
    * Emit a friendRequestSent event with the given sender and recipient.
    *
    * @param currentFriendRequest contains Player who is requesting another player to be
-   * their friend and Player who is the intended recipient of the friend request.
+   *                             their friend and Player who is the intended recipient
+   *                             of the friend request.
    */
   public inviteFriend(currentFriendRequest: PlayerToPlayerUpdate): void {
     // This should be caught by TownController
@@ -249,8 +250,9 @@ export default class Town {
    * Emit a canceledFriendRequest event with the given sender and recipient.
    *
    * @param currentFriendRequest contains the Player who is canceling a request that
-   * THEY sent to another player and Player who is the intended recipient of the
-   * original friend request that is being canceled.
+   *                             THEY sent to another player and Player who is the
+   *                             intended recipient of the original friend request that
+   *                             is being canceled.
    */
   public cancelFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
     // This should be caught by TownController
@@ -262,7 +264,8 @@ export default class Town {
    * player's friends list.
    *
    * @param currentFriendRequest contains the recipient of the initial friend request
-   * who Is ACCEPTING the received friend request and the sender of the initial request.
+   *                             who Is ACCEPTING the received friend request and the
+   *                             sender of the initial request.
    */
   public acceptFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
     currentFriendRequest.actor.addFriend(currentFriendRequest.affected);
@@ -275,7 +278,8 @@ export default class Town {
    * Removes each player from each other's friends list.
    *
    * @param currentFriends containts the player removing the affected from their friend's
-   * list and the player to be removed from the instigator's friends list.
+   *                       list and the player to be removed from the instigator's friends
+   *                       list.
    */
   public removeFriend(currentFriends: PlayerToPlayerUpdate): void {
     currentFriends.actor.removeFriend(currentFriends.affected);
@@ -288,7 +292,7 @@ export default class Town {
    * add each player to other player's friends list.
    *
    * @param currentRequest contains the recipient of the initial friend request and
-   * the sender of the initial friend request.
+   *                       the sender of the initial friend request.
    */
   public declineFriendRequest(currentRequest: PlayerToPlayerUpdate): void {
     // This should be caught by TownController

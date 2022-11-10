@@ -188,8 +188,9 @@ export class MockedPlayer {
   }
 
   invitedAllToConvArea(invite: ConversationAreaInvite): void {
+    const { requester, requested, requesterLocation } = invite;
     const onInviteAllToConvAreaListener = getEventListener(this.socket, 'inviteAllToConvArea');
-    onInviteAllToConvAreaListener(invite);
+    onInviteAllToConvAreaListener({ requester, requested, requesterLocation });
   }
 
   acceptedConvAreaInvite(
