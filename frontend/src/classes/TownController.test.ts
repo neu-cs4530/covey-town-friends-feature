@@ -627,11 +627,11 @@ describe('TownController', () => {
       let player1Location: PlayerLocation;
       let player2Location: PlayerLocation;
       let convoAreaGroupInviteOurPlayer: ConversationAreaGroupInvite;
-      let teleportInviteOurPlayer: TeleportInviteSingular;
       let convoAreaGroupInviteNotOurPlayer: ConversationAreaGroupInvite;
-      let teleportInvite1: TeleportInviteSingular;
-      let teleportInvite2: TeleportInviteSingular;
-      let newInvites: TeleportInviteSingular[];
+      let teleportInviteOurPlayer: TeleportInviteSingular;
+      let teleportInviteOurPlayer2: TeleportInviteSingular;
+      let teleportInviteNotOurPlayer: TeleportInviteSingular;
+      let ourPlayerInvites: TeleportInviteSingular[];
       beforeEach(() => {
         conversationAreaRequestSentEventListener = getEventListener(
           mockSocket,
@@ -659,27 +659,27 @@ describe('TownController', () => {
           requested: [testController.ourPlayer],
           requesterLocation: player1Location,
         };
-        teleportInviteOurPlayer = {
-          requester: playerTestData,
-          requested: testController.ourPlayer,
-          requesterLocation: player1Location,
-        };
         convoAreaGroupInviteNotOurPlayer = {
           requester: playerTestData,
           requested: [playerTestData3],
           requesterLocation: player1Location,
         };
-        teleportInvite1 = {
+        teleportInviteOurPlayer = {
+          requester: playerTestData,
+          requested: testController.ourPlayer,
+          requesterLocation: player1Location,
+        };
+        teleportInviteOurPlayer2 = {
+          requester: playerTestData2,
+          requested: testController.ourPlayer,
+          requesterLocation: player2Location,
+        };
+        teleportInviteNotOurPlayer = {
           requester: playerTestData,
           requested: playerTestData3,
           requesterLocation: player1Location,
         };
-        teleportInvite2 = {
-          requester: playerTestData2,
-          requested: playerTestData3,
-          requesterLocation: player2Location,
-        };
-        newInvites = [teleportInvite1, teleportInvite2];
+        ourPlayerInvites = [teleportInviteOurPlayer, teleportInviteOurPlayer2];
       });
       describe('conversationAreaRequestSent events', () => {
         it('Emits a conversationAreaInvitesChanged event if a new invite is sent if this player was invited', () => {
@@ -711,14 +711,58 @@ describe('TownController', () => {
         });
       });
       describe('conversationAreaRequestAccepted events', () => {
-        it('Emits a conversationAreaInvitesChanged event if this player accepted an invite', () => {});
-        it('Removes the corresponding invite if this player accepted an invite', () => {});
-        it('Does not modify invites list if this player was not the acceptor of an invite', () => {});
+        it('Emits a conversationAreaInvitesChanged event if this player accepted an invite', () => {
+          // populate conversation area invites with two teleport invites
+          testController._conversationAreaInvites = ourPlayerInvites;
+          conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer);
+          expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([
+            teleportInviteOurPlayer2,
+          ]);
+
+          // accept second invite
+          conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer2);
+          expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
+
+          // test with more than one invite in the list
+        });
+        it('Removes the corresponding invite if this player accepted an invite', () => {
+          testController._conversationAreaInvites = ourPlayerInvites;
+          conversationAreaRequestAcceptedEventListener(teleportInviteOurPlayer2);
+
+          expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
+        });
+        it('Does not modify invites list if this player was not the acceptor of an invite', () => {
+          testController._conversationAreaInvites = [teleportInviteOurPlayer];
+          conversationAreaRequestAcceptedEventListener(teleportInviteNotOurPlayer);
+
+          expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
+        });
       });
       describe('conversationAreaRequestDeclined events', () => {
-        it('Emits a conversationAreaInvitesChanged event if this player declined an invite', () => {});
-        it('Removes the corresponding invite if this player declined an invite', () => {});
-        it('Does not modify invites list if this player was not the decliner of an invite', () => {});
+        it('Emits a conversationAreaInvitesChanged event if this player declined an invite', () => {
+          // populate conversation area invites with two teleport invites
+          testController._conversationAreaInvites = ourPlayerInvites;
+          conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer);
+          expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([
+            teleportInviteOurPlayer2,
+          ]);
+
+          // decline second invite
+          conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer2);
+          expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith([]);
+        });
+        it('Removes the corresponding invite if this player declined an invite', () => {
+          testController._conversationAreaInvites = ourPlayerInvites;
+          conversationAreaRequestDeclinedEventListener(teleportInviteOurPlayer2);
+
+          expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
+        });
+        it('Does not modify invites list if this player was not the decliner of an invite', () => {
+          testController._conversationAreaInvites = [teleportInviteOurPlayer];
+          conversationAreaRequestDeclinedEventListener(teleportInviteNotOurPlayer);
+
+          expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
+        });
       });
     });
   });
