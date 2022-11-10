@@ -723,7 +723,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   /**
    * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
-   * remove this request from our list of friendRequests
+   * remove this request from our list of friendRequests.
    *
    * @param requestToRemove the friend request from actor to affected to remove
    */
