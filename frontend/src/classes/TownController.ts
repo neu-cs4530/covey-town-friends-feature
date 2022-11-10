@@ -393,7 +393,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playersInternal;
   }
 
-  public set _players(newPlayers: PlayerController[]) {
+  public set players(newPlayers: PlayerController[]) {
     this.emit('playersChanged', newPlayers);
     this._playersInternal = newPlayers;
   }
@@ -411,7 +411,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._conversationAreaInvitesInternal;
   }
 
-  public set _conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
+  public set conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
     // Only update the list if the new list is not the same as the current one
     if (
       !(
@@ -433,7 +433,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playerFriendRequestsInternal;
   }
 
-  public set _playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
+  public set playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
     // Only update the list if the new list is not the same as the current one
     if (
       !(
@@ -451,7 +451,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playerFriendsInternal;
   }
 
-  public set _playerFriends(newPlayerFriends: PlayerController[]) {
+  public set playerFriends(newPlayerFriends: PlayerController[]) {
     if (
       !(
         this._playerFriendsInternal.length === newPlayerFriends.length &&
@@ -532,7 +532,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('playerJoined', newPlayer => {
       const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
-      this._players = this.players.concat([newPlayerObj]);
+      this.players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
     /**
@@ -541,14 +541,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
-      this._players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+      this.players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
 
       // if the disconnectedPlayer is in our friends list, remove it from our friends as well
       this._removePlayerControllerFromFriendsList(disconnectedPlayer.id);
 
       // clear any friend requests where disconnectedPlayer is either the actor or affected
       const updatedRequestList = [...this.playerFriendRequests];
-      this._playerFriendRequests = updatedRequestList.filter(
+      this.playerFriendRequests = updatedRequestList.filter(
         request =>
           !(
             request.actor.id === disconnectedPlayer.id ||
@@ -583,7 +583,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       } else {
         //TODO: It should not be possible to receive a playerMoved event for a player that is not already in the players array, right?
         const newPlayer = PlayerController.fromPlayerModel(movedPlayer);
-        this._players = this.players.concat(newPlayer);
+        this.players = this.players.concat(newPlayer);
         this.emit('playerMoved', newPlayer);
       }
     });
@@ -639,7 +639,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         const updatedFriendRequests = [...this.playerFriendRequests];
         updatedFriendRequests.push(friendRequest);
         // use setter because it emits necessary event
-        this._playerFriendRequests = updatedFriendRequests;
+        this.playerFriendRequests = updatedFriendRequests;
       }
     });
 
@@ -737,7 +737,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         request =>
           !(request.actor.id === initialSender.id && request.affected.id === initialReceiver.id),
       );
-      this._playerFriendRequests = [...updatedRequestList];
+      this.playerFriendRequests = [...updatedRequestList];
     }
   }
 
@@ -765,7 +765,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
 
     // update the playerFriends list
-    this._playerFriends = [...updatedFriendsList];
+    this.playerFriends = [...updatedFriendsList];
   }
 
   /**
@@ -791,7 +791,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
 
     // update the playerFriends list
-    this._playerFriends = [...updatedFriendsList];
+    this.playerFriends = [...updatedFriendsList];
   }
 
   /**
@@ -897,14 +897,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._friendlyNameInternal = initialData.friendlyName;
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
-        this._players = initialData.currentPlayers.map(eachPlayerModel =>
+        this.players = initialData.currentPlayers.map(eachPlayerModel =>
           PlayerController.fromPlayerModel(eachPlayerModel),
         );
 
         this._conversationAreas = [];
         this._viewingAreas = [];
-        this._conversationAreaInvites = [];
-        this._playerFriendRequests = [];
+        this.conversationAreaInvites = [];
+        this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {

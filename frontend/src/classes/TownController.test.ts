@@ -130,14 +130,14 @@ describe('TownController', () => {
     });
     it('does not update if the new conv area invites are the same as the old', () => {
       expect(testController.conversationAreaInvites).toEqual([]);
-      testController._conversationAreaInvites = newInvites;
+      testController.conversationAreaInvites = newInvites;
       expect(testController.conversationAreaInvites).toEqual(newInvites);
-      testController._conversationAreaInvites = [teleportInvite2, teleportInvite1];
+      testController.conversationAreaInvites = [teleportInvite2, teleportInvite1];
       expect(mockListeners.conversationAreaInvitesChanged).toBeCalledTimes(1);
     });
     it('emits the conversationAreaInvitesChanged event when setting and updates the param', () => {
       expect(testController.conversationAreaInvites).toEqual([]);
-      testController._conversationAreaInvites = newInvites;
+      testController.conversationAreaInvites = newInvites;
       expect(testController.conversationAreaInvites).toEqual(newInvites);
       expect(mockListeners.conversationAreaInvitesChanged).toBeCalledTimes(1);
       expect(mockListeners.conversationAreaInvitesChanged).toBeCalledWith(newInvites);
@@ -165,14 +165,14 @@ describe('TownController', () => {
     });
     it('does not update if the new friend requests param is the same as the old', () => {
       expect(testController.playerFriendRequests).toEqual([]);
-      testController._playerFriendRequests = newFriendRequests;
+      testController.playerFriendRequests = newFriendRequests;
       expect(testController.playerFriendRequests).toEqual(newFriendRequests);
-      testController._playerFriendRequests = [request2, request1];
+      testController.playerFriendRequests = [request2, request1];
       expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(1);
     });
     it('emits the playerFriendRequestsChanged event when setting and updates the param', () => {
       expect(testController.playerFriendRequests).toEqual([]);
-      testController._playerFriendRequests = newFriendRequests;
+      testController.playerFriendRequests = newFriendRequests;
       expect(testController.playerFriendRequests).toEqual(newFriendRequests);
       expect(mockListeners.playerFriendRequestsChanged).toBeCalledTimes(1);
       expect(mockListeners.playerFriendRequestsChanged).toBeCalledWith(newFriendRequests);
@@ -199,20 +199,20 @@ describe('TownController', () => {
     });
     it('does not update if the new friends param is the same as the old and empty', () => {
       expect(testController.playerFriends).toEqual([]);
-      testController._playerFriends = [];
+      testController.playerFriends = [];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(0);
     });
     it('does not update if the new friends param is the same as the old and non-empty', () => {
       expect(testController.playerFriends).toEqual([]);
       const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
       const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
-      testController._playerFriends = [testSamePlayer];
+      testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController._playerFriends = [testSamePlayer];
+      testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController._playerFriends = [testSamePlayer, testSamePlayer2];
+      testController.playerFriends = [testSamePlayer, testSamePlayer2];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      testController._playerFriends = [testSamePlayer2, testSamePlayer];
+      testController.playerFriends = [testSamePlayer2, testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
@@ -222,12 +222,12 @@ describe('TownController', () => {
     });
     it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
       expect(testController.playerFriends).toEqual([]);
-      testController._playerFriends = [
+      testController.playerFriends = [
         PlayerController.fromPlayerModel(testPlayer),
         PlayerController.fromPlayerModel(testPlayer2),
       ];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController._playerFriends = [PlayerController.fromPlayerModel(testPlayer)];
+      testController.playerFriends = [PlayerController.fromPlayerModel(testPlayer)];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
     });
   });
@@ -813,7 +813,7 @@ describe('TownController', () => {
             rotation: 'front',
             moving: false,
           });
-          testController._players = [player1PC, player2PC];
+          testController.players = [player1PC, player2PC];
           // Set up IDs
           playerTestData.id = 'id1';
           playerTestData2.id = 'id2';
@@ -838,8 +838,8 @@ describe('TownController', () => {
         });
         afterEach(() => {
           // clear testController's friends and requests
-          testController._playerFriends = [];
-          testController._playerFriendRequests = [];
+          testController.playerFriends = [];
+          testController.playerFriendRequests = [];
         });
         it('Emits a playerFriendRequestsChanged event with the updated list of friend requests', () => {
           // check that the requests from the beforeEach are present
@@ -1015,7 +1015,7 @@ describe('TownController', () => {
             rotation: 'front',
             moving: false,
           });
-          testController._players = [player1PC, player2PC];
+          testController.players = [player1PC, player2PC];
           // Set up IDs
           playerTestData.id = 'id1';
           playerTestData2.id = 'id2';
@@ -1040,8 +1040,8 @@ describe('TownController', () => {
         });
         afterEach(() => {
           // reset testController's friends and requests after each test
-          testController._playerFriends = [];
-          testController._playerFriendRequests = [];
+          testController.playerFriends = [];
+          testController.playerFriendRequests = [];
         });
         it('Does not emit a playerFriendRequestsChanged event', () => {
           // should be 4 calls from the beforeEach setup
@@ -1138,7 +1138,7 @@ describe('TownController', () => {
       );
 
       // make player 1 our friend
-      testController._playerFriends = [testPlayerController];
+      testController.playerFriends = [testPlayerController];
     });
     it('Emits playersChanged events when players join', () => {
       expect(testPlayerPlayersChangedFn).toBeCalledWith([
@@ -1164,7 +1164,7 @@ describe('TownController', () => {
         actor: testPlayer,
         affected: testPlayer2,
       };
-      testController._playerFriendRequests = [requestFromPlayer1ToPlayer2];
+      testController.playerFriendRequests = [requestFromPlayer1ToPlayer2];
 
       // disconnect player 2 and expect the request is removed and expect the friend request
       // involving player 2 to be removed from the friend request list
