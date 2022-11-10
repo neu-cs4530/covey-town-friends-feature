@@ -200,7 +200,7 @@ export default class Town {
     // Set up a listener to process the conversation area teleport request.
     // Makes the necessary backend changes & then emits an event to let the TownController
     // know the changes have been made.
-    socket.on('inviteAllToConvArea', (invite: ConversationAreaInvite) => {
+    socket.on('inviteAllToConvArea', (invite: ConversationAreaGroupInvite) => {
       this.inviteToConversationArea(invite);
     });
 
@@ -319,7 +319,7 @@ export default class Town {
    * @param instigator the player sending out the invites.
    * @param invitedFriends the players invited.
    */
-  public inviteToConversationArea(invite: ConversationAreaInvite): void {
+  public inviteToConversationArea(invite: ConversationAreaGroupInvite): void {
     // For each requested player, add the corresponding teleport request to their invite list.
     invite.requested.forEach(friend => {
       const inviteToOne: TeleportInviteSingular = {

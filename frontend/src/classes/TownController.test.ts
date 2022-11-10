@@ -12,7 +12,6 @@ import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
-  ConversationAreaInvite,
   CoveyTownSocket,
   Player as PlayerModel,
   PlayerLocation,
@@ -383,7 +382,7 @@ describe('TownController', () => {
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
     it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called', () => {
-      const testInvite: ConversationAreaInvite = {
+      const testInvite: ConversationAreaGroupInvite = {
         requester: playerTestData.player,
         requested: [playerTestData2.player],
         requesterLocation: player1Location,
@@ -634,8 +633,6 @@ describe('TownController', () => {
       let conversationAreaRequestSentEventListener: (update: ConversationAreaGroupInvite) => void;
       let conversationAreaRequestAcceptedEventListener: (update: TeleportInviteSingular) => void;
       let conversationAreaRequestDeclinedEventListener: (update: TeleportInviteSingular) => void;
-      let player1Location: PlayerLocation;
-      let player2Location: PlayerLocation;
       let convAreaGroupInviteOurPlayer: ConversationAreaGroupInvite;
       let convAreaGroupInviteNotOurPlayer: ConversationAreaGroupInvite;
       let teleportInviteOurPlayer: TeleportInviteSingular;

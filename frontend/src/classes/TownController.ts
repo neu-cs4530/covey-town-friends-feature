@@ -18,7 +18,7 @@ import {
   TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
-  ConversationAreaInvite,
+  ConversationAreaGroupInvite,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -159,7 +159,7 @@ export type TownEvents = {
    * a list of requested Players, as well as a PlayerLocation that the requested
    * will be transported to if they accept the request.
    */
-  clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
+  clickedInviteAllToConvArea: (invite: ConversationAreaGroupInvite) => void;
 
   /**
    * An event that indicates that the player has accepted a conversation area invite.
@@ -934,7 +934,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.
    */
-  public clickedInviteAllToConvArea(invite: ConversationAreaInvite): void {
+  public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
     this._socket.emit('inviteAllToConvArea', invite);
   }
 }
