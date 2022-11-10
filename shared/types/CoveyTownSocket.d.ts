@@ -76,7 +76,7 @@ export type PlayerToPlayerUpdate = {
   affected: PlayerSrc;
 };
 
-export type ConversationAreaInvite = {
+export type ConversationAreaGroupInvite = {
   requester: PlayerSrc;
   requested: PlayerSrc[];
   // Check whether this is a shallow/deep copy, potentially remove player location
@@ -114,7 +114,7 @@ export interface ServerToClientEvents {
   // actor is remover, affected is the removed friend
   friendRemoved: (friendRequest: PlayerToPlayerUpdate) => void;
   conversationAreaRequestSent: (
-    conversationAreaInviteRequest: ConversationAreaInvite
+    conversationAreaInviteRequest: ConversationAreaGroupInvite
   ) => void;
   conversationAreaRequestAccepted: (
     conversationAreaInviteRequest: TeleportInviteSingular

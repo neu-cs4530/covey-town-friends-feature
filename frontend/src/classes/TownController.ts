@@ -14,11 +14,11 @@ import {
   CoveyTownSocket,
   PlayerLocation,
   PlayerToPlayerUpdate,
-  TeleportInviteSingular,
   TeleportAction,
+  TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
-  ConversationAreaInvite,
+  ConversationAreaGroupInvite,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -159,7 +159,7 @@ export type TownEvents = {
    * a list of requested Players, as well as a PlayerLocation that the requested
    * will be transported to if they accept the request.
    */
-  clickedInviteAllToConvArea: (invite: ConversationAreaInvite) => void;
+  clickedInviteAllToConvArea: (invite: ConversationAreaGroupInvite) => void;
 
   /**
    * An event that indicates that the player has accepted a conversation area invite.
@@ -596,6 +596,74 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    /**
+     * When a conversation area group invite is sent out, check to see if our player was among
+     * the list of invitees. If so, add this new teleport invite to the exisitng list of invites,
+     * if there isn't already an indentical invite present.
+     *
+     * If the invite was unique, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
+      const affectedPlayers = conversationAreaInviteRequest.requested;
+      // find the index of our player within the list of recipients in this conversationAreaInviteRequest
+      const ourPlayerIndex: number = affectedPlayers.findIndex(
+        invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
+      );
+
+      // using the index (if found), add our player to a copy of the current list of _conversationAreaInvitesInternal
+      // and call the setter for _conversationAreaInvitesInternal
+      if (ourPlayerIndex !== -1) {
+        const newInvite: TeleportInviteSingular = {
+          requester: conversationAreaInviteRequest.requester,
+          requested: affectedPlayers[ourPlayerIndex],
+          requesterLocation: conversationAreaInviteRequest.requesterLocation,
+        };
+        const newConvoAreaInvites: TeleportInviteSingular[] =
+          this._conversationAreaInvitesInternal.concat([newInvite]);
+        this._conversationAreaInvites = newConvoAreaInvites;
+      }
+    });
+
+    /**
+     * When a conversation area individual invite is accepted, use the remover helper to
+     * deal with removing the invite.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestAccepted', conversationAreaInviteRequest => {
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
+    });
+
+    /**
+     * When a conversation area individual invite is declined, use the remover helper to
+     * deal with removing the invite.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestDeclined', conversationAreaInviteRequest => {
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
+    });
+  }
+
+  /**
+   * Check to see if our player was the requested person in the given invite. If so, remove
+   * this invite from the current list of invites.
+   *
+   * @param teleportInviteToRemove the teleport invite to remove, if found
+   */
+  private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
+    if (teleportInviteToRemove.requested.id === this.ourPlayer.id) {
+      const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
+        invite =>
+          !(
+            invite.requesterLocation.x === teleportInviteToRemove.requesterLocation.x &&
+            invite.requesterLocation.y === teleportInviteToRemove.requesterLocation.y &&
+            invite.requester.id === teleportInviteToRemove.requester.id
+          ),
+      );
+      this._conversationAreaInvites = newInvitesFiltered;
+    }
   }
 
   /**
@@ -866,7 +934,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.
    */
-  public clickedInviteAllToConvArea(invite: ConversationAreaInvite): void {
+  public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
     this._socket.emit('inviteAllToConvArea', invite);
   }
 }

@@ -13,7 +13,7 @@ import {
 } from '../TestUtils';
 import {
   ChatMessage,
-  ConversationAreaInvite,
+  ConversationAreaGroupInvite,
   Interactable,
   PlayerLocation,
   PlayerToPlayerUpdate,
@@ -363,7 +363,7 @@ describe('Town', () => {
   let player2Friends: Player[];
   let friendRequest: PlayerToPlayerUpdate;
   let teleportRequest: TeleportInviteSingular;
-  let conversationRequest: ConversationAreaInvite;
+  let conversationRequest: ConversationAreaGroupInvite;
 
   beforeEach(async () => {
     town = new Town(nanoid(), false, nanoid(), townEmitter);
