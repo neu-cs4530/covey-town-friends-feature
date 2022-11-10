@@ -15,7 +15,7 @@ import {
   BoundingBox,
   ClientToServerEvents,
   ConversationArea,
-  ConversationAreaInvite,
+  ConversationAreaGroupInvite,
   CoveyTownSocket,
   Direction,
   Interactable,
@@ -191,7 +191,7 @@ export class MockedPlayer {
     onRemoveFriendListener({ actor, affected });
   }
 
-  invitedAllToConvArea(invite: ConversationAreaInvite): void {
+  invitedAllToConvArea(invite: ConversationAreaGroupInvite): void {
     const { requester, requested, requesterLocation } = invite;
     const onInviteAllToConvAreaListener = getEventListener(this.socket, 'inviteAllToConvArea');
     onInviteAllToConvAreaListener({ requester, requested, requesterLocation });
