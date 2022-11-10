@@ -533,10 +533,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
       this._players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+
       // if the disconnectedPlayer is in our friends list, remove it from our friends as well
-      this._playerFriends = this.playerFriends.filter(
-        eachFriend => eachFriend.id !== disconnectedPlayer.id,
-      );
+      this._removePlayerControllerFromFriendsList(disconnectedPlayer.id);
+
       // clear any friend requests where disconnectedPlayer is either the actor or affected
       const updatedRequestList = [...this.playerFriendRequests];
       this._playerFriendRequests = updatedRequestList.filter(
