@@ -682,31 +682,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       // update friends list
       // only needs to be done on this controller because the other controller will also receive this event
-      // Assume we can find actor/affected in the player list because you can't friend request someone who
-      // isn't a Player in Town (or accept a friend request of someone who isn't a Player).
-      const updatedFriendsList = [...this.playerFriends];
       if (actor.id === ourPlayerID) {
-        // Get new friend (affected) from player list
-        const affectedPC = this.players.find(
-          controller => controller.id === affected.id,
-        ) as PlayerController;
-        // Add it to the friend List
-        // Should exist by virtue of how the UI works but check in case
-        if (affectedPC) {
-          updatedFriendsList.push(affectedPC);
-        }
+        this._addPlayerControllerToFriendsList(affected.id);
       } else if (affected.id === ourPlayerID) {
-        // Get new friend (actor) from Player list
-        const actorPC = this.players.find(
-          controller => controller.id === actor.id,
-        ) as PlayerController;
-        // Add it to the friend list
-        // Should exist by virtue of how the UI works but check in case
-        if (actorPC) {
-          updatedFriendsList.push(actorPC);
-        }
+        this._addPlayerControllerToFriendsList(actor.id);
       }
-      this._playerFriends = [...updatedFriendsList];
     });
 
     /**
@@ -742,7 +722,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   *
    * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
    * remove this request from our list of friendRequests
    *
@@ -763,7 +742,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   *
    * Given the ID of a player in the town, removes the PlayerController matching that ID
    * from our friends list. Does not do anything if that player is not in our friends list
    *
@@ -785,6 +763,31 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedFriendsList.splice(indexToRemove, 1);
       }
     }
+    this._playerFriends = [...updatedFriendsList];
+  }
+
+  /**
+   * Given the ID of a player in the town, adds the PlayerController matching that ID
+   * from our friends list.
+   * Assume we can find actor/affected in the player list because you can't friend request someone who
+   * isn't a Player in Town (or accept a friend request of someone who isn't a Player).
+   *
+   * @param id the id of the player controller to remove from the friends list
+   */
+  private _addPlayerControllerToFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // Get new friend's PlayerController from player list
+    const controllerToAdd = this.players.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Add it to the friend List
+    // Should exist by virtue of how the UI works but check in case
+    if (controllerToAdd) {
+      updatedFriendsList.push(controllerToAdd);
+    }
+
     this._playerFriends = [...updatedFriendsList];
   }
 
