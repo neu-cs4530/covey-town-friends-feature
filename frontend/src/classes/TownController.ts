@@ -18,6 +18,7 @@ import {
   TeleportAction,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  Player,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -648,18 +649,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('friendRequestDeclined', friendRequest => {
       // actor is decliner, affected is the initial sender of the request
       const { actor, affected } = friendRequest;
-      const ourPlayerID = this.ourPlayer.id;
 
       // looking for a request from affected to actor, but only if one of them is our player
       // otherwise we shouldn't even have the request saved
-      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
-        const updatedRequestList = this.playerFriendRequests.filter(
-          // the person being declined (affected) is the sender of the original request (request.actor)
-          // the decliner (actor) is the recipient (request.affected) of the request we want to remove
-          request => !(request.actor.id === affected.id && request.affected.id === actor.id),
-        );
-        this._playerFriendRequests = [...updatedRequestList];
-      }
+      this._removeFriendRequestIfInvolved(affected, actor);
     });
 
     /**
@@ -675,15 +668,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const { actor, affected } = friendRequest;
       const ourPlayerID = this.ourPlayer.id;
 
-      // if our player is involved in the accepted request, remove it
-      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
-        const updatedRequestList = this.playerFriendRequests.filter(
-          // the person being accepted (affected) is the sender of the original request (request.actor)
-          // the accepter (actor) is the recipient (request.affected) of the request we want to remove
-          request => !(request.actor.id === affected.id && request.affected.id === actor.id),
-        );
-        this._playerFriendRequests = [...updatedRequestList];
-      }
+      // // if our player is involved in the accepted request, remove it
+      this._removeFriendRequestIfInvolved(affected, actor);
 
       // update friends list
       // only needs to be done on this controller because the other controller will also receive this event
@@ -721,17 +707,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('friendRequestCanceled', playerToPlayerUpdate => {
       // actor is sender / canceler, affected is original recipient
       const { actor, affected } = playerToPlayerUpdate;
-      const ourPlayerID = this.ourPlayer.id;
 
-      // if our player is involved in the canceled request
-      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
-        const updatedRequestList = this.playerFriendRequests.filter(
-          // actor is the original sender, affected is original intended recipient
-          request => !(request.actor.id === actor.id && request.affected.id === affected.id),
-        );
-
-        this._playerFriendRequests = [...updatedRequestList];
-      }
+      // if our player is involved in the canceled request remove it
+      this._removeFriendRequestIfInvolved(actor, affected);
     });
 
     /**
@@ -779,6 +757,27 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       this._playerFriends = [...updatedFriendsList];
     });
+  }
+
+  /**
+   *
+   * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
+   * remove this request from our list of friendRequests
+   *
+   * @param requestToRemove the friend request from actor to affected to remove
+   */
+  private _removeFriendRequestIfInvolved(initialSender: Player, initialReceiver: Player) {
+    const ourPlayerID = this.ourPlayer.id;
+
+    if (initialSender.id === ourPlayerID || initialReceiver.id === ourPlayerID) {
+      const updatedRequestList = this.playerFriendRequests.filter(
+        // the person being accepted (affected) is the sender of the original request (request.actor)
+        // the accepter (actor) is the recipient (request.affected) of the request we want to remove
+        request =>
+          !(request.actor.id === initialSender.id && request.affected.id === initialReceiver.id),
+      );
+      this._playerFriendRequests = [...updatedRequestList];
+    }
   }
 
   /**
