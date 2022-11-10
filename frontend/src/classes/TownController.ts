@@ -14,8 +14,8 @@ import {
   CoveyTownSocket,
   PlayerLocation,
   PlayerToPlayerUpdate,
-  TeleportInviteSingular,
   TeleportAction,
+  TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -597,15 +597,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
       const affectedPlayers = conversationAreaInviteRequest.requested;
-      let ourPlayerIndex: number | undefined;
-      for (let index = 0; index < affectedPlayers.length; index++) {
-        if (affectedPlayers[index].id === this.ourPlayer.id) {
-          ourPlayerIndex = index;
-          break;
-        }
-      }
+      // find the index of our player within the list of recipients in this conversationAreaInviteRequest
+      const ourPlayerIndex: number = affectedPlayers.findIndex(
+        invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
+      );
 
-      if (ourPlayerIndex !== undefined) {
+      // using the index (if found), add our player to a copy of the current list of _conversationAreaInvitesInternal
+      // and call the setter for _conversationAreaInvitesInternal
+      if (ourPlayerIndex !== -1) {
         const newInvite: TeleportInviteSingular = {
           requester: conversationAreaInviteRequest.requester,
           requested: affectedPlayers[ourPlayerIndex],
@@ -618,9 +617,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * When a conversation area invidiual invite is accepted, check to see if our player was the
-     * person who accepted it. If so, remove this invite from the current list of invites,
-     * if it exisits in the list.
+     * When a conversation area individual invite is accepted, check to see if our player was the
+     * person who accepted it using the remove helper. If so, remove this invite from the current
+     * list of invites, if it exisits in the list.
      *
      * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
@@ -629,9 +628,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * When a conversation area invidiual invite is declined, check to see if our player was the
-     * person who declined it. If so, remove this invite from the current list of invites,
-     * if it exisits in the list.
+     * When a conversation area individual invite is declined, check to see if our player was the
+     * person who declined it using the remove helper. If so, remove this invite from the current
+     * list of invites, if it exisits in the list.
      *
      * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
      */
@@ -641,7 +640,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Filters the current list of conversation area invites based on the given invidiual invite,
+   * Filters the current list of conversation area invites based on the given individual invite,
    * if our player is the requested person in the invite.
    *
    * @param teleportInviteToRemove the teleport invite to remove, if found
