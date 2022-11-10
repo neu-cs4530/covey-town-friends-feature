@@ -750,7 +750,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _removePlayerControllerFromFriendsList(id: string) {
     const updatedFriendsList = [...this.playerFriends];
 
-    // fnid the player controller to remove by matching id
+    // find the player controller to remove by matching id
     const playerControllerToRemove = updatedFriendsList.find(
       controller => controller.id === id,
     ) as PlayerController;
