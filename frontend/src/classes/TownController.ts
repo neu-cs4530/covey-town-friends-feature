@@ -18,6 +18,7 @@ import {
   TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  Player,
   ConversationAreaGroupInvite,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
@@ -392,7 +393,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playersInternal;
   }
 
-  private set _players(newPlayers: PlayerController[]) {
+  public set players(newPlayers: PlayerController[]) {
     this.emit('playersChanged', newPlayers);
     this._playersInternal = newPlayers;
   }
@@ -410,7 +411,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._conversationAreaInvitesInternal;
   }
 
-  public set _conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
+  public set conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
     // Only update the list if the new list is not the same as the current one
     if (
       !(
@@ -432,7 +433,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playerFriendRequestsInternal;
   }
 
-  public set _playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
+  public set playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
     // Only update the list if the new list is not the same as the current one
     if (
       !(
@@ -450,7 +451,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playerFriendsInternal;
   }
 
-  public set _playerFriends(newPlayerFriends: PlayerController[]) {
+  public set playerFriends(newPlayerFriends: PlayerController[]) {
     if (
       !(
         this._playerFriendsInternal.length === newPlayerFriends.length &&
@@ -531,7 +532,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('playerJoined', newPlayer => {
       const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
-      this._players = this.players.concat([newPlayerObj]);
+      this.players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
     /**
@@ -540,7 +541,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
-      this._players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+      this.players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+
+      // if the disconnectedPlayer is in our friends list, remove it from our friends as well
+      this._removePlayerControllerFromFriendsList(disconnectedPlayer.id);
+
+      // clear any friend requests where disconnectedPlayer is either the actor or affected
+      const updatedRequestList = [...this.playerFriendRequests];
+      this.playerFriendRequests = updatedRequestList.filter(
+        request =>
+          !(
+            request.actor.id === disconnectedPlayer.id ||
+            request.affected.id === disconnectedPlayer.id
+          ),
+      );
     });
     /**
      * When a player moves, update local state and emit an event to the controller's event listeners
@@ -556,12 +570,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           playerToUpdate.location.interactableID = movedPlayer.location.interactableID;
         } else {
           playerToUpdate.location = movedPlayer.location;
+          // find the player in our friends list whose location we also want to update
+          const friendToUpdate = this.playerFriends.find(
+            eachFriend => eachFriend.id === movedPlayer.id,
+          );
+          // if they are present
+          if (friendToUpdate) {
+            friendToUpdate.location = movedPlayer.location;
+          }
         }
         this.emit('playerMoved', playerToUpdate);
       } else {
         //TODO: It should not be possible to receive a playerMoved event for a player that is not already in the players array, right?
         const newPlayer = PlayerController.fromPlayerModel(movedPlayer);
-        this._players = this.players.concat(newPlayer);
+        this.players = this.players.concat(newPlayer);
         this.emit('playerMoved', newPlayer);
       }
     });
@@ -597,7 +619,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
     });
 
-    /**
+    /*
      * When a conversation area group invite is sent out, check to see if our player was among
      * the list of invitees. If so, add this new teleport invite to the exisitng list of invites,
      * if there isn't already an indentical invite present.
@@ -621,11 +643,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         };
         const newConvoAreaInvites: TeleportInviteSingular[] =
           this._conversationAreaInvitesInternal.concat([newInvite]);
-        this._conversationAreaInvites = newConvoAreaInvites;
+        this.conversationAreaInvites = newConvoAreaInvites;
       }
     });
 
-    /**
+    /*
      * When a conversation area individual invite is accepted, use the remover helper to
      * deal with removing the invite.
      *
@@ -644,9 +666,183 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('conversationAreaRequestDeclined', conversationAreaInviteRequest => {
       this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
     });
+
+    /**
+     *
+     * When any player sends a friend request to another player, we check if that friend request was sent BY or TO us.
+     * In either of those cases, we store those friend requests for the UI to render and emit an event for the hook
+     * to catch. Otherwise we can ignore the request.
+     *
+     * Assumes a player cannot send a friend request to themself. (UI will not allow this)
+     *
+     * Assumes a player cannot receive duplicate friend requests. (UI will not allow this)
+     *
+     * */
+    this._socket.on('friendRequestSent', friendRequest => {
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the incoming request, save it
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedFriendRequests = [...this.playerFriendRequests];
+        updatedFriendRequests.push(friendRequest);
+        // use setter because it emits necessary event
+        this.playerFriendRequests = updatedFriendRequests;
+      }
+    });
+
+    /**
+     *
+     * When any player declines a friend request, we check to see if the original request was sent to or from us.
+     * In either of those cases, we remove the request from our list of stored friend requests, for the UI to know
+     * what to render. Otherwise ignore the request.
+     *
+     * Right now, when the backend emits a friendRequestDeclined event, the actor is the decliner and the affected is
+     * the initial sender. However, this means that when looking for the request we have to flip the actor and affected.
+     * The proposed refactor is to make is so that friendRequestDeclined is emitted with the original friend request that
+     * is being declined. (Backlog refactor)
+     *
+     * */
+    this._socket.on('friendRequestDeclined', friendRequest => {
+      // actor is decliner, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+
+      // looking for a request from affected to actor, but only if one of them is our player
+      // otherwise we shouldn't even have the request saved
+      this._removeFriendRequestIfInvolved(affected, actor);
+    });
+
+    /**
+     *
+     * When a friend request is accepted, if we are one of the players in the accepted request,
+     * update our list of requests by removing it, and add the other player into our friends list.
+     *
+     * Since actor is the receiver of the intiial request, we need to flip
+     * the actor and affected to find the original request. (Backlog refactor)
+     */
+    this._socket.on('friendRequestAccepted', friendRequest => {
+      // actor is accepter, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // // if our player is involved in the accepted request, remove it
+      this._removeFriendRequestIfInvolved(affected, actor);
+
+      // update friends list
+      // only needs to be done on this controller because the other controller will also receive this event
+      if (actor.id === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(affected.id);
+      } else if (affected.id === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(actor.id);
+      }
+    });
+
+    /**
+     * Whenever a player cancels a friend request, if we are either the remover or the removed,
+     * remove that friend request from our list of requests
+     */
+    this._socket.on('friendRequestCanceled', playerToPlayerUpdate => {
+      // actor is sender / canceler, affected is original recipient
+      const { actor, affected } = playerToPlayerUpdate;
+
+      // if our player is involved in the canceled request remove it
+      this._removeFriendRequestIfInvolved(actor, affected);
+    });
+
+    /**
+     * Whenever a player removes a friend, if we are either the remover or the removed,
+     * remove the other player from our friends list.
+     */
+    this._socket.on('friendRemoved', playerToPlayerUpdate => {
+      // actor is remover, affected is the removed friend
+      const { actor, affected } = playerToPlayerUpdate;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the removal
+      if (actor.id === ourPlayerID) {
+        // if we are the actor, remove affected
+        this._removePlayerControllerFromFriendsList(affected.id);
+      } else if (affected.id === ourPlayerID) {
+        // if we are the affected, remove actor
+        this._removePlayerControllerFromFriendsList(actor.id);
+      }
+    });
   }
 
   /**
+   * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
+   * remove this request from our list of friendRequests.
+   *
+   * @param requestToRemove the friend request from actor to affected to remove
+   */
+  private _removeFriendRequestIfInvolved(initialSender: Player, initialReceiver: Player) {
+    const ourPlayerID = this.ourPlayer.id;
+
+    if (initialSender.id === ourPlayerID || initialReceiver.id === ourPlayerID) {
+      const updatedRequestList = this.playerFriendRequests.filter(
+        // the person being accepted (affected) is the sender of the original request (request.actor)
+        // the accepter (actor) is the recipient (request.affected) of the request we want to remove
+        request =>
+          !(request.actor.id === initialSender.id && request.affected.id === initialReceiver.id),
+      );
+      this.playerFriendRequests = [...updatedRequestList];
+    }
+  }
+
+  /**
+   * Given the ID of a player in the town, removes the PlayerController matching that ID
+   * from our friends list. Does not do anything if that player is not in our friends list
+   *
+   * @param id the id of the player controller to remove from the friends list
+   */
+  private _removePlayerControllerFromFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // find the player controller to remove by matching id
+    const playerControllerToRemove = updatedFriendsList.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Remove that controller from friends list from friends list
+    // (Should exist by virtue of how the UI works but checking in case)
+    if (playerControllerToRemove) {
+      const indexToRemove = updatedFriendsList.indexOf(playerControllerToRemove);
+      if (indexToRemove >= 0) {
+        updatedFriendsList.splice(indexToRemove, 1);
+      }
+    }
+
+    // update the playerFriends list
+    this.playerFriends = [...updatedFriendsList];
+  }
+
+  /**
+   * Given the ID of a player in the town, adds the PlayerController matching that ID
+   * from our friends list.
+   * Assume we can find actor/affected in the player list because you can't friend request someone who
+   * isn't a Player in Town (or accept a friend request of someone who isn't a Player).
+   *
+   * @param id the id of the player controller to add to the friends list
+   */
+  private _addPlayerControllerToFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // Get new friend's PlayerController from player list
+    const controllerToAdd = this.players.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Add it to the friend List
+    // Should exist by virtue of how the UI works but check in case
+    if (controllerToAdd) {
+      updatedFriendsList.push(controllerToAdd);
+    }
+
+    // update the playerFriends list
+    this.playerFriends = [...updatedFriendsList];
+  }
+
+  /*
    * Check to see if our player was the requested person in the given invite. If so, remove
    * this invite from the current list of invites.
    *
@@ -662,7 +858,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             invite.requester.id === teleportInviteToRemove.requester.id
           ),
       );
-      this._conversationAreaInvites = newInvitesFiltered;
+      this.conversationAreaInvites = newInvitesFiltered;
     }
   }
 
@@ -769,14 +965,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._friendlyNameInternal = initialData.friendlyName;
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
-        this._players = initialData.currentPlayers.map(eachPlayerModel =>
+        this.players = initialData.currentPlayers.map(eachPlayerModel =>
           PlayerController.fromPlayerModel(eachPlayerModel),
         );
 
         this._conversationAreas = [];
         this._viewingAreas = [];
-        this._conversationAreaInvites = [];
-        this._playerFriendRequests = [];
+        this.conversationAreaInvites = [];
+        this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {

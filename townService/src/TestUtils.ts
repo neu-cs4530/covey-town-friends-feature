@@ -143,18 +143,22 @@ export class MockedPlayer {
 
   player: Player | undefined;
 
+  id: string;
+
   constructor(
     socket: MockProxy<CoveyTownSocket>,
     socketToRoomMock: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>,
     userName: string,
     townID: string,
     player: Player | undefined,
+    id: string,
   ) {
     this.socket = socket;
     this.socketToRoomMock = socketToRoomMock;
     this.userName = userName;
     this.townID = townID;
     this.player = player;
+    this.id = id;
   }
 
   moveTo(x: number, y: number, rotation: Direction = 'front', moving = false): void {
@@ -230,7 +234,7 @@ export function mockPlayer(townID: string): MockedPlayer {
     }
     throw new Error(`Tried to broadcast to ${room} but this player is in ${townID}`);
   });
-  return new MockedPlayer(socket, socketToRoomMock, userName, townID, undefined);
+  return new MockedPlayer(socket, socketToRoomMock, userName, townID, undefined, nanoid());
 }
 
 /**
