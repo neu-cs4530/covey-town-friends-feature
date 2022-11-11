@@ -231,6 +231,61 @@ describe('TownController', () => {
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
     });
   });
+  describe('Setting the selected friends property', () => {
+    let testPlayer: PlayerModel;
+    let testPlayer2: PlayerModel;
+    // Sets up two testPlayers to become friends with each other as well as clearing the mock listeners
+    // that are set up to catch the 'playerFriendsChanged' events.
+    beforeEach(() => {
+      testPlayer = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      testPlayer2 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      mockClear(mockListeners.playerFriendsChanged);
+      testController.addListener('playerFriendsChanged', mockListeners.playerFriendsChanged);
+    });
+    it('does not update if the new friends param is the same as the old and empty', () => {
+      expect(testController.playerFriends).toEqual([]);
+      testController.playerFriends = [];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(0);
+    });
+    it('does not update if the new friends param is the same as the old and non-empty', () => {
+      expect(testController.playerFriends).toEqual([]);
+      const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
+      const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
+      testController.playerFriends = [testSamePlayer];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController.playerFriends = [testSamePlayer];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController.playerFriends = [testSamePlayer, testSamePlayer2];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+      testController.playerFriends = [testSamePlayer2, testSamePlayer];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
+      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
+        testSamePlayer,
+        testSamePlayer2,
+      ]);
+    });
+    it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
+      expect(testController.playerFriends).toEqual([]);
+      testController.playerFriends = [
+        PlayerController.fromPlayerModel(testPlayer),
+        PlayerController.fromPlayerModel(testPlayer2),
+      ];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
+      testController.playerFriends = [PlayerController.fromPlayerModel(testPlayer)];
+      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+    });
+    describe('selectFriend function', () => {});
+    describe('deselectFriend function', () => {});
+  });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {
       mockSocket.on.mockImplementation((eventName, eventListener) => {
