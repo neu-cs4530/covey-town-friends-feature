@@ -495,6 +495,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   public set selectedFriends(newSelectedFriends: PlayerController[]) {
+    // only emit a selectedFriendsChanged event if the list contains different friends
     if (
       !(
         this._selectedFriendsInternal.length === newSelectedFriends.length &&
@@ -829,38 +830,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Updates this.selectedFriends list to include friendToSelect. Assumes this player IS already a friend (UI enforced)
-   * and does nothing if the friend is already selected
-   * @param friendToSelect holds the current PlayerControler to add to the selectedFriends list
-   */
-  public selectFriend(friendToSelect: PlayerController): void {
-    // if the friendToSelect is NOT already selected
-    if (this.selectedFriends.indexOf(friendToSelect) == -1) {
-      const newSelected = [...this.selectedFriends];
-      newSelected.push(friendToSelect);
-      this.selectedFriends = [...newSelected];
-    }
-    // else do nothing
-  }
-
-  /**
-   * Updates this.selectedFriends list to NOT include friendToSelect. Assumes this player IS already a friend (UI enforced)
-   * and does nothing if the friend is already selected
-   * @param friendToSelect holds the current PlayerControler to add to the selectedFriends list
-   */
-  public deselectFriend(friendToSelect: PlayerController): void {
-    const indexToRemove = this.selectedFriends.indexOf(friendToSelect);
-
-    // if the friendToSelect exists in the selected list
-    if (indexToRemove >= 0) {
-      const newSelected = [...this.selectedFriends];
-      newSelected.splice(indexToRemove, 1);
-      this.selectedFriends = [...newSelected];
-    }
-    // else do nothing
-  }
-
-  /**
    * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
    * remove this request from our list of friendRequests.
    *
@@ -1145,6 +1114,38 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Updates this.selectedFriends list to include friendToSelect. Assumes this player IS already a friend (UI enforced)
+   * and does nothing if the friend is already selected
+   * @param friendToSelect holds the current PlayerController to add to the selectedFriends list
+   */
+  public selectFriend(friendToSelect: PlayerController): void {
+    // if the friendToSelect is NOT already selected
+    if (this.selectedFriends.indexOf(friendToSelect) == -1) {
+      const newSelected = [...this.selectedFriends];
+      newSelected.push(friendToSelect);
+      this.selectedFriends = [...newSelected];
+    }
+    // else do nothing
+  }
+
+  /**
+   * Updates this.selectedFriends list to NOT include friendToSelect. Assumes this player IS already a friend (UI enforced)
+   * and does nothing if the friend is already deselected
+   * @param friendToSelect holds the current PlayerController to add to the selectedFriends list
+   */
+  public deselectFriend(friendToSelect: PlayerController): void {
+    const indexToRemove = this.selectedFriends.indexOf(friendToSelect);
+
+    // if the friendToSelect exists in the selected list
+    if (indexToRemove >= 0) {
+      const newSelected = [...this.selectedFriends];
+      newSelected.splice(indexToRemove, 1);
+      this.selectedFriends = [...newSelected];
+    }
+    // else do nothing
+  }
+
+  /**
    * Emits a acceptFriendRequest event to the townService
    * @param acceptedRequest the friend request - holds the current player and the player whose
    * friend request was accepted.
@@ -1368,7 +1369,7 @@ export function useCurrentPlayerFriendRequests(): PlayerToPlayerUpdate[] {
  *
  * This hook relies on the TownControllerContext.
  *
- * @returns the list of player friend requests that have been sent/received (but not answered).
+ * @returns the list of player friends.
  */
 export function useCurrentPlayerFriends(): PlayerController[] {
   const townController = useTownController();
