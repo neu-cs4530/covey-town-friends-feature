@@ -205,19 +205,19 @@ describe('TownController', () => {
     it('does not update if the new friends param is the same as the old and non-empty', () => {
       expect(testController.playerFriends).toEqual([]);
       const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
-      const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
+      const testPlayerController2 = PlayerController.fromPlayerModel(testPlayer2);
       testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
       testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController.playerFriends = [testSamePlayer, testSamePlayer2];
+      testController.playerFriends = [testSamePlayer, testPlayerController2];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      testController.playerFriends = [testSamePlayer2, testSamePlayer];
+      testController.playerFriends = [testPlayerController2, testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
         testSamePlayer,
-        testSamePlayer2,
+        testPlayerController2,
       ]);
     });
     it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
@@ -234,12 +234,14 @@ describe('TownController', () => {
   describe('Setting the selected friends property', () => {
     let testPlayer: PlayerModel;
     let testPlayer2: PlayerModel;
+    let testPlayerController1: PlayerController;
+    let testPlayerController2: PlayerController;
     // Sets up two testPlayers to become friends with each other as well as clearing the mock listeners
     // that are set up to catch the 'playerFriendsChanged' events.
     beforeEach(() => {
       testPlayer = {
         id: nanoid(),
-        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
         userName: nanoid(),
       };
       testPlayer2 = {
@@ -247,44 +249,183 @@ describe('TownController', () => {
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
       };
-      mockClear(mockListeners.playerFriendsChanged);
-      testController.addListener('playerFriendsChanged', mockListeners.playerFriendsChanged);
+      testPlayerController1 = PlayerController.fromPlayerModel(testPlayer);
+      testPlayerController2 = PlayerController.fromPlayerModel(testPlayer2);
+      testController.selectedFriends = [];
+      mockClear(mockListeners.selectedFriendsChanged);
+      testController.addListener('selectedFriendsChanged', mockListeners.selectedFriendsChanged);
     });
-    it('does not update if the new friends param is the same as the old and empty', () => {
-      expect(testController.playerFriends).toEqual([]);
-      testController.playerFriends = [];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(0);
+    it('does not update if the new selectedFriends param is the same as the old and empty', () => {
+      // no selected friends
+      expect(testController.selectedFriends).toEqual([]);
+      // update to another empty list
+      testController.selectedFriends = [];
+      // no emit
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(0);
     });
-    it('does not update if the new friends param is the same as the old and non-empty', () => {
-      expect(testController.playerFriends).toEqual([]);
-      const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
-      const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
-      testController.playerFriends = [testSamePlayer];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController.playerFriends = [testSamePlayer];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController.playerFriends = [testSamePlayer, testSamePlayer2];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      testController.playerFriends = [testSamePlayer2, testSamePlayer];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
-      expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
-        testSamePlayer,
-        testSamePlayer2,
+    it('does not update if the new selectedFriends param is the same as the old and non-empty', () => {
+      // empty selectedFriends list
+      expect(testController.selectedFriends).toEqual([]);
+      // select player1
+      testController.selectedFriends = [testPlayerController1];
+      // should be called once
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+      expect(mockListeners.selectedFriendsChanged).toHaveBeenCalledWith([testPlayerController1]);
+
+      // update with same list
+      testController.selectedFriends = [testPlayerController1];
+
+      // should have no more calls
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+
+      // new update
+      testController.selectedFriends = [testPlayerController1, testPlayerController2];
+
+      // one more emit
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
+      expect(mockListeners.selectedFriendsChanged).toHaveBeenCalledWith([
+        testPlayerController1,
+        testPlayerController2,
       ]);
+
+      // update selected friends with same items different order
+      testController.selectedFriends = [testPlayerController2, testPlayerController1];
+
+      // no more emits
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
     });
-    it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
-      expect(testController.playerFriends).toEqual([]);
-      testController.playerFriends = [
-        PlayerController.fromPlayerModel(testPlayer),
-        PlayerController.fromPlayerModel(testPlayer2),
-      ];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController.playerFriends = [PlayerController.fromPlayerModel(testPlayer)];
-      expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
+    it('emits a selectedPlayerFriends when players are added and removed from the friends list', () => {
+      // empty list
+      expect(testController.selectedFriends).toEqual([]);
+      // update with both friends
+      testController.selectedFriends = [testPlayerController1, testPlayerController2];
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+
+      // update to remove one friend
+      testController.selectedFriends = [testPlayerController1];
+      expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
     });
-    describe('selectFriend function', () => {});
-    describe('deselectFriend function', () => {});
+    describe('selectFriend function', () => {
+      it('emits a selectedPlayerFriends when a new PlayerController is given', () => {
+        expect(mockListeners.selectedFriendsChanged).not.toBeCalled();
+
+        // select one friend
+        testController.selectFriend(testPlayerController1);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledWith([testPlayerController1]);
+
+        // select other friend
+        testController.selectFriend(testPlayerController2);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledWith([
+          testPlayerController1,
+          testPlayerController2,
+        ]);
+      });
+      it('doesnt emit a selectedPlayerFriends when a PlayerController that is already selected is given', () => {
+        expect(mockListeners.selectedFriendsChanged).not.toBeCalled();
+
+        // select one friend
+        testController.selectFriend(testPlayerController1);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+
+        // select same friend and expect no more emits
+        testController.selectFriend(testPlayerController1);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+      });
+      it('updates the list of selected friends when a new PC is given', () => {
+        expect(testController.selectedFriends).toEqual([]);
+
+        // select one and expect updated list
+        testController.selectFriend(testPlayerController1);
+        expect(testController.selectedFriends).toEqual([testPlayerController1]);
+
+        // select second friend and expect updated list
+        testController.selectFriend(testPlayerController2);
+        expect(testController.selectedFriends).toEqual([
+          testPlayerController1,
+          testPlayerController2,
+        ]);
+      });
+      it('doesnt change the list of selected friends when an already selected PC is given', () => {
+        expect(testController.selectedFriends).toEqual([]);
+
+        // select friend 1
+        testController.selectFriend(testPlayerController1);
+        expect(testController.selectedFriends).toEqual([testPlayerController1]);
+
+        // select friend 1 again
+        testController.selectFriend(testPlayerController1);
+        expect(testController.selectedFriends).toEqual([testPlayerController1]);
+      });
+    });
+    describe('deselectFriend function', () => {
+      it('emits a selectedPlayerFriends when a PlayerController that was already selected is given', () => {
+        // select two friends
+        testController.selectFriend(testPlayerController1);
+        testController.selectFriend(testPlayerController2);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
+
+        // deselect one friend
+        testController.deselectFriend(testPlayerController1);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledWith([testPlayerController2]);
+        // deselect other friend
+        testController.deselectFriend(testPlayerController2);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledWith([]);
+      });
+      it('doesnt emit a selectedPlayerFriends when a PlayerController that isnt already selected is given', () => {
+        // select one friend
+        testController.selectFriend(testPlayerController1);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+
+        // deselect a non-selected friend
+        testController.deselectFriend(testPlayerController2);
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(1);
+
+        // deslect the selected friend
+        testController.deselectFriend(testPlayerController1);
+        // it should emit
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
+
+        // try to deslect the friend again
+        testController.deselectFriend(testPlayerController1);
+        // it shouldn't emit anything
+        expect(mockListeners.selectedFriendsChanged).toBeCalledTimes(2);
+      });
+      it('updates the list of selected friends when an already selected PC is given', () => {
+        // select two friends
+        testController.selectFriend(testPlayerController1);
+        testController.selectFriend(testPlayerController2);
+        expect(testController.selectedFriends).toEqual([
+          testPlayerController1,
+          testPlayerController2,
+        ]);
+
+        // deselect one friend
+        testController.deselectFriend(testPlayerController1);
+        expect(testController.selectedFriends).toEqual([testPlayerController2]);
+        // deselect other friend
+        testController.deselectFriend(testPlayerController2);
+        expect(testController.selectedFriends).toEqual([]);
+      });
+      it('doesnt change the list of selected friends when a non-selected PC is given', () => {
+        // select one friend
+        testController.selectFriend(testPlayerController1);
+        expect(testController.selectedFriends).toEqual([testPlayerController1]);
+
+        // deselect a non-selected friend
+        testController.deselectFriend(testPlayerController2);
+        expect(testController.selectedFriends).toEqual([testPlayerController1]);
+
+        // deslect the selected friend
+        testController.deselectFriend(testPlayerController1);
+        // it should update
+        expect(testController.selectedFriends).toEqual([]);
+
+        // try to deslect the friend again
+        testController.deselectFriend(testPlayerController1);
+        // it shouldn't change
+        expect(testController.selectedFriends).toEqual([]);
+      });
+    });
   });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {

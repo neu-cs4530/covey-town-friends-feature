@@ -502,7 +502,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         newSelectedFriends.every(friend => this._selectedFriendsInternal.includes(friend))
       )
     ) {
-      this.selectedFriends = newSelectedFriends;
+      this._selectedFriendsInternal = newSelectedFriends;
       this.emit('selectedFriendsChanged', newSelectedFriends);
     }
   }
