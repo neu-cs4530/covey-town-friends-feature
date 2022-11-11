@@ -83,7 +83,7 @@ export default class Player {
     return this._friends;
   }
 
-  // TODO: Remove when functional
+  // TODO: Remove when refactoring
   get selectedFriends(): Player[] {
     return this._selectedFriends;
   }
