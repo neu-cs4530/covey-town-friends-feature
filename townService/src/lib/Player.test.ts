@@ -83,6 +83,7 @@ describe('Player', () => {
       player.removeFriend(player2);
       expect(player.friends.length).toEqual(0);
     });
+    // Potential TODO: remove when refactoring
     it('Removes the given player from the selected friend list IF the friend was selected', () => {
       player.addFriend(player2);
       player.addFriend(player3);
@@ -103,6 +104,7 @@ describe('Player', () => {
       expect(player.friends.length).toEqual(1);
     });
   });
+  // Potential TODO: remove when refactoring
   describe('selectFriends', () => {
     it('Adds the other player to the current players selected friends list', () => {
       player.addFriend(player2);
@@ -122,6 +124,7 @@ describe('Player', () => {
       expect(player.selectedFriends.length).toEqual(1);
     });
   });
+  // Potential TODO: remove when refactoring
   describe('deselectFriend', () => {
     it('Removes the other player from the current players selected friends list', () => {
       player.addFriend(player2);

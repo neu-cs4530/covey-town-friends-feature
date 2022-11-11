@@ -27,7 +27,7 @@ export default class Player {
   /** The current set of friends this player has. */
   private _friends: Player[] = [];
 
-  // TODO: remove when refactoring
+  // Potential TODO: remove when refactoring
   /** The current set of selected friends this player has. This list is used for requesting multiple friends
    * at once to join a conversation area, or sending a message to multiple friends. */
   private _selectedFriends: Player[] = [];
@@ -83,7 +83,7 @@ export default class Player {
     return this._friends;
   }
 
-  // TODO: Remove when refactoring
+  // Potential TODO: remove when refactoring
   get selectedFriends(): Player[] {
     return this._selectedFriends;
   }
@@ -116,14 +116,14 @@ export default class Player {
       this._friends.splice(friendsListIndexToRemove, 1);
     }
 
-    // TODO: remove when refactoring
+    // Potential TODO: remove when refactoring
     const selectedListIndexToRemove = this._selectedFriends.indexOf(friendToRemove);
     if (selectedListIndexToRemove >= 0) {
       this._selectedFriends.splice(selectedListIndexToRemove, 1);
     }
   }
 
-  // TODO: remove when refactoring
+  // Potential TODO: remove when refactoring
   /**
    * Add the given friend to this player's selected friends list. Assumes this player is already a
    * friend of this player. It should not add anyone to the list who is already on the list.
@@ -138,7 +138,7 @@ export default class Player {
     }
   }
 
-  // TODO: remove when refactoring
+  // Potential TODO: remove when refactoring
   /**
    * Player to deselected (remove from the selected friends list).
    *
