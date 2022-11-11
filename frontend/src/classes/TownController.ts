@@ -584,10 +584,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
+      const controllerToRemove = this.players.find(player => player.id == disconnectedPlayer.id);
+
       this.players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
 
       // if the disconnectedPlayer is in our friends list, remove it from our friends as well
       this._removePlayerControllerFromFriendsList(disconnectedPlayer.id);
+
+      // if the disconnectedPlayer is a selectedFriend, deselect them
+      if (controllerToRemove) {
+        this.deselectFriend(controllerToRemove);
+      }
 
       // clear any friend requests where disconnectedPlayer is either the actor or affected
       const updatedRequestList = [...this.playerFriendRequests];
@@ -620,6 +627,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           // if they are present
           if (friendToUpdate) {
             friendToUpdate.location = movedPlayer.location;
+          }
+
+          // find the player in our selectedFriends list whose location we also want to update
+          const selectedFriendToUpdate = this.selectedFriends.find(
+            eachFriend => eachFriend.id === movedPlayer.id,
+          );
+          // if they are present
+          if (selectedFriendToUpdate) {
+            selectedFriendToUpdate.location = movedPlayer.location;
           }
         }
         this.emit('playerMoved', playerToUpdate);
