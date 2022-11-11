@@ -26,7 +26,6 @@ import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
 import TownController, { TownEvents } from './TownController';
 import ViewingAreaController from './ViewingAreaController';
-import Player from '../../../townService/src/lib/Player';
 
 /**
  * Mocks the socket-io client constructor such that it will always return the same
@@ -205,19 +204,19 @@ describe('TownController', () => {
     it('does not update if the new friends param is the same as the old and non-empty', () => {
       expect(testController.playerFriends).toEqual([]);
       const testSamePlayer = PlayerController.fromPlayerModel(testPlayer);
-      const testPlayerController2 = PlayerController.fromPlayerModel(testPlayer2);
+      const testSamePlayer2 = PlayerController.fromPlayerModel(testPlayer2);
       testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
       testController.playerFriends = [testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(1);
-      testController.playerFriends = [testSamePlayer, testPlayerController2];
+      testController.playerFriends = [testSamePlayer, testSamePlayer2];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
-      testController.playerFriends = [testPlayerController2, testSamePlayer];
+      testController.playerFriends = [testSamePlayer2, testSamePlayer];
       expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([testSamePlayer]);
       expect(mockListeners.playerFriendsChanged).toHaveBeenCalledWith([
         testSamePlayer,
-        testPlayerController2,
+        testSamePlayer2,
       ]);
     });
     it('emits a playerFriendsChanged when players are added and removed from the friends list', () => {
