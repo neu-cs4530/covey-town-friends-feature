@@ -1492,6 +1492,14 @@ describe('TownController', () => {
         [],
       );
     });
+    it('Emits selectedFriendsChanged events when a friend leaves', () => {
+      emitEventAndExpectListenerFiring(
+        'playerDisconnect',
+        testPlayerController,
+        'selectedFriendsChanged',
+        [],
+      );
+    });
     it('Emits playerFriendRequestsChanged events when player in your current requests leave', () => {
       // add player 2 to the town
       emitEventAndExpectListenerFiring('playerJoined', testPlayer2, 'playersChanged');
