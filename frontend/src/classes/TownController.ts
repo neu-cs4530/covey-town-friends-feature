@@ -259,7 +259,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   /**
    * The current list of this TownController's selected friends in this town. Selected or deselecting
-   * friends in the UI will replace this array with a new one clients should take note not to retain stale references.
+   * friends in the UI will replace this array with a new one. Clients should take note not to retain stale references.
    */
   private _selectedFriendsInternal: PlayerController[] = [];
 
