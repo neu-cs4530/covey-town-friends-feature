@@ -1473,8 +1473,8 @@ describe('TownController', () => {
 
       // make player 1 our friend
       testController.playerFriends = [testPlayerController];
-      // make player 1 selected
-      testController.selectedFriends = [testPlayerController];
+      // select friend testPlayerController
+      testController.selectFriend(testPlayerController);
     });
     it('Emits playersChanged events when players join', () => {
       expect(testPlayerPlayersChangedFn).toBeCalledWith([
@@ -1552,7 +1552,6 @@ describe('TownController', () => {
       // expect that the controller in our friend list updated in addition to the one in the player list
       expect(testPlayerInFriendsList.location).toEqual(testPlayer.location);
     });
-
     it('Updates selected friends location on playerMoved event', async () => {
       testPlayer.location = {
         moving: true,
@@ -1578,7 +1577,6 @@ describe('TownController', () => {
       // expect that the controller in our friend list updated in addition to the one in the player list
       expect(testSelectedFriend.location).toEqual(testPlayer.location);
     });
-
     it('Emits playerMoved events when players move', async () => {
       testPlayer.location = {
         moving: true,
