@@ -1411,6 +1411,33 @@ export function useCurrentPlayerFriends(): PlayerController[] {
 }
 
 /**
+ * A react hook to retrieve the current selected friends for this town controller's UI/player.
+ * This hook will re-render any components that use it when the set of selected friends
+ * changes.
+ *
+ * @returns the list of player selected friends
+ */
+export function useSelectedFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [selectedFriends, setSelectedFriends] = useState<PlayerController[]>(
+    townController.selectedFriends,
+  );
+
+  useEffect(() => {
+    const updateSelected = (newSelectedFriends: PlayerController[]) => {
+      setSelectedFriends(newSelectedFriends);
+    };
+
+    townController.addListener('selectedFriendsChanged', updateSelected);
+    return () => {
+      townController.removeListener('selectedFriendsChanged', updateSelected);
+    };
+  }, [townController]);
+
+  return selectedFriends;
+}
+
+/**
  * A react hook to return the PlayerController's corresponding to each player in the town.
  *
  * This hook will cause components that use it to re-render when the set of players in the town changes.
