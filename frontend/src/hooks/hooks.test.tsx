@@ -20,6 +20,7 @@ import TownController, {
   usePlayers,
   useTownSettings,
   useCurrentPlayerFriends,
+  useSelectedFriends,
 } from '../classes/TownController';
 import { EventNames, getTownEventListener, mockTownController } from '../TestUtils';
 import {
@@ -555,6 +556,91 @@ describe('[T3] TownController-Dependent Hooks', () => {
       expect(getSingleListenerRemoved('playerFriendsChanged')).toBe(addCall);
       getSingleListenerAdded('playerFriendsChanged', newController.addListener);
     });
+  });
+
+  describe('useSelectedFriends', () => {
+    let renderData: RenderResult;
+    let playerFriends: PlayerController[];
+    let friend1: PlayerController;
+    let hookReturnValue: PlayerController[] = [];
+    function TestComponent() {
+      hookReturnValue = useSelectedFriends();
+      return null;
+    }
+    beforeEach(() => {
+      playerFriends = [];
+      townController = mockTownController({
+        playerFriends,
+      });
+      for (let i = 0; i < 3; i++) {
+        playerFriends.push(
+          new PlayerController(nanoid(), nanoid(), { moving: false, rotation: 'back', x: 0, y: 1 }),
+        );
+      }
+      friend1 = new PlayerController(nanoid(), nanoid(), {
+        moving: false,
+        rotation: 'back',
+        x: 0,
+        y: 1,
+      });
+      useTownControllerSpy.mockReturnValue(townController);
+      renderData = render(<TestComponent />);
+    });
+    // it('Returns an initial state of the current player friends', () => {
+    //   hookReturnValue.sort((a, b) => (a.id && b.id ? a.id.localeCompare(b.id) : 0));
+    //   expect(hookReturnValue).toEqual([playerFriends[0], playerFriends[1], playerFriends[2]]);
+    // });
+    // it('Updates its value in response to playerFriendRequestsChanged events', () => {
+    //   act(() => {
+    //     const listener = getSingleListenerAdded('playerFriendsChanged');
+    //     playerFriends.push(friend1);
+    //     listener(playerFriends);
+    //   });
+    //   expect(hookReturnValue).toEqual([
+    //     playerFriends[0],
+    //     playerFriends[1],
+    //     playerFriends[2],
+    //     friend1,
+    //   ]);
+    // });
+    // it('Only adds a listener once', () => {
+    //   // Check that there was one listener added
+    //   getSingleListenerAdded('playerFriendsChanged');
+    //   // Trigger re-render
+    //   act(() => {
+    //     const listener = getTownEventListener(townController, 'playerFriendsChanged');
+    //     playerFriends.push(friend1);
+    //     listener(playerFriends);
+    //   });
+    //   renderData.rerender(<TestComponent />);
+    //   // Should still be one
+    //   getSingleListenerAdded('playerFriendsChanged');
+    // });
+    // it('Removes the listener when the component is unmounted', () => {
+    //   const addCall = getSingleListenerAdded('playerFriendsChanged');
+    //   cleanup();
+    //   const removeCall = getSingleListenerRemoved('playerFriendsChanged');
+    //   expect(addCall).toBe(removeCall);
+    // });
+    // it('Adds a listener on first render and does not re-register a listener on each render', () => {
+    //   getSingleListenerAdded('playerFriendsChanged');
+    //   renderData.rerender(<TestComponent />);
+    //   renderData.rerender(<TestComponent />);
+    //   renderData.rerender(<TestComponent />);
+    //   getSingleListenerAdded('playerFriendsChanged');
+    // });
+    // it('Removes the listener if the townController changes and adds one to the new controller', () => {
+    //   const addCall = getSingleListenerAdded('playerFriendsChanged');
+    //   const newController = mockTownController({
+    //     friendlyName: nanoid(),
+    //     townID: nanoid(),
+    //     conversationAreas: [],
+    //   });
+    //   useTownControllerSpy.mockReturnValue(newController);
+    //   renderData.rerender(<TestComponent />);
+    //   expect(getSingleListenerRemoved('playerFriendsChanged')).toBe(addCall);
+    //   getSingleListenerAdded('playerFriendsChanged', newController.addListener);
+    // });
   });
 
   describe('[T3] useTownSettings', () => {
