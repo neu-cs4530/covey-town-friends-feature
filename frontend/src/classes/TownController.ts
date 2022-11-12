@@ -1053,6 +1053,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.conversationAreaInvites = [];
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
+        this._selectedFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
