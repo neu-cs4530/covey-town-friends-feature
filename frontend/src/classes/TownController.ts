@@ -196,6 +196,23 @@ export type TownEvents = {
    * player who received it and is now declining it (requested), and the requester's location.
    */
   clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
+
+  // Sprint 3 Potential TODO: assess whether these need to be here
+  /**
+   * A function that indicates that a friend has been selected in the UI.
+   * The request object contains the PlayerController of the friend to select.
+   * It assumes that the PC is already a friend. Does nothing if friend is already selected
+   */
+  selectFriend: (friendToSelect: PlayerController) => void;
+
+  // Sprint 3 Potential TODO: assess whether these need to be here
+  /**
+   * A function that indicates that a friend has been deselected in the UI.
+   * The request object contains the PlayerController of the friend to deselect.
+   * It assumes that the PC is already a friend. Does nothing if the friend is not
+   * already selected.
+   */
+  deselectFriend: (friendToDeselect: PlayerController) => void;
 };
 
 /**
@@ -631,6 +648,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             friendToUpdate.location = movedPlayer.location;
           }
 
+          // Potential TODO: reassess whether this update is necessary because of deep vs shallow copies
           // find the player in our selectedFriends list whose location we also want to update
           const selectedFriendToUpdate = this.selectedFriends.find(
             eachFriend => eachFriend.id === movedPlayer.id,
@@ -1115,6 +1133,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Emits a selectedFriendsChanged if we are selecting a friend who is not already selected.
    * Updates this.selectedFriends list to include friendToSelect. Assumes this player IS already a friend (UI enforced)
    * and does nothing if the friend is already selected
    * @param friendToSelect holds the current PlayerController to add to the selectedFriends list
@@ -1130,14 +1149,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Updates this.selectedFriends list to NOT include friendToSelect. Assumes this player IS already a friend (UI enforced)
+   * Emits a selectedFriendsChanged if we are deselecting a friend who was previously selected.
+   * Updates this.selectedFriends list to NOT include friendToDeselect. Assumes this player IS already a friend (UI enforced)
    * and does nothing if the friend is already deselected
-   * @param friendToSelect holds the current PlayerController to add to the selectedFriends list
+   * @param friendToDeselect holds the current PlayerController to add to the selectedFriends list
    */
-  public deselectFriend(friendToSelect: PlayerController): void {
-    const indexToRemove = this.selectedFriends.indexOf(friendToSelect);
+  public deselectFriend(friendToDeselect: PlayerController): void {
+    const indexToRemove = this.selectedFriends.indexOf(friendToDeselect);
 
-    // if the friendToSelect exists in the selected list
+    // if the friendToDeselect exists in the selected list
     if (indexToRemove >= 0) {
       const newSelected = [...this.selectedFriends];
       newSelected.splice(indexToRemove, 1);
