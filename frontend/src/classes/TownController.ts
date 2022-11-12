@@ -630,14 +630,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             friendToUpdate.location = movedPlayer.location;
           }
 
-          // find the player in our selectedFriends list whose location we also want to update
-          const selectedFriendToUpdate = this.selectedFriends.find(
-            eachFriend => eachFriend.id === movedPlayer.id,
-          );
-          // if they are present
-          if (selectedFriendToUpdate) {
-            selectedFriendToUpdate.location = movedPlayer.location;
-          }
+          // // find the player in our selectedFriends list whose location we also want to update
+          // const selectedFriendToUpdate = this.selectedFriends.find(
+          //   eachFriend => eachFriend.id === movedPlayer.id,
+          // );
+          // // if they are present
+          // if (selectedFriendToUpdate) {
+          //   selectedFriendToUpdate.location = movedPlayer.location;
+          // }
         }
         this.emit('playerMoved', playerToUpdate);
       } else {
