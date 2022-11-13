@@ -198,6 +198,12 @@ export type TownEvents = {
    */
   clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
 
+  /**
+   * An event that indicates that a new brief message has been received, which is the parameter
+   * passed to the listener.
+   */
+  clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
+
   // Sprint 3 Potential TODO: assess whether these need to be here
   /**
    * A function that indicates that a friend has been selected in the UI.
@@ -1254,7 +1260,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *                     and the body of the message.
    */
   public clickedSendBriefMessage(briefMessage: BriefMessage): void {
-    this._socket.emit('briefMessage', briefMessage);
+    this._socket.emit('sendBriefMessage', briefMessage);
   }
 }
 
