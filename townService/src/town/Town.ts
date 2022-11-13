@@ -17,6 +17,7 @@ import {
   ConversationAreaGroupInvite,
   TeleportInviteSingular,
   PlayerToPlayerUpdate,
+  BriefMessage,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
@@ -216,6 +217,11 @@ export default class Town {
     // the changes have been made.
     socket.on('declineConvAreaInvite', (convAreaInvite: TeleportInviteSingular) => {
       this.declineConversationAreaInvite(convAreaInvite);
+    });
+
+    // Set up a listener to forward all brief messages to all clients in the town.
+    socket.on('briefMessage', (briefMessage: BriefMessage) => {
+      this._broadcastEmitter.emit('briefMessage', briefMessage);
     });
 
     return newPlayer;
