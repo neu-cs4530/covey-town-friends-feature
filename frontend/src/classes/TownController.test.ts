@@ -476,9 +476,19 @@ describe('TownController', () => {
       emitEventAndExpectListenerFiring('chatMessage', message, 'chatMessage', message);
     });
     it('Emits a sendBriefMessage event when clickedSendBriefMessage is called', () => {
+      const testPlayer1 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      const testPlayer2 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
       const testMessage: BriefMessage = {
-        sender: nanoid(),
-        recipients: [],
+        sender: testPlayer1,
+        recipients: [testPlayer2],
         body: nanoid(),
       };
       testController.clickedSendBriefMessage(testMessage);

@@ -96,7 +96,7 @@ export type TeleportAction = {
 
 export type BriefMessage = {
   sender: PlayerSrc;
-  recipients: PlayerSr[];
+  recipients: PlayerSrc[];
   body: string;
 }
 
@@ -150,5 +150,6 @@ export interface ClientToServerEvents {
   acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
   // requester is the Player who originally sent the invite 
   declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
+  // sender is the Player who sent the message to their currently selected friends
   sendBriefMessage: (briefMessage: BriefMessage) => void;
 }

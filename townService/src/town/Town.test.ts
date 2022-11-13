@@ -823,11 +823,11 @@ describe('Town', () => {
       const emittedMessage = getLastEmittedEvent(townEmitter, 'chatMessage');
       expect(emittedMessage).toEqual(chatMessage);
     });
-    it('Forwards brief messages to all players in the same town', async () => {
+    it('Forwards brief message events to all players in the same town', async () => {
       const briefMessageHandler = getEventListener(playerTestData.socket, 'sendBriefMessage');
       const testBriefMessage: BriefMessage = {
-        sender: nanoid(),
-        recipients: [],
+        sender: player,
+        recipients: [player2, player3],
         body: nanoid(),
       };
 

@@ -199,8 +199,10 @@ export type TownEvents = {
   clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
 
   /**
-   * An event that indicates that a new brief message has been received, which is the parameter
-   * passed to the listener.
+   * An event that indicates that a new brief message has been sent, which is the parameter
+   * passed to the listener. The message object contains the player who is sending the
+   * message (sender), the list of selected friends meant to receive it (recipients),
+   * and the message itself (body).
    */
   clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
 
@@ -1255,9 +1257,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a briefMessage event to the townService
-   * @param briefMessage The message to be sent - holds the sender, list of recipients,
-   *                     and the body of the message.
+   * Emits a sendBriefMessage event to the townService
+   * @param briefMessage The message to be sent - holds the sender, list of recipients (the
+   *                     sender's currently selected friends), and the body of the message.
    */
   public clickedSendBriefMessage(briefMessage: BriefMessage): void {
     this._socket.emit('sendBriefMessage', briefMessage);
