@@ -587,7 +587,7 @@ describe('TownController', () => {
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
-      expect(mockSocket.emit).not.toBeCalledWith('inviteAllToConvArea', testInvite);
+      expect(mockSocket.emit).not.toBeCalled();
     });
     it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is in a conversation area', () => {
       testController.conversationAreas[0].occupants.push(
