@@ -1053,6 +1053,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.conversationAreaInvites = [];
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
+        this._selectedFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -1408,6 +1409,33 @@ export function useCurrentPlayerFriends(): PlayerController[] {
     };
   }, [townController]);
   return playerFriends;
+}
+
+/**
+ * A react hook to retrieve the current selected friends for this town controller's UI/player.
+ * This hook will re-render any components that use it when the set of selected friends
+ * changes.
+ *
+ * @returns the list of player selected friends
+ */
+export function useSelectedFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [selectedFriends, setSelectedFriends] = useState<PlayerController[]>(
+    townController.selectedFriends,
+  );
+
+  useEffect(() => {
+    const updateSelected = (newSelectedFriends: PlayerController[]) => {
+      setSelectedFriends(newSelectedFriends);
+    };
+
+    townController.addListener('selectedFriendsChanged', updateSelected);
+    return () => {
+      townController.removeListener('selectedFriendsChanged', updateSelected);
+    };
+  }, [townController]);
+
+  return selectedFriends;
 }
 
 /**
