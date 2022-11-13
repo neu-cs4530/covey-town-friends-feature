@@ -1247,7 +1247,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
     if (
       // check that the player is in a conversation areas before allowing the invite to be sent
-      this._conversationAreasInternal.find(area =>
+      this.conversationAreas.find(area =>
         area.occupants.find(player => player.id === invite.requester.id),
       )
     ) {
