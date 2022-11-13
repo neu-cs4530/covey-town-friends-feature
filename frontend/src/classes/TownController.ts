@@ -1244,7 +1244,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *               they accepted the invite.
    */
   public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
-    this._socket.emit('inviteAllToConvArea', invite);
+    if (
+      // check that the player is in a conversation areas before allowing the invite to be sent
+      this._conversationAreasInternal.find(area =>
+        area.occupants.find(player => player.id === invite.requester.id),
+      )
+    ) {
+      this._socket.emit('inviteAllToConvArea', invite);
+    }
   }
 }
 
