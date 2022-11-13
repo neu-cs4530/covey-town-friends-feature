@@ -12,6 +12,7 @@ import {
   mockPlayer,
 } from '../TestUtils';
 import {
+  BriefMessage,
   ChatMessage,
   ConversationAreaGroupInvite,
   Interactable,
@@ -433,6 +434,7 @@ describe('Town', () => {
         'inviteAllToConvArea',
         'acceptConvAreaInvite',
         'declineConvAreaInvite',
+        'sendBriefMessage',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -820,6 +822,19 @@ describe('Town', () => {
 
       const emittedMessage = getLastEmittedEvent(townEmitter, 'chatMessage');
       expect(emittedMessage).toEqual(chatMessage);
+    });
+    it('Forwards brief messages to all players in the same town', async () => {
+      const briefMessageHandler = getEventListener(playerTestData.socket, 'sendBriefMessage');
+      const testBriefMessage: BriefMessage = {
+        sender: nanoid(),
+        recipients: [],
+        body: nanoid(),
+      };
+
+      briefMessageHandler(testBriefMessage);
+
+      const emittedMessage = getLastEmittedEvent(townEmitter, 'briefMessageSent');
+      expect(emittedMessage).toEqual(testBriefMessage);
     });
   });
   describe('addConversationArea', () => {

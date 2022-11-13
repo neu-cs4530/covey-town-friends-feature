@@ -220,8 +220,8 @@ export default class Town {
     });
 
     // Set up a listener to forward all brief messages to all clients in the town.
-    socket.on('briefMessage', (briefMessage: BriefMessage) => {
-      this._broadcastEmitter.emit('briefMessage', briefMessage);
+    socket.on('sendBriefMessage', (briefMessage: BriefMessage) => {
+      this._broadcastEmitter.emit('briefMessageSent', briefMessage);
     });
 
     return newPlayer;
