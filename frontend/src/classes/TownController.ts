@@ -1239,13 +1239,21 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a inviteAllToConvArea event to the townService
+   * Emits a inviteAllToConvArea event to the townService if the Player who is requesting
+   * is within a conversation area that is located in the town.
    * @param invite holds the requester, list of requested, and destination location,
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.
    */
   public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
-    this._socket.emit('inviteAllToConvArea', invite);
+    if (
+      // check that the player is in a conversation areas before allowing the invite to be sent
+      this.conversationAreas.find(area =>
+        area.occupants.find(player => player.id === invite.requester.id),
+      )
+    ) {
+      this._socket.emit('inviteAllToConvArea', invite);
+    }
   }
 }
 

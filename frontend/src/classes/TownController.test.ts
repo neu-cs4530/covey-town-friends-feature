@@ -102,6 +102,9 @@ describe('TownController', () => {
     playerTestData.userName = 'player1';
     playerTestData2.userName = 'player2';
     playerTestData3.userName = 'player3';
+    playerTestData.id = '003';
+    playerTestData2.id = '004';
+    playerTestData3.id = '005';
   });
   describe('Setting the conversation area invites property', () => {
     let teleportInvite1: TeleportInviteSingular;
@@ -577,10 +580,26 @@ describe('TownController', () => {
       testController.clickedRemoveFriend(testRemoveFriend);
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
-    it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called', () => {
+    it('Does not emit inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is not in a conversation area', () => {
       const testInvite: ConversationAreaGroupInvite = {
-        requester: playerTestData.player,
-        requested: [playerTestData2.player],
+        requester: playerTestData,
+        requested: [playerTestData2],
+        requesterLocation: player1Location,
+      };
+      testController.clickedInviteAllToConvArea(testInvite);
+      expect(mockSocket.emit).not.toBeCalled();
+    });
+    it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is in a conversation area', () => {
+      testController.conversationAreas[0].occupants.push(
+        PlayerController.fromPlayerModel({
+          id: playerTestData.id,
+          userName: playerTestData.userName,
+          location: player1Location,
+        }),
+      );
+      const testInvite: ConversationAreaGroupInvite = {
+        requester: playerTestData,
+        requested: [playerTestData2],
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
