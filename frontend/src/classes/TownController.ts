@@ -1238,7 +1238,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a inviteAllToConvArea event to the townService
+   * Emits a inviteAllToConvArea event to the townService if the Player who is requesting
+   * is within a conversation area that is located in the town.
    * @param invite holds the requester, list of requested, and destination location,
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.

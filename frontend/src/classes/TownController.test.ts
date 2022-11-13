@@ -589,7 +589,7 @@ describe('TownController', () => {
       testController.clickedInviteAllToConvArea(testInvite);
       expect(mockSocket.emit).not.toBeCalledWith('inviteAllToConvArea', testInvite);
     });
-    it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called', () => {
+    it('Emits inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is in a conversation area', () => {
       testController.conversationAreas[0].occupants.push(
         PlayerController.fromPlayerModel({
           id: playerTestData.id,
