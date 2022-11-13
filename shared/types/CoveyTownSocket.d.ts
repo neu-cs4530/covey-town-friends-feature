@@ -128,7 +128,7 @@ export interface ServerToClientEvents {
   conversationAreaRequestDeclined: (
     conversationAreaInviteRequest: TeleportInviteSingular
   ) => void;
-  briefMessage: (briefMessage: BriefMessage) => void;
+  briefMessageSent: (briefMessage: BriefMessage) => void;
 }
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
@@ -150,5 +150,5 @@ export interface ClientToServerEvents {
   acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
   // requester is the Player who originally sent the invite 
   declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
-  briefMessage: (briefMessage: BriefMessage) => void;
+  sendBriefMessage: (briefMessage: BriefMessage) => void;
 }
