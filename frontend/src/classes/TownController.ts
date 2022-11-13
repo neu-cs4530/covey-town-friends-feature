@@ -1062,6 +1062,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.conversationAreaInvites = [];
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
+        this._selectedFriendsInternal = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -1247,13 +1248,21 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a inviteAllToConvArea event to the townService.
+   * Emits a inviteAllToConvArea event to the townService if the Player who is requesting
+   * is within a conversation area that is located in the town.
    * @param invite holds the requester, list of requested, and destination location,
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.
    */
   public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
-    this._socket.emit('inviteAllToConvArea', invite);
+    if (
+      // check that the player is in a conversation areas before allowing the invite to be sent
+      this.conversationAreas.find(area =>
+        area.occupants.find(player => player.id === invite.requester.id),
+      )
+    ) {
+      this._socket.emit('inviteAllToConvArea', invite);
+    }
   }
 
   /**
@@ -1426,6 +1435,33 @@ export function useCurrentPlayerFriends(): PlayerController[] {
     };
   }, [townController]);
   return playerFriends;
+}
+
+/**
+ * A react hook to retrieve the current selected friends for this town controller's UI/player.
+ * This hook will re-render any components that use it when the set of selected friends
+ * changes.
+ *
+ * @returns the list of player selected friends
+ */
+export function useSelectedFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [selectedFriends, setSelectedFriends] = useState<PlayerController[]>(
+    townController.selectedFriends,
+  );
+
+  useEffect(() => {
+    const updateSelected = (newSelectedFriends: PlayerController[]) => {
+      setSelectedFriends(newSelectedFriends);
+    };
+
+    townController.addListener('selectedFriendsChanged', updateSelected);
+    return () => {
+      townController.removeListener('selectedFriendsChanged', updateSelected);
+    };
+  }, [townController]);
+
+  return selectedFriends;
 }
 
 /**
