@@ -20,6 +20,7 @@ import {
   ViewingArea as ViewingAreaModel,
   Player,
   ConversationAreaGroupInvite,
+  BriefMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -1245,6 +1246,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
     this._socket.emit('inviteAllToConvArea', invite);
+  }
+
+  /**
+   * Emits a briefMessage event to the townService
+   * @param briefMessage The message to be sent - holds the sender, list of recipients,
+   *                     and the body of the message.
+   */
+  public clickedSendBriefMessage(briefMessage: BriefMessage): void {
+    this._socket.emit('briefMessage', briefMessage);
   }
 }
 

@@ -94,6 +94,12 @@ export type TeleportAction = {
   playerDestinationLocation: PlayerLocation;
 }
 
+export type BriefMessage = {
+  sender: PlayerSrc;
+  recipients: PlayerSr[];
+  body: string;
+}
+
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
@@ -122,6 +128,7 @@ export interface ServerToClientEvents {
   conversationAreaRequestDeclined: (
     conversationAreaInviteRequest: TeleportInviteSingular
   ) => void;
+  briefMessage: (briefMessage: BriefMessage) => void;
 }
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
@@ -143,4 +150,5 @@ export interface ClientToServerEvents {
   acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
   // requester is the Player who originally sent the invite 
   declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
+  briefMessage: (briefMessage: BriefMessage) => void;
 }
