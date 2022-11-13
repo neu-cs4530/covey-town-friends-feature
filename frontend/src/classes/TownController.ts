@@ -1110,7 +1110,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emit a viewing area update to the townService
+   * Emit a viewing area update to the townService.
    * @param viewingArea The Viewing Area Controller that is updated and should be emitted
    *    with the event
    */
@@ -1176,25 +1176,25 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a acceptFriendRequest event to the townService
+   * Emits a acceptFriendRequest event to the townService.
    * @param acceptedRequest the friend request - holds the current player and the player whose
-   * friend request was accepted.
+   *                        friend request was accepted.
    */
   public clickedAcceptFriendRequest(acceptedRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('acceptFriendRequest', acceptedRequest);
   }
 
   /**
-   * Emits a declineFriendRequest event to the townService
+   * Emits a declineFriendRequest event to the townService.
    * @param declinedRequest the friend reqeust - holds the current player and the player whose
-   * friend request was declined
+   *                        friend request was declined
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
   /**
-   * Emits a playerMovement event to the TownService
+   * Emits a playerMovement event to the TownService.
    * @param teleportAction the teleport action to complete - whom to teleport and to where
    */
   public clickedTeleportToFriend(teleportAction: TeleportAction): void {
@@ -1202,52 +1202,52 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a sendFriendRequest event to the townService
+   * Emits a sendFriendRequest event to the townService.
    * @param sentRequest the friend request - holds the current player and the player whose
-   * who is being requested
+   *                    who is being requested
    */
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
-   * Emits a cancelFriendRequest event to the townService
+   * Emits a cancelFriendRequest event to the townService.
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
-   * who is being requested
+   *                        who is being requested
    */
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
-   * Emits a removeFriend event to the townService
-   * @param removedFriend holds the current player and the player who
-   * is being unfriended.
+   * Emits a removeFriend event to the townService.
+   * @param removedFriend holds the current player and the player who is being unfriended.
    */
   public clickedRemoveFriend(removedFriend: PlayerToPlayerUpdate): void {
     this._socket.emit('removeFriend', removedFriend);
   }
 
   /**
-   * Emits a acceptConvAreaInvite event to the townService
+   * Emits a acceptConvAreaInvite event to the townService.
    * @param acceptedInvite the conv area invite - holds the player who accepted, the player whose
-   * conv area invite was accepted, and the teleport destination.
+   *                       conv area invite was accepted, and the teleport destination.
    */
   public clickedAcceptConvAreaInvite(acceptedInvite: TeleportInviteSingular): void {
     this._socket.emit('acceptConvAreaInvite', acceptedInvite);
   }
 
   /**
-   * Emits a declineConvAreaInvite event to the townService
+   * Emits a declineConvAreaInvite event to the townService.
    * @param declinedInvite the friend reqeust - holds the player who declined, the player whose
-   * conv area invite was declined, and what would have been the teleport destination.
+   *                       conv area invite was declined, and what would have been the teleport
+   *                       destination.
    */
   public clickedDeclineConvAreaInvite(declinedInvite: TeleportInviteSingular): void {
     this._socket.emit('declineConvAreaInvite', declinedInvite);
   }
 
   /**
-   * Emits a inviteAllToConvArea event to the townService
+   * Emits a inviteAllToConvArea event to the townService.
    * @param invite holds the requester, list of requested, and destination location,
    *               within the conversation area, that the requested would be transported to if
    *               they accepted the invite.
@@ -1257,7 +1257,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a sendBriefMessage event to the townService
+   * Emits a sendBriefMessage event to the townService.
    * @param briefMessage The message to be sent - holds the sender, list of recipients (the
    *                     sender's currently selected friends), and the body of the message.
    */
