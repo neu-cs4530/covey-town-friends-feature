@@ -21,6 +21,7 @@ import {
   TeleportAction,
   TeleportInviteSingular,
   TownJoinResponse,
+  BriefMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
@@ -476,6 +477,25 @@ describe('TownController', () => {
         sid: nanoid(),
       };
       emitEventAndExpectListenerFiring('chatMessage', message, 'chatMessage', message);
+    });
+    it('Emits a sendBriefMessage event when clickedSendBriefMessage is called', () => {
+      const testPlayer1 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      const testPlayer2 = {
+        id: nanoid(),
+        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+        userName: nanoid(),
+      };
+      const testMessage: BriefMessage = {
+        sender: testPlayer1,
+        recipients: [testPlayer2],
+        body: nanoid(),
+      };
+      testController.clickedSendBriefMessage(testMessage);
+      expect(mockSocket.emit).toBeCalledWith('sendBriefMessage', testMessage);
     });
     it("Emits the local player's movement updates to the socket and to locally subscribed CoveyTownEvents listeners", () => {
       const newLocation: PlayerLocation = { ...testController.ourPlayer.location, x: 10, y: 10 };
