@@ -7,7 +7,7 @@ import useTownController from '../../hooks/useTownController';
  * selected friends to a conversation area, view conversation area invites, and send a brief
  * message to all selected friends.
  *
- * See relevant hooks: `usePlayersInTown` and `useCoveyAppState`
+ * See relevant hooks: 'useTownController', + ADD IN OTHERS YOU USE
  *
  */
 export default function FriendsInTownList(): JSX.Element {
