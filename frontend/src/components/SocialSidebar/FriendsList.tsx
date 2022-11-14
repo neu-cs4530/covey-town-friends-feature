@@ -20,7 +20,7 @@ export default function FriendsInTownList(): JSX.Element {
     <Box>
       <Tooltip label={`Town ID: ${townID}`}>
         <Heading as='h2' fontSize='l'>
-          Current town: {friendlyName}
+          Friends:
         </Heading>
       </Tooltip>
       <OrderedList>

@@ -3,8 +3,11 @@ import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
 import FriendsList from './FriendsList';
+import useTownController from '../../hooks/useTownController';
 
 export default function SocialSidebar(): JSX.Element {
+  const { friendlyName, townID } = useTownController();
+
   return (
     <VStack
       align='left'
@@ -17,10 +20,10 @@ export default function SocialSidebar(): JSX.Element {
       divider={<StackDivider borderColor='gray.200' />}
       borderRadius='4px'>
       <Heading fontSize='xl' as='h1'>
-        Players In This Town
+        Current town: {friendlyName}
       </Heading>
-      <PlayersList />
       <FriendsList />
+      <PlayersList />
       <ConversationAreasList />
     </VStack>
   );
