@@ -1490,10 +1490,10 @@ describe('TownController', () => {
           expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
         it('Does not modify invites list if this player was not the decliner of the invite', () => {
-          testController.conversationAreaInvites = [];
+          testController.conversationAreaInvites = [teleportInviteOurPlayer];
           conversationAreaRequestDeclinedEventListener(teleportInviteNotOurPlayer);
 
-          expect(testController.conversationAreaInvites).toStrictEqual([]);
+          expect(testController.conversationAreaInvites).toStrictEqual([teleportInviteOurPlayer]);
         });
       });
     });
