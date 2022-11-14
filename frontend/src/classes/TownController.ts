@@ -745,6 +745,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
       const affectedPlayers = conversationAreaInviteRequest.requested;
+      const newRequester = conversationAreaInviteRequest.requester;
+      const newRequesterLocation = conversationAreaInviteRequest.requesterLocation;
       // find the index of our player within the list of recipients in this conversationAreaInviteRequest
       const ourPlayerIndex: number = affectedPlayers.findIndex(
         invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
@@ -758,9 +760,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           requested: affectedPlayers[ourPlayerIndex],
           requesterLocation: conversationAreaInviteRequest.requesterLocation,
         };
-        const newConvoAreaInvites: TeleportInviteSingular[] =
-          this._conversationAreaInvitesInternal.concat([newInvite]);
-        this.conversationAreaInvites = newConvoAreaInvites;
+        // check if our player already has an existing invite from this new requester to this new location
+        const existantInviteIndex: number = this._conversationAreaInvitesInternal.findIndex(
+          invite =>
+            invite.requester === newRequester && invite.requesterLocation === newRequesterLocation,
+        );
+        // if invite was not found in current list, add it
+        if (existantInviteIndex === -1) {
+          const newConvoAreaInvites: TeleportInviteSingular[] =
+            this._conversationAreaInvitesInternal.concat([newInvite]);
+          this.conversationAreaInvites = newConvoAreaInvites;
+        }
       }
     });
 
@@ -895,9 +905,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         recipientPlayer => recipientPlayer.id === this.ourPlayer.id,
       );
 
-      // if found our player among the recipients, call the setter for _latestBriefMessage
+      // if found our player among the recipients, call the setter for latestBriefMessage
       if (ourPlayer) {
-        this._latestBriefMessage = briefMessage;
+        this.latestBriefMessage = briefMessage;
       }
     });
   }
