@@ -90,7 +90,7 @@ export type TownEvents = {
   conversationAreasChanged: (currentConversationAreas: ConversationAreaController[]) => void;
 
   /**
-   * An event that indicated that the set of TownController.ourPlayer's friends have changed. This event is
+   * An event that indicates that the set of TownController.ourPlayer's friends have changed. This event is
    * dispatched when a player accepts a friend request that has been sent to them, a player has accepted
    * one of this players requests, or if this player choses to remove a friend from their friends list.
    * This event is dispatched after updating the town controller's record of TownController.ourPlayer's friends.
@@ -98,11 +98,17 @@ export type TownEvents = {
   playerFriendsChanged: (currentPlayerFriends: PlayerController[]) => void;
 
   /**
-   * An event that indicated that the set of selected friends have changed. This event is
+   * An event that indicates that the set of selected friends have changed. This event is
    * dispatched when a player selects or deselects a friend in the UI.
    * This event is dispatched after updating the town controller's record of TownController.selectedFriends.
    */
   selectedFriendsChanged: (selectedFriends: PlayerController[]) => void;
+
+  /**
+   * An event that indicates that the latest brief message to this player has changed. This event
+   * is emitted after updating the player's latest brief message.
+   */
+  latestBriefMessageChanged: (latestBriefMessage: BriefMessage) => void;
 
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
@@ -288,6 +294,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * friends in the UI will replace this array with a new one. Clients should take note not to retain stale references.
    */
   private _selectedFriendsInternal: PlayerController[] = [];
+
+  /**
+   * The latest brief message that this TownController.ourPlayer has recieved. Updates every time
+   * a new brief message is sent to this player, regardless of whether it has the same content. If
+   * this player has not recieved any brief messages yet, it remains undefined.
+   */
+  private _latestBriefMessage: BriefMessage | undefined;
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -532,6 +545,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this._selectedFriendsInternal = newSelectedFriends;
       this.emit('selectedFriendsChanged', newSelectedFriends);
     }
+  }
+
+  public set latestMessage(newLatestBriefMessage: BriefMessage) {
+    this._latestBriefMessage = newLatestBriefMessage;
+    this.emit('latestBriefMessageChanged', newLatestBriefMessage);
   }
 
   public get interactableEmitter() {
@@ -855,6 +873,22 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._removePlayerControllerFromFriendsList(actor.id);
       }
     });
+
+    /**
+     * Whenever a brief message event is recieved, if we are one of the recipients,
+     * update our latestMessage with the new message.
+     */
+    this._socket.on('briefMessageSent', briefMessage => {
+      // search for our player among the list of recipents
+      const ourPlayer = briefMessage.recipients.find(
+        recipientPlayer => recipientPlayer.id === this.ourPlayer.id,
+      );
+
+      // if found our player among the recipients, call the setter for _latestBriefMessage
+      if (ourPlayer) {
+        this._latestBriefMessage = briefMessage;
+      }
+    });
   }
 
   /**
@@ -1063,6 +1097,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         this._selectedFriendsInternal = [];
+        this._latestBriefMessage = undefined;
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
