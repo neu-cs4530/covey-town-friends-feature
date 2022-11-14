@@ -22,7 +22,7 @@ export default function PlayersInTownList(): JSX.Element {
     <Box>
       <Tooltip label={`Town ID: ${townID}`}>
         <Heading as='h2' fontSize='l'>
-          Current town: {friendlyName}
+          Other Players In This Town:
         </Heading>
       </Tooltip>
       <OrderedList>
