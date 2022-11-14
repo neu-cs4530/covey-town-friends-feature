@@ -547,9 +547,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public set latestMessage(newLatestBriefMessage: BriefMessage) {
+  public get latestBriefMessage(): BriefMessage | undefined {
+    if (this._latestBriefMessage) {
+      return this._latestBriefMessage;
+    } else {
+      return undefined;
+    }
+  }
+
+  public set latestBriefMessage(newLatestBriefMessage: BriefMessage | undefined) {
     this._latestBriefMessage = newLatestBriefMessage;
-    this.emit('latestBriefMessageChanged', newLatestBriefMessage);
+    // if message is set to undefined, don't emit
+    if (newLatestBriefMessage) {
+      this.emit('latestBriefMessageChanged', newLatestBriefMessage);
+    }
   }
 
   public get interactableEmitter() {
@@ -1497,6 +1508,33 @@ export function useSelectedFriends(): PlayerController[] {
   }, [townController]);
 
   return selectedFriends;
+}
+
+/**
+ * A react hook to retrieve the latest brief message sent to this town controller's UI/player.
+ * This hook will re-render any components that use it when the latest brief message
+ * changes.
+ *
+ * @returns the latest brief message sent to this town controller's UI/player
+ */
+export function useLatestBriefMessage(): BriefMessage | undefined {
+  const townController = useTownController();
+  const [latestBriefMessage, setLatestBriefMessage] = useState<BriefMessage | undefined>(
+    townController.latestBriefMessage,
+  );
+
+  useEffect(() => {
+    const updateLatestBriefMessage = (newLatestBriefMessage: BriefMessage) => {
+      setLatestBriefMessage(newLatestBriefMessage);
+    };
+
+    townController.addListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    return () => {
+      townController.removeListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    };
+  }, [townController]);
+
+  return latestBriefMessage;
 }
 
 /**
