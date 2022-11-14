@@ -106,7 +106,7 @@ export type TownEvents = {
 
   /**
    * An event that indicates that the latest brief message to this player has changed. This event
-   * is emitted after updating the player's latest brief message.
+   * is dispatched after updating the player's latest brief message.
    */
   latestBriefMessageChanged: (latestBriefMessage: BriefMessage) => void;
 
@@ -548,11 +548,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   public get latestBriefMessage(): BriefMessage | undefined {
-    if (this._latestBriefMessage) {
-      return this._latestBriefMessage;
-    } else {
-      return undefined;
-    }
+    return this._latestBriefMessage;
   }
 
   public set latestBriefMessage(newLatestBriefMessage: BriefMessage | undefined) {
@@ -743,30 +739,35 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      *
      * If the invite was unique, emits a conversationAreaInvitesChanged event.
      */
-    this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
-      const affectedPlayers = conversationAreaInviteRequest.requested;
-      const newRequester = conversationAreaInviteRequest.requester;
-      const newRequesterLocation = conversationAreaInviteRequest.requesterLocation;
-      // find the index of our player within the list of recipients in this conversationAreaInviteRequest
+    this._socket.on('conversationAreaRequestSent', convAreaInviteRequest => {
+      const affectedPlayers = convAreaInviteRequest.requested;
+      const newRequester = convAreaInviteRequest.requester;
+      const newRequesterLocation = convAreaInviteRequest.requesterLocation;
+      // find the index of our player within the list of recipients in this convAreaInviteRequest
       const ourPlayerIndex: number = affectedPlayers.findIndex(
         invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
       );
 
-      // using the index (if found), add our player to a copy of the current list of _conversationAreaInvitesInternal
-      // and call the setter for _conversationAreaInvitesInternal
+      // If our player is found within the list of recipients, use its index to create a new
+      // singular invite and check for a duplicate invite already in the current list of
+      // conversation area invites. If no duplicate found, add our player to a copy of the current
+      // list of _conversationAreaInvitesInternal and call its setter
       if (ourPlayerIndex !== -1) {
         const newInvite: TeleportInviteSingular = {
-          requester: conversationAreaInviteRequest.requester,
+          requester: convAreaInviteRequest.requester,
           requested: affectedPlayers[ourPlayerIndex],
-          requesterLocation: conversationAreaInviteRequest.requesterLocation,
+          requesterLocation: convAreaInviteRequest.requesterLocation,
         };
-        // check if our player already has an existing invite from this new requester to this new location
-        const existantInviteIndex: number = this._conversationAreaInvitesInternal.findIndex(
-          invite =>
-            invite.requester === newRequester && invite.requesterLocation === newRequesterLocation,
-        );
-        // if invite was not found in current list, add it
-        if (existantInviteIndex === -1) {
+        // check if our player already has an existing invite from this new requester to this new
+        // location. i.e., this invite is not a functional duplicate of an already existing one
+        const potentialDuplicateInviteIndex: number =
+          this._conversationAreaInvitesInternal.findIndex(
+            invite =>
+              invite.requester === newRequester &&
+              invite.requesterLocation === newRequesterLocation,
+          );
+        // if invite was not found in current list of conversation area invites, add it
+        if (potentialDuplicateInviteIndex === -1) {
           const newConvoAreaInvites: TeleportInviteSingular[] =
             this._conversationAreaInvitesInternal.concat([newInvite]);
           this.conversationAreaInvites = newConvoAreaInvites;
