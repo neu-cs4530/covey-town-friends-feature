@@ -9,9 +9,38 @@ import TownController, * as TownControllerHooks from '../../classes/TownControll
 import PlayerController from '../../classes/PlayerController';
 import * as useTownController from '../../hooks/useTownController';
 import { mockTownController } from '../../TestUtils';
-import { PlayerLocation } from '../../types/CoveyTownSocket';
+import { Player, PlayerLocation } from '../../types/CoveyTownSocket';
 import * as PlayerName from './PlayerName';
-import PlayersList from './PlayersList';
+import PlayersList, { isPlayerInList } from './PlayersList';
+import { type } from 'os';
+
+describe('isPlayerInList', () => {
+  let testList: PlayerController[];
+  let contPlayer1: PlayerController;
+  let contPlayer2: PlayerController;
+  const player1: Player = {
+    id: nanoid(),
+    location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
+    userName: nanoid(),
+  };
+  const player2: Player = {
+    id: nanoid(),
+    location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
+    userName: nanoid(),
+  };
+  beforeEach(() => {
+    contPlayer1 = PlayerController.fromPlayerModel(player1);
+    contPlayer2 = PlayerController.fromPlayerModel(player2);
+    testList = [contPlayer1];
+  });
+  it('Should return true if the given player is in the list', () => {
+    expect(isPlayerInList(contPlayer1, testList)).toBe(true);
+  });
+  it('Should return false if the given player is NOT in the list', () => {
+    expect(isPlayerInList(contPlayer2, testList)).toBe(false);
+    expect(isPlayerInList(contPlayer1, [])).toBe(false);
+  });
+});
 
 describe('PlayersInTownList', () => {
   const randomLocation = (): PlayerLocation => ({
@@ -55,7 +84,10 @@ describe('PlayersInTownList', () => {
     // Spy on console.error and intercept react key warnings to fail test
     consoleErrorSpy = jest.spyOn(global.console, 'error');
     consoleErrorSpy.mockImplementation((message?, ...optionalParams) => {
-      const stringMessage = message as string;
+      //const stringMessage = message as string;
+      const stringMessage = `${message}`;
+      console.log('MESSAGE');
+      console.log(typeof stringMessage);
       if (stringMessage.includes('children with the same key,')) {
         throw new Error(stringMessage.replace('%s', optionalParams[0]));
       } else if (stringMessage.includes('warning-keys')) {
@@ -86,7 +118,7 @@ describe('PlayersInTownList', () => {
     useTownControllerSpy.mockReturnValue(mockedTownController);
   });
   describe('Heading', () => {
-    it('Displays a heading "Current town: townName', async () => {
+    it('Displays a heading "Other Players in This Town', async () => {
       const renderData = renderPlayersList();
       const heading = await renderData.findByRole('heading', { level: 2 });
       expect(heading).toHaveTextContent(`Other Players In This Town`);
