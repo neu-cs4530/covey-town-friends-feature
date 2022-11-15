@@ -4,14 +4,13 @@ import React, { useEffect, useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
 import { useCurrentPlayerFriends, usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
-import { Player } from '../../types/CoveyTownSocket';
 import PlayerName from './PlayerName';
 
 /**
- *
- * @param givenPlayer
- * @param playerList
- * @returns
+ * Determines whether or not a given PlayerController is in a given list of PlayerControllers
+ * @param givenPlayer the PlayerController to check for in the provided list
+ * @param playerList the list of PlayerControllers
+ * @returns true if the player is in the list, false otherwise
  */
 export function isPlayerInList(givenPlayer: PlayerController, playerList: PlayerController[]) {
   // attempt to find the equivalent givenPlayer in playerList
@@ -27,18 +26,6 @@ export function isPlayerInList(givenPlayer: PlayerController, playerList: Player
   }
 }
 
-export function useCurrentPlayerNotFriends(): PlayerController[] {
-  const players = usePlayers();
-  const friends = useCurrentPlayerFriends();
-  const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
-
-  useEffect(() => {
-    const newNotFriends = players.filter(player => !isPlayerInList(player, friends));
-    setPlayerNotFriends(newNotFriends);
-  }, [friends, players]);
-  return playerNotFriends;
-}
-
 /**
  * Lists the current players in the town, along with the current town's name and ID
  *
@@ -50,15 +37,16 @@ export default function PlayersInTownList(): JSX.Element {
   const { townID } = useTownController();
   const players = usePlayers();
   const friends = useCurrentPlayerFriends();
-  // const notFriends: PlayerController[] = players.filter(player => !isPlayerInList(player, friends));
-  const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
 
+  // Set up a not-friends list to be updated every time player & friends is
+  const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
     const newNotFriends = players.filter(player => !isPlayerInList(player, friends));
     setPlayerNotFriends(newNotFriends);
   }, [friends, players]);
 
-  const sorted = players.concat([]);
+  // Sort the not-friends list to be passed in
+  const sorted = players.concat([]); // TODO, once sure tests work: replace with playerNotFriends
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),
   );
