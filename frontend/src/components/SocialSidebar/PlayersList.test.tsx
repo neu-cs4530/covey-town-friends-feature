@@ -60,7 +60,9 @@ describe('PlayersInTownList', () => {
   let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;
   let usePlayersSpy: jest.SpyInstance<PlayerController[], []>;
   let useTownControllerSpy: jest.SpyInstance<TownController, []>;
+  let useFriendsSpy: jest.SpyInstance<PlayerController[], []>;
   let players: PlayerController[] = [];
+  let friends: PlayerController[] = [];
   let townID: string;
   let townFriendlyName: string;
   const expectProperlyRenderedPlayersList = async (
@@ -98,6 +100,7 @@ describe('PlayersInTownList', () => {
     });
     usePlayersSpy = jest.spyOn(TownControllerHooks, 'usePlayers');
     useTownControllerSpy = jest.spyOn(useTownController, 'default');
+    useFriendsSpy = jest.spyOn(TownControllerHooks, 'useCurrentPlayerFriends');
   });
 
   beforeEach(() => {
@@ -111,7 +114,9 @@ describe('PlayersInTownList', () => {
         ),
       );
     }
+    friends = [];
     usePlayersSpy.mockReturnValue(players);
+    useFriendsSpy.mockReturnValue(friends);
     townID = nanoid();
     townFriendlyName = nanoid();
     const mockedTownController = mockTownController({ friendlyName: townFriendlyName, townID });
