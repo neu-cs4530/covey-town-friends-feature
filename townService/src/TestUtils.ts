@@ -15,6 +15,7 @@ import {
   BoundingBox,
   ClientToServerEvents,
   ConversationArea,
+  ConversationAreaGroupInvite,
   CoveyTownSocket,
   Direction,
   Interactable,
@@ -142,18 +143,22 @@ export class MockedPlayer {
 
   player: Player | undefined;
 
+  id: string;
+
   constructor(
     socket: MockProxy<CoveyTownSocket>,
     socketToRoomMock: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>,
     userName: string,
     townID: string,
     player: Player | undefined,
+    id: string,
   ) {
     this.socket = socket;
     this.socketToRoomMock = socketToRoomMock;
     this.userName = userName;
     this.townID = townID;
     this.player = player;
+    this.id = id;
   }
 
   moveTo(x: number, y: number, rotation: Direction = 'front', moving = false): void {
@@ -185,6 +190,30 @@ export class MockedPlayer {
     const onRemoveFriendListener = getEventListener(this.socket, 'removeFriend');
     onRemoveFriendListener({ actor, affected });
   }
+
+  invitedAllToConvArea(invite: ConversationAreaGroupInvite): void {
+    const { requester, requested, requesterLocation } = invite;
+    const onInviteAllToConvAreaListener = getEventListener(this.socket, 'inviteAllToConvArea');
+    onInviteAllToConvAreaListener({ requester, requested, requesterLocation });
+  }
+
+  acceptedConvAreaInvite(
+    requester: Player,
+    requested: Player,
+    requesterLocation: PlayerLocation,
+  ): void {
+    const onAcceptConvAreaInviteListener = getEventListener(this.socket, 'acceptConvAreaInvite');
+    onAcceptConvAreaInviteListener({ requester, requested, requesterLocation });
+  }
+
+  declinedConvAreaInvite(
+    requester: Player,
+    requested: Player,
+    requesterLocation: PlayerLocation,
+  ): void {
+    const onDeclineConcAreaInviteListener = getEventListener(this.socket, 'declineConvAreaInvite');
+    onDeclineConcAreaInviteListener({ requester, requested, requesterLocation });
+  }
 }
 
 /**
@@ -205,7 +234,7 @@ export function mockPlayer(townID: string): MockedPlayer {
     }
     throw new Error(`Tried to broadcast to ${room} but this player is in ${townID}`);
   });
-  return new MockedPlayer(socket, socketToRoomMock, userName, townID, undefined);
+  return new MockedPlayer(socket, socketToRoomMock, userName, townID, undefined, nanoid());
 }
 
 /**

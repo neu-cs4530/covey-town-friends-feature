@@ -76,7 +76,7 @@ export type PlayerToPlayerUpdate = {
   affected: PlayerSrc;
 };
 
-export type ConversationAreaInvite = {
+export type ConversationAreaGroupInvite = {
   requester: PlayerSrc;
   requested: PlayerSrc[];
   // Check whether this is a shallow/deep copy, potentially remove player location
@@ -92,6 +92,12 @@ export type TeleportInviteSingular = {
 export type TeleportAction = {
   actor: PlayerSrc;
   playerDestinationLocation: PlayerLocation;
+}
+
+export type BriefMessage = {
+  sender: PlayerSrc;
+  recipients: PlayerSrc[];
+  body: string;
 }
 
 export interface ServerToClientEvents {
@@ -114,7 +120,7 @@ export interface ServerToClientEvents {
   // actor is remover, affected is the removed friend
   friendRemoved: (friendRequest: PlayerToPlayerUpdate) => void;
   conversationAreaRequestSent: (
-    conversationAreaInviteRequest: ConversationAreaInvite
+    conversationAreaInviteRequest: ConversationAreaGroupInvite
   ) => void;
   conversationAreaRequestAccepted: (
     conversationAreaInviteRequest: TeleportInviteSingular
@@ -122,6 +128,8 @@ export interface ServerToClientEvents {
   conversationAreaRequestDeclined: (
     conversationAreaInviteRequest: TeleportInviteSingular
   ) => void;
+  // sender is the Player who sent the message to their currently selected friends
+  briefMessageSent: (briefMessage: BriefMessage) => void;
 }
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
@@ -137,4 +145,12 @@ export interface ClientToServerEvents {
   cancelFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is the Player who clicked remove friend
   removeFriend(removeFriend: PlayerToPlayerUpdate);
+  // requester is the Player who clicked to invite selected friends 
+  inviteAllToConvArea(invite: ConversationAreaGroupInvite);
+  // requester is the Player who originally sent the invite
+  acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
+  // requester is the Player who originally sent the invite 
+  declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
+  // sender is the Player who sent the message to their currently selected friends
+  sendBriefMessage: (briefMessage: BriefMessage) => void;
 }

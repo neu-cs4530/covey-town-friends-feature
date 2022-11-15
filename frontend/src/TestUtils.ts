@@ -6,7 +6,13 @@ import PlayerController from './classes/PlayerController';
 import TownController, { TownEvents } from './classes/TownController';
 import ViewingAreaController from './classes/ViewingAreaController';
 import { TownsService } from './generated/client';
-import { CoveyTownSocket, ServerToClientEvents, TownJoinResponse } from './types/CoveyTownSocket';
+import {
+  CoveyTownSocket,
+  PlayerToPlayerUpdate,
+  ServerToClientEvents,
+  TeleportInviteSingular,
+  TownJoinResponse,
+} from './types/CoveyTownSocket';
 
 //These types copied from socket.io server library so that we don't have to depend on the whole thing to have type-safe tests.
 type SocketReservedEventsMap = {
@@ -85,6 +91,10 @@ type MockedTownControllerProperties = {
   players?: PlayerController[];
   conversationAreas?: ConversationAreaController[];
   viewingAreas?: ViewingAreaController[];
+  conversationAreaInvites?: TeleportInviteSingular[];
+  playerFriendRequests?: PlayerToPlayerUpdate[];
+  playerFriends?: PlayerController[];
+  selectedFriends?: PlayerController[];
 };
 export function mockTownController({
   friendlyName,
@@ -95,6 +105,10 @@ export function mockTownController({
   players,
   conversationAreas,
   viewingAreas,
+  conversationAreaInvites,
+  playerFriendRequests,
+  playerFriends,
+  selectedFriends,
 }: MockedTownControllerProperties) {
   const mockedController = mock<TownController>();
   if (friendlyName) {
@@ -122,6 +136,26 @@ export function mockTownController({
   }
   if (viewingAreas) {
     Object.defineProperty(mockedController, 'viewingAreas', { value: viewingAreas });
+  }
+  if (conversationAreaInvites) {
+    Object.defineProperty(mockedController, 'conversationAreaInvites', {
+      value: conversationAreaInvites,
+    });
+  }
+  if (playerFriendRequests) {
+    Object.defineProperty(mockedController, 'playerFriendRequests', {
+      value: playerFriendRequests,
+    });
+  }
+  if (playerFriends) {
+    Object.defineProperty(mockedController, 'playerFriends', {
+      value: playerFriends,
+    });
+  }
+  if (selectedFriends) {
+    Object.defineProperty(mockedController, 'selectedFriends', {
+      value: selectedFriends,
+    });
   }
   return mockedController;
 }

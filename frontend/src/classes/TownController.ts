@@ -15,8 +15,12 @@ import {
   PlayerLocation,
   PlayerToPlayerUpdate,
   TeleportAction,
+  TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  Player,
+  ConversationAreaGroupInvite,
+  BriefMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -41,49 +45,93 @@ export type TownEvents = {
    * @param providerVideoToken a secret token that can be used to connect to the video service
    */
   connect: (providerVideoToken: string) => void;
+
   /**
    * An event that indicates that the TownController has been disconnected from the townService
    */
   disconnect: () => void;
+
   /**
    * An event that indicates that the town settings have been updated. This event is dispatched
    * before updating the properties of this TownController; clients may find the new settings in the parameter
    */
   townSettingsUpdated: (newTownSettings: TownSettingsUpdate) => void;
+
   /**
    * An event that indicates that the set of players in the town has changed. This event is dispatched
    * before updating the proeprties of this TownController; clients will find the new players in the parameter
    */
   playersChanged: (newPlayers: PlayerController[]) => void;
+
   /**
    * An event that indicates that a player has moved. This event is dispatched after updating the player's location -
    * the new location can be found on the PlayerController.
    */
   playerMoved: (movedPlayer: PlayerController) => void;
+
+  /**
+   * An event that indicates that the set of conversation area requests has changed. This event is
+   * dispatched when a request is added to the list, or removed - i.e., after updating this town
+   * controller's record of conversation area requests.
+   */
+  conversationAreaInvitesChanged: (currentConvAreaInvites: TeleportInviteSingular[]) => void;
+
+  /**
+   * An event that indicates that the set of friend requests for this player has changed. This event
+   * is dispatched when a request is added to the list (sent), or removed (accepted/declined).
+   */
+  playerFriendRequestsChanged: (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => void;
+
   /**
    * An event that indicates that the set of conversation areas has changed. This event is dispatched
    * when a conversation area is created, or when the set of active conversations has changed. This event is dispatched
    * after updating the town controller's record of conversation areas.
    */
   conversationAreasChanged: (currentConversationAreas: ConversationAreaController[]) => void;
+
+  /**
+   * An event that indicates that the set of TownController.ourPlayer's friends have changed. This event is
+   * dispatched when a player accepts a friend request that has been sent to them, a player has accepted
+   * one of this players requests, or if this player choses to remove a friend from their friends list.
+   * This event is dispatched after updating the town controller's record of TownController.ourPlayer's friends.
+   */
+  playerFriendsChanged: (currentPlayerFriends: PlayerController[]) => void;
+
+  /**
+   * An event that indicates that the set of selected friends have changed. This event is
+   * dispatched when a player selects or deselects a friend in the UI.
+   * This event is dispatched after updating the town controller's record of TownController.selectedFriends.
+   */
+  selectedFriendsChanged: (selectedFriends: PlayerController[]) => void;
+
+  /**
+   * An event that indicates that the latest brief message to this player has changed. This event
+   * is dispatched after updating the player's latest brief message.
+   */
+  latestBriefMessageChanged: (latestBriefMessage: BriefMessage) => void;
+
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+
   /**
    * An event that indicates that a new chat message has been received, which is the parameter passed to the listener
    */
   chatMessage: (message: ChatMessage) => void;
+
   /**
    * An event that indicates that the 2D game is now paused. Pausing the game should, if nothing else,
    * release all key listeners, so that text entry is possible
    */
   pause: () => void;
+
   /**
    * An event that indicates that the 2D game should now be unpaused (resumed).
    */
   unPause: () => void;
+
   /**
    * An event that indicates that the player is now interacting with a different interactable
    * @param typeName the type of interactable
@@ -132,6 +180,54 @@ export type TownEvents = {
    * being un-friended.
    */
   clickedRemoveFriend: (removeFriend: PlayerToPlayerUpdate) => void;
+
+  /**
+   * An event that indicates that the player has requested the list of players to
+   * join them in a given conversation area. The request contains a requester Player,
+   * a list of requested Players, as well as a PlayerLocation that the requested
+   * will be transported to if they accept the request.
+   */
+  clickedInviteAllToConvArea: (invite: ConversationAreaGroupInvite) => void;
+
+  /**
+   * An event that indicates that the player has accepted a conversation area invite.
+   * The request object contains the player who originally sent the request (requester), the
+   * player who received it and is now accepting it (requested), and the requester's location
+   * (the destination the requested will be teleported to).
+   */
+  clickedAcceptConvAreaInvite: (acceptedInvite: TeleportInviteSingular) => void;
+
+  /**
+   * An event that indicates that the player has declined a conversation area invite.
+   * The request object contains the player who originally sent the request (requester), the
+   * player who received it and is now declining it (requested), and the requester's location.
+   */
+  clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
+
+  /**
+   * An event that indicates that a new brief message has been sent, which is the parameter
+   * passed to the listener. The message object contains the player who is sending the
+   * message (sender), the list of selected friends meant to receive it (recipients),
+   * and the message itself (body).
+   */
+  clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
+
+  // Sprint 3 Potential TODO: assess whether these need to be here
+  /**
+   * A function that indicates that a friend has been selected in the UI.
+   * The request object contains the PlayerController of the friend to select.
+   * It assumes that the PC is already a friend. Does nothing if friend is already selected
+   */
+  selectFriend: (friendToSelect: PlayerController) => void;
+
+  // Sprint 3 Potential TODO: assess whether these need to be here
+  /**
+   * A function that indicates that a friend has been deselected in the UI.
+   * The request object contains the PlayerController of the friend to deselect.
+   * It assumes that the PC is already a friend. Does nothing if the friend is not
+   * already selected.
+   */
+  deselectFriend: (friendToDeselect: PlayerController) => void;
 };
 
 /**
@@ -169,6 +265,42 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * with a new one; clients should take note not to retain stale references.
    */
   private _playersInternal: PlayerController[] = [];
+
+  // When designing frontend, would just have to check:
+  // - if request.actor = TownController.ourPlayer -> render a 'cancel request' button
+  // - if request.affected = TownController.ourPlayer -> render a 'accept request' button
+  /**
+   * The current list of friend requests that concerns TownController.ourPlayer. Includes
+   * requests where the actor is TownController.ourPlayer, and where the affected is.
+   * Adding or removing requests might replace the array with a new one; clients should take
+   * note not to retain stale references.
+   */
+  private _playerFriendRequestsInternal: PlayerToPlayerUpdate[] = [];
+
+  /**
+   * The current list of conversation area requests in the town. Adding or removing requests might
+   * replace the array with a new one; clients should take note not to retain stale references.
+   */
+  private _conversationAreaInvitesInternal: TeleportInviteSingular[] = [];
+
+  /**
+   * The current list of this TownController.ourPlayer's friends in this town. Adding or removing
+   * friends will replace the array with a new one. clients should take note not to retain stale references.
+   */
+  private _playerFriendsInternal: PlayerController[] = [];
+
+  /**
+   * The current list of this TownController's selected friends in this town. Selected or deselecting
+   * friends in the UI will replace this array with a new one. Clients should take note not to retain stale references.
+   */
+  private _selectedFriendsInternal: PlayerController[] = [];
+
+  /**
+   * The latest brief message that this TownController.ourPlayer has recieved. Updates every time
+   * a new brief message is sent to this player, regardless of whether it has the same content. If
+   * this player has not recieved any brief messages yet, it remains undefined.
+   */
+  private _latestBriefMessage: BriefMessage | undefined;
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -326,7 +458,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return this._playersInternal;
   }
 
-  private set _players(newPlayers: PlayerController[]) {
+  public set players(newPlayers: PlayerController[]) {
     this.emit('playersChanged', newPlayers);
     this._playersInternal = newPlayers;
   }
@@ -338,6 +470,93 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private set _conversationAreas(newConversationAreas: ConversationAreaController[]) {
     this._conversationAreasInternal = newConversationAreas;
     this.emit('conversationAreasChanged', newConversationAreas);
+  }
+
+  public get conversationAreaInvites() {
+    return this._conversationAreaInvitesInternal;
+  }
+
+  public set conversationAreaInvites(newConversationAreaInvites: TeleportInviteSingular[]) {
+    // Only update the list if the new list is not the same as the current one
+    if (
+      !(
+        this._conversationAreaInvitesInternal.length === newConversationAreaInvites.length &&
+        this._conversationAreaInvitesInternal.every(item =>
+          newConversationAreaInvites.includes(item),
+        ) &&
+        newConversationAreaInvites.every(item =>
+          this._conversationAreaInvitesInternal.includes(item),
+        )
+      )
+    ) {
+      this._conversationAreaInvitesInternal = newConversationAreaInvites;
+      this.emit('conversationAreaInvitesChanged', newConversationAreaInvites);
+    }
+  }
+
+  public get playerFriendRequests() {
+    return this._playerFriendRequestsInternal;
+  }
+
+  public set playerFriendRequests(newPlayerFriendRequests: PlayerToPlayerUpdate[]) {
+    // Only update the list if the new list is not the same as the current one
+    if (
+      !(
+        this._playerFriendRequestsInternal.length === newPlayerFriendRequests.length &&
+        this._playerFriendRequestsInternal.every(item => newPlayerFriendRequests.includes(item)) &&
+        newPlayerFriendRequests.every(item => this._playerFriendRequestsInternal.includes(item))
+      )
+    ) {
+      this._playerFriendRequestsInternal = newPlayerFriendRequests;
+      this.emit('playerFriendRequestsChanged', newPlayerFriendRequests);
+    }
+  }
+
+  public get playerFriends() {
+    return this._playerFriendsInternal;
+  }
+
+  public set playerFriends(newPlayerFriends: PlayerController[]) {
+    if (
+      !(
+        this._playerFriendsInternal.length === newPlayerFriends.length &&
+        this._playerFriendsInternal.every(friend => newPlayerFriends.includes(friend)) &&
+        newPlayerFriends.every(friend => this._playerFriendsInternal.includes(friend))
+      )
+    ) {
+      this._playerFriendsInternal = newPlayerFriends;
+      this.emit('playerFriendsChanged', newPlayerFriends);
+    }
+  }
+
+  public get selectedFriends() {
+    return this._selectedFriendsInternal;
+  }
+
+  public set selectedFriends(newSelectedFriends: PlayerController[]) {
+    // only emit a selectedFriendsChanged event if the list contains different friends
+    if (
+      !(
+        this._selectedFriendsInternal.length === newSelectedFriends.length &&
+        this._selectedFriendsInternal.every(friend => newSelectedFriends.includes(friend)) &&
+        newSelectedFriends.every(friend => this._selectedFriendsInternal.includes(friend))
+      )
+    ) {
+      this._selectedFriendsInternal = newSelectedFriends;
+      this.emit('selectedFriendsChanged', newSelectedFriends);
+    }
+  }
+
+  public get latestBriefMessage(): BriefMessage | undefined {
+    return this._latestBriefMessage;
+  }
+
+  public set latestBriefMessage(newLatestBriefMessage: BriefMessage | undefined) {
+    this._latestBriefMessage = newLatestBriefMessage;
+    // if message is set to undefined, don't emit
+    if (newLatestBriefMessage) {
+      this.emit('latestBriefMessageChanged', newLatestBriefMessage);
+    }
   }
 
   public get interactableEmitter() {
@@ -408,7 +627,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      */
     this._socket.on('playerJoined', newPlayer => {
       const newPlayerObj = PlayerController.fromPlayerModel(newPlayer);
-      this._players = this.players.concat([newPlayerObj]);
+      this.players = this.players.concat([newPlayerObj]);
       this.emit('playerMoved', newPlayerObj);
     });
     /**
@@ -417,7 +636,28 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * Note that setting the players array will also emit an event that the players in the town have changed.
      */
     this._socket.on('playerDisconnect', disconnectedPlayer => {
-      this._players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+      this.players = this.players.filter(eachPlayer => eachPlayer.id !== disconnectedPlayer.id);
+
+      // if the disconnectedPlayer is in our friends list, remove it from our friends as well
+      this._removePlayerControllerFromFriendsList(disconnectedPlayer.id);
+
+      // if the disconnectedPlayer is a selectedFriend, deselect them
+      const controllerToRemove = this.selectedFriends.find(
+        player => player.id == disconnectedPlayer.id,
+      );
+      if (controllerToRemove) {
+        this.deselectFriend(controllerToRemove);
+      }
+
+      // clear any friend requests where disconnectedPlayer is either the actor or affected
+      const updatedRequestList = [...this.playerFriendRequests];
+      this.playerFriendRequests = updatedRequestList.filter(
+        request =>
+          !(
+            request.actor.id === disconnectedPlayer.id ||
+            request.affected.id === disconnectedPlayer.id
+          ),
+      );
     });
     /**
      * When a player moves, update local state and emit an event to the controller's event listeners
@@ -433,12 +673,30 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           playerToUpdate.location.interactableID = movedPlayer.location.interactableID;
         } else {
           playerToUpdate.location = movedPlayer.location;
+          // find the player in our friends list whose location we also want to update
+          const friendToUpdate = this.playerFriends.find(
+            eachFriend => eachFriend.id === movedPlayer.id,
+          );
+          // if they are present
+          if (friendToUpdate) {
+            friendToUpdate.location = movedPlayer.location;
+          }
+
+          // Potential TODO: reassess whether this update is necessary because of deep vs shallow copies
+          // find the player in our selectedFriends list whose location we also want to update
+          const selectedFriendToUpdate = this.selectedFriends.find(
+            eachFriend => eachFriend.id === movedPlayer.id,
+          );
+          // if they are present
+          if (selectedFriendToUpdate) {
+            selectedFriendToUpdate.location = movedPlayer.location;
+          }
         }
         this.emit('playerMoved', playerToUpdate);
       } else {
         //TODO: It should not be possible to receive a playerMoved event for a player that is not already in the players array, right?
         const newPlayer = PlayerController.fromPlayerModel(movedPlayer);
-        this._players = this.players.concat(newPlayer);
+        this.players = this.players.concat(newPlayer);
         this.emit('playerMoved', newPlayer);
       }
     });
@@ -473,6 +731,279 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    /*
+     * When a conversation area group invite is sent out, check to see if our player was among
+     * the list of invitees. If so, add this new teleport invite to the exisitng list of invites,
+     * if there isn't already an indentical invite present.
+     *
+     * If the invite was unique, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestSent', convAreaInviteRequest => {
+      const affectedPlayers = convAreaInviteRequest.requested;
+      const newRequester = convAreaInviteRequest.requester;
+      const newRequesterLocation = convAreaInviteRequest.requesterLocation;
+      // find the index of our player within the list of recipients in this convAreaInviteRequest
+      const ourPlayerIndex: number = affectedPlayers.findIndex(
+        invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
+      );
+
+      // If our player is found within the list of recipients, use its index to create a new
+      // singular invite and check for a duplicate invite already in the current list of
+      // conversation area invites. If no duplicate found, add our player to a copy of the current
+      // list of _conversationAreaInvitesInternal and call its setter
+      if (ourPlayerIndex !== -1) {
+        const newInvite: TeleportInviteSingular = {
+          requester: convAreaInviteRequest.requester,
+          requested: affectedPlayers[ourPlayerIndex],
+          requesterLocation: convAreaInviteRequest.requesterLocation,
+        };
+        // check if our player already has an existing invite from this new requester to this new
+        // location. i.e., this invite is not a functional duplicate of an already existing one
+        const potentialDuplicateInviteIndex: number =
+          this._conversationAreaInvitesInternal.findIndex(
+            invite =>
+              invite.requester === newRequester &&
+              invite.requesterLocation === newRequesterLocation,
+          );
+        // if invite was not found in current list of conversation area invites, add it
+        if (potentialDuplicateInviteIndex === -1) {
+          const newConvoAreaInvites: TeleportInviteSingular[] =
+            this._conversationAreaInvitesInternal.concat([newInvite]);
+          this.conversationAreaInvites = newConvoAreaInvites;
+        }
+      }
+    });
+
+    /*
+     * When a conversation area individual invite is accepted, use the remover helper to
+     * deal with removing the invite.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestAccepted', conversationAreaInviteRequest => {
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
+    });
+
+    /**
+     * When a conversation area individual invite is declined, use the remover helper to
+     * deal with removing the invite.
+     *
+     * If the invite did exist and was removed, emits a conversationAreaInvitesChanged event.
+     */
+    this._socket.on('conversationAreaRequestDeclined', conversationAreaInviteRequest => {
+      this._removeTeleportInviteFromInvites(conversationAreaInviteRequest);
+    });
+
+    /**
+     *
+     * When any player sends a friend request to another player, we check if that friend request was sent BY or TO us.
+     * In either of those cases, we store those friend requests for the UI to render and emit an event for the hook
+     * to catch. Otherwise we can ignore the request.
+     *
+     * Assumes a player cannot send a friend request to themself. (UI will not allow this)
+     *
+     * Assumes a player cannot receive duplicate friend requests. (UI will not allow this)
+     *
+     * */
+    this._socket.on('friendRequestSent', friendRequest => {
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the incoming request, save it
+      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+        const updatedFriendRequests = [...this.playerFriendRequests];
+        updatedFriendRequests.push(friendRequest);
+        // use setter because it emits necessary event
+        this.playerFriendRequests = updatedFriendRequests;
+      }
+    });
+
+    /**
+     *
+     * When any player declines a friend request, we check to see if the original request was sent to or from us.
+     * In either of those cases, we remove the request from our list of stored friend requests, for the UI to know
+     * what to render. Otherwise ignore the request.
+     *
+     * Right now, when the backend emits a friendRequestDeclined event, the actor is the decliner and the affected is
+     * the initial sender. However, this means that when looking for the request we have to flip the actor and affected.
+     * The proposed refactor is to make is so that friendRequestDeclined is emitted with the original friend request that
+     * is being declined. (Backlog refactor)
+     *
+     * */
+    this._socket.on('friendRequestDeclined', friendRequest => {
+      // actor is decliner, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+
+      // looking for a request from affected to actor, but only if one of them is our player
+      // otherwise we shouldn't even have the request saved
+      this._removeFriendRequestIfInvolved(affected, actor);
+    });
+
+    /**
+     *
+     * When a friend request is accepted, if we are one of the players in the accepted request,
+     * update our list of requests by removing it, and add the other player into our friends list.
+     *
+     * Since actor is the receiver of the intiial request, we need to flip
+     * the actor and affected to find the original request. (Backlog refactor)
+     */
+    this._socket.on('friendRequestAccepted', friendRequest => {
+      // actor is accepter, affected is the initial sender of the request
+      const { actor, affected } = friendRequest;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // // if our player is involved in the accepted request, remove it
+      this._removeFriendRequestIfInvolved(affected, actor);
+
+      // update friends list
+      // only needs to be done on this controller because the other controller will also receive this event
+      if (actor.id === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(affected.id);
+      } else if (affected.id === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(actor.id);
+      }
+    });
+
+    /**
+     * Whenever a player cancels a friend request, if we are either the remover or the removed,
+     * remove that friend request from our list of requests
+     */
+    this._socket.on('friendRequestCanceled', playerToPlayerUpdate => {
+      // actor is sender / canceler, affected is original recipient
+      const { actor, affected } = playerToPlayerUpdate;
+
+      // if our player is involved in the canceled request remove it
+      this._removeFriendRequestIfInvolved(actor, affected);
+    });
+
+    /**
+     * Whenever a player removes a friend, if we are either the remover or the removed,
+     * remove the other player from our friends list.
+     */
+    this._socket.on('friendRemoved', playerToPlayerUpdate => {
+      // actor is remover, affected is the removed friend
+      const { actor, affected } = playerToPlayerUpdate;
+      const ourPlayerID = this.ourPlayer.id;
+
+      // if our player is involved in the removal
+      if (actor.id === ourPlayerID) {
+        // if we are the actor, remove affected
+        this._removePlayerControllerFromFriendsList(affected.id);
+      } else if (affected.id === ourPlayerID) {
+        // if we are the affected, remove actor
+        this._removePlayerControllerFromFriendsList(actor.id);
+      }
+    });
+
+    /**
+     * Whenever a brief message event is recieved, if we are one of the recipients,
+     * update our latestMessage with the new message.
+     */
+    this._socket.on('briefMessageSent', briefMessage => {
+      // search for our player among the list of recipents
+      const ourPlayer = briefMessage.recipients.find(
+        recipientPlayer => recipientPlayer.id === this.ourPlayer.id,
+      );
+
+      // if found our player among the recipients, call the setter for latestBriefMessage
+      if (ourPlayer) {
+        this.latestBriefMessage = briefMessage;
+      }
+    });
+  }
+
+  /**
+   * Given a PlayerToPlayerUpdate, if this.ourPlayer is either the actor or affected,
+   * remove this request from our list of friendRequests.
+   *
+   * @param requestToRemove the friend request from actor to affected to remove
+   */
+  private _removeFriendRequestIfInvolved(initialSender: Player, initialReceiver: Player) {
+    const ourPlayerID = this.ourPlayer.id;
+
+    if (initialSender.id === ourPlayerID || initialReceiver.id === ourPlayerID) {
+      const updatedRequestList = this.playerFriendRequests.filter(
+        // the person being accepted (affected) is the sender of the original request (request.actor)
+        // the accepter (actor) is the recipient (request.affected) of the request we want to remove
+        request =>
+          !(request.actor.id === initialSender.id && request.affected.id === initialReceiver.id),
+      );
+      this.playerFriendRequests = [...updatedRequestList];
+    }
+  }
+
+  /**
+   * Given the ID of a player in the town, removes the PlayerController matching that ID
+   * from our friends list. Does not do anything if that player is not in our friends list
+   *
+   * @param id the id of the player controller to remove from the friends list
+   */
+  private _removePlayerControllerFromFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // find the player controller to remove by matching id
+    const playerControllerToRemove = updatedFriendsList.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Remove that controller from friends list from friends list
+    // (Should exist by virtue of how the UI works but checking in case)
+    if (playerControllerToRemove) {
+      const indexToRemove = updatedFriendsList.indexOf(playerControllerToRemove);
+      if (indexToRemove >= 0) {
+        updatedFriendsList.splice(indexToRemove, 1);
+      }
+    }
+
+    // update the playerFriends list
+    this.playerFriends = [...updatedFriendsList];
+  }
+
+  /**
+   * Given the ID of a player in the town, adds the PlayerController matching that ID
+   * from our friends list.
+   * Assume we can find actor/affected in the player list because you can't friend request someone who
+   * isn't a Player in Town (or accept a friend request of someone who isn't a Player).
+   *
+   * @param id the id of the player controller to add to the friends list
+   */
+  private _addPlayerControllerToFriendsList(id: string) {
+    const updatedFriendsList = [...this.playerFriends];
+
+    // Get new friend's PlayerController from player list
+    const controllerToAdd = this.players.find(
+      controller => controller.id === id,
+    ) as PlayerController;
+
+    // Add it to the friend List
+    // Should exist by virtue of how the UI works but check in case
+    if (controllerToAdd) {
+      updatedFriendsList.push(controllerToAdd);
+    }
+
+    // update the playerFriends list
+    this.playerFriends = [...updatedFriendsList];
+  }
+
+  /*
+   * Check to see if our player was the requested person in the given invite. If so, remove
+   * this invite from the current list of invites.
+   *
+   * @param teleportInviteToRemove the teleport invite to remove, if found
+   */
+  private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
+    if (teleportInviteToRemove.requested.id === this.ourPlayer.id) {
+      const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
+        invite =>
+          !(
+            invite.requesterLocation.x === teleportInviteToRemove.requesterLocation.x &&
+            invite.requesterLocation.y === teleportInviteToRemove.requesterLocation.y &&
+            invite.requester.id === teleportInviteToRemove.requester.id
+          ),
+      );
+      this.conversationAreaInvites = newInvitesFiltered;
+    }
   }
 
   /**
@@ -578,12 +1109,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._friendlyNameInternal = initialData.friendlyName;
         this._townIsPubliclyListedInternal = initialData.isPubliclyListed;
         this._sessionToken = initialData.sessionToken;
-        this._players = initialData.currentPlayers.map(eachPlayerModel =>
+        this.players = initialData.currentPlayers.map(eachPlayerModel =>
           PlayerController.fromPlayerModel(eachPlayerModel),
         );
 
         this._conversationAreas = [];
         this._viewingAreas = [];
+        this.conversationAreaInvites = [];
+        this.playerFriendRequests = [];
+        this._playerFriendsInternal = [];
+        this._selectedFriendsInternal = [];
+        this._latestBriefMessage = undefined;
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -632,7 +1168,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emit a viewing area update to the townService
+   * Emit a viewing area update to the townService.
    * @param viewingArea The Viewing Area Controller that is updated and should be emitted
    *    with the event
    */
@@ -664,26 +1200,59 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a friend accepted event to the townService
+   * Emits a selectedFriendsChanged if we are selecting a friend who is not already selected.
+   * Updates this.selectedFriends list to include friendToSelect. Assumes this player IS already a friend (UI enforced)
+   * and does nothing if the friend is already selected
+   * @param friendToSelect holds the current PlayerController to add to the selectedFriends list
+   */
+  public selectFriend(friendToSelect: PlayerController): void {
+    // if the friendToSelect is NOT already selected
+    if (this.selectedFriends.indexOf(friendToSelect) == -1) {
+      const newSelected = [...this.selectedFriends];
+      newSelected.push(friendToSelect);
+      this.selectedFriends = [...newSelected];
+    }
+    // else do nothing
+  }
+
+  /**
+   * Emits a selectedFriendsChanged if we are deselecting a friend who was previously selected.
+   * Updates this.selectedFriends list to NOT include friendToDeselect. Assumes this player IS already a friend (UI enforced)
+   * and does nothing if the friend is already deselected
+   * @param friendToDeselect holds the current PlayerController to add to the selectedFriends list
+   */
+  public deselectFriend(friendToDeselect: PlayerController): void {
+    const indexToRemove = this.selectedFriends.indexOf(friendToDeselect);
+
+    // if the friendToDeselect exists in the selected list
+    if (indexToRemove >= 0) {
+      const newSelected = [...this.selectedFriends];
+      newSelected.splice(indexToRemove, 1);
+      this.selectedFriends = [...newSelected];
+    }
+    // else do nothing
+  }
+
+  /**
+   * Emits a acceptFriendRequest event to the townService.
    * @param acceptedRequest the friend request - holds the current player and the player whose
-   * friend request was accepted.
+   *                        friend request was accepted.
    */
   public clickedAcceptFriendRequest(acceptedRequest: PlayerToPlayerUpdate): void {
     this._socket.emit('acceptFriendRequest', acceptedRequest);
   }
 
   /**
-   * Emits a friend declined event to the townService
+   * Emits a declineFriendRequest event to the townService.
    * @param declinedRequest the friend reqeust - holds the current player and the player whose
-   * friend request was declined
+   *                        friend request was declined
    */
   public clickedDeclineFriendRequest(declinedRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('declineFriendRequest', declinedRequest);
   }
 
   /**
-   * Emits a teleport event to the TownService
+   * Emits a playerMovement event to the TownService.
    * @param teleportAction the teleport action to complete - whom to teleport and to where
    */
   public clickedTeleportToFriend(teleportAction: TeleportAction): void {
@@ -691,32 +1260,75 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a sent friend request event to the townService
+   * Emits a sendFriendRequest event to the townService.
    * @param sentRequest the friend request - holds the current player and the player whose
-   * who is being requested
+   *                    who is being requested
    */
   public clickedSendRequest(sentRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('sendFriendRequest', sentRequest);
   }
 
   /**
-   * Emits a canceled friend request event to the townService
+   * Emits a cancelFriendRequest event to the townService.
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
-   * who is being requested
+   *                        who is being requested
    */
   public clickedCancelRequest(canceledRequest: PlayerToPlayerUpdate): void {
-    // TODO: emit special event
     this._socket.emit('cancelFriendRequest', canceledRequest);
   }
 
   /**
-   * Emits a friend removed event to the townService
-   * @param removeFriend holds the current player and the player who
-   * is being unfriended.
+   * Emits a removeFriend event to the townService.
+   * @param removedFriend holds the current player and the player who is being unfriended.
    */
-  public clickedRemoveFriend(removeFriend: PlayerToPlayerUpdate): void {
-    this._socket.emit('removeFriend', removeFriend);
+  public clickedRemoveFriend(removedFriend: PlayerToPlayerUpdate): void {
+    this._socket.emit('removeFriend', removedFriend);
+  }
+
+  /**
+   * Emits a acceptConvAreaInvite event to the townService.
+   * @param acceptedInvite the conv area invite - holds the player who accepted, the player whose
+   *                       conv area invite was accepted, and the teleport destination.
+   */
+  public clickedAcceptConvAreaInvite(acceptedInvite: TeleportInviteSingular): void {
+    this._socket.emit('acceptConvAreaInvite', acceptedInvite);
+  }
+
+  /**
+   * Emits a declineConvAreaInvite event to the townService.
+   * @param declinedInvite the friend reqeust - holds the player who declined, the player whose
+   *                       conv area invite was declined, and what would have been the teleport
+   *                       destination.
+   */
+  public clickedDeclineConvAreaInvite(declinedInvite: TeleportInviteSingular): void {
+    this._socket.emit('declineConvAreaInvite', declinedInvite);
+  }
+
+  /**
+   * Emits a inviteAllToConvArea event to the townService if the Player who is requesting
+   * is within a conversation area that is located in the town.
+   * @param invite holds the requester, list of requested, and destination location,
+   *               within the conversation area, that the requested would be transported to if
+   *               they accepted the invite.
+   */
+  public clickedInviteAllToConvArea(invite: ConversationAreaGroupInvite): void {
+    if (
+      // check that the player is in a conversation areas before allowing the invite to be sent
+      this.conversationAreas.find(area =>
+        area.occupants.find(player => player.id === invite.requester.id),
+      )
+    ) {
+      this._socket.emit('inviteAllToConvArea', invite);
+    }
+  }
+
+  /**
+   * Emits a sendBriefMessage event to the townService.
+   * @param briefMessage The message to be sent - holds the sender, list of recipients (the
+   *                     sender's currently selected friends), and the body of the message.
+   */
+  public clickedSendBriefMessage(briefMessage: BriefMessage): void {
+    this._socket.emit('sendBriefMessage', briefMessage);
   }
 }
 
@@ -799,6 +1411,141 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
     };
   }, [townController, setConversationAreas]);
   return conversationAreas;
+}
+
+/**
+ * A react hook to retrieve the current conversation area requests. This hook will re-render any
+ * components that use it when the set of conversation area requests changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of conversation area requests that are currently un-answered (i.e.,
+ * TownController.ourPlayer hasn't accepted or declined them yet)
+ */
+export function usePendingConversationAreaInvites(): TeleportInviteSingular[] {
+  const townController = useTownController();
+  const [conversationAreaInvites, setConversationAreaInvites] = useState<TeleportInviteSingular[]>(
+    townController.conversationAreaInvites,
+  );
+
+  useEffect(() => {
+    const updateInvites = (currentConvAreaInvites: TeleportInviteSingular[]) => {
+      setConversationAreaInvites(currentConvAreaInvites);
+    };
+    townController.addListener('conversationAreaInvitesChanged', updateInvites);
+    return () => {
+      townController.removeListener('conversationAreaInvitesChanged', updateInvites);
+    };
+  }, [townController]);
+  return conversationAreaInvites;
+}
+
+/**
+ * A react hook to retrieve the current friend requests for the town controller's player.
+ * This hook will re-render any components that use it when the set of friend requests
+ * changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of player friend requests that have been sent/received (but not answered).
+ */
+export function useCurrentPlayerFriendRequests(): PlayerToPlayerUpdate[] {
+  const townController = useTownController();
+  const [playerFriendRequests, setPlayerFriendRequests] = useState<PlayerToPlayerUpdate[]>(
+    townController.playerFriendRequests,
+  );
+
+  useEffect(() => {
+    const updateFriendRequests = (currentPlayerFriendRequests: PlayerToPlayerUpdate[]) => {
+      setPlayerFriendRequests(currentPlayerFriendRequests);
+    };
+    townController.addListener('playerFriendRequestsChanged', updateFriendRequests);
+    return () => {
+      townController.removeListener('playerFriendRequestsChanged', updateFriendRequests);
+    };
+  }, [townController]);
+  return playerFriendRequests;
+}
+
+/**
+ * A react hook to retrieve the current friends for this town controller's player.
+ * This hook will re-render any components that use it when the set of friends
+ * changes.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of player friends.
+ */
+export function useCurrentPlayerFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [playerFriends, setPlayerFriends] = useState<PlayerController[]>(
+    townController.playerFriends,
+  );
+
+  useEffect(() => {
+    const updateFriends = (currentPlayerFriends: PlayerController[]) => {
+      setPlayerFriends(currentPlayerFriends);
+    };
+    townController.addListener('playerFriendsChanged', updateFriends);
+    return () => {
+      townController.removeListener('playerFriendsChanged', updateFriends);
+    };
+  }, [townController]);
+  return playerFriends;
+}
+
+/**
+ * A react hook to retrieve the current selected friends for this town controller's UI/player.
+ * This hook will re-render any components that use it when the set of selected friends
+ * changes.
+ *
+ * @returns the list of player selected friends
+ */
+export function useSelectedFriends(): PlayerController[] {
+  const townController = useTownController();
+  const [selectedFriends, setSelectedFriends] = useState<PlayerController[]>(
+    townController.selectedFriends,
+  );
+
+  useEffect(() => {
+    const updateSelected = (newSelectedFriends: PlayerController[]) => {
+      setSelectedFriends(newSelectedFriends);
+    };
+
+    townController.addListener('selectedFriendsChanged', updateSelected);
+    return () => {
+      townController.removeListener('selectedFriendsChanged', updateSelected);
+    };
+  }, [townController]);
+
+  return selectedFriends;
+}
+
+/**
+ * A react hook to retrieve the latest brief message sent to this town controller's UI/player.
+ * This hook will re-render any components that use it when the latest brief message
+ * changes.
+ *
+ * @returns the latest brief message sent to this town controller's UI/player
+ */
+export function useLatestBriefMessage(): BriefMessage | undefined {
+  const townController = useTownController();
+  const [latestBriefMessage, setLatestBriefMessage] = useState<BriefMessage | undefined>(
+    townController.latestBriefMessage,
+  );
+
+  useEffect(() => {
+    const updateLatestBriefMessage = (newLatestBriefMessage: BriefMessage) => {
+      setLatestBriefMessage(newLatestBriefMessage);
+    };
+
+    townController.addListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    return () => {
+      townController.removeListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    };
+  }, [townController]);
+
+  return latestBriefMessage;
 }
 
 /**

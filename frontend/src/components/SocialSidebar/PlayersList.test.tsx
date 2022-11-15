@@ -89,7 +89,7 @@ describe('PlayersInTownList', () => {
     it('Displays a heading "Current town: townName', async () => {
       const renderData = renderPlayersList();
       const heading = await renderData.findByRole('heading', { level: 2 });
-      expect(heading).toHaveTextContent(`Current town: ${townFriendlyName}`);
+      expect(heading).toHaveTextContent(`Other Players In This Town`);
     });
     it('Includes a tooltip that has the town ID', async () => {
       const renderData = renderPlayersList();
