@@ -90,7 +90,7 @@ export type TownEvents = {
   conversationAreasChanged: (currentConversationAreas: ConversationAreaController[]) => void;
 
   /**
-   * An event that indicated that the set of TownController.ourPlayer's friends have changed. This event is
+   * An event that indicates that the set of TownController.ourPlayer's friends have changed. This event is
    * dispatched when a player accepts a friend request that has been sent to them, a player has accepted
    * one of this players requests, or if this player choses to remove a friend from their friends list.
    * This event is dispatched after updating the town controller's record of TownController.ourPlayer's friends.
@@ -98,11 +98,17 @@ export type TownEvents = {
   playerFriendsChanged: (currentPlayerFriends: PlayerController[]) => void;
 
   /**
-   * An event that indicated that the set of selected friends have changed. This event is
+   * An event that indicates that the set of selected friends have changed. This event is
    * dispatched when a player selects or deselects a friend in the UI.
    * This event is dispatched after updating the town controller's record of TownController.selectedFriends.
    */
   selectedFriendsChanged: (selectedFriends: PlayerController[]) => void;
+
+  /**
+   * An event that indicates that the latest brief message to this player has changed. This event
+   * is dispatched after updating the player's latest brief message.
+   */
+  latestBriefMessageChanged: (latestBriefMessage: BriefMessage) => void;
 
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
@@ -288,6 +294,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * friends in the UI will replace this array with a new one. Clients should take note not to retain stale references.
    */
   private _selectedFriendsInternal: PlayerController[] = [];
+
+  /**
+   * The latest brief message that this TownController.ourPlayer has recieved. Updates every time
+   * a new brief message is sent to this player, regardless of whether it has the same content. If
+   * this player has not recieved any brief messages yet, it remains undefined.
+   */
+  private _latestBriefMessage: BriefMessage | undefined;
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -534,6 +547,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
+  public get latestBriefMessage(): BriefMessage | undefined {
+    return this._latestBriefMessage;
+  }
+
+  public set latestBriefMessage(newLatestBriefMessage: BriefMessage | undefined) {
+    this._latestBriefMessage = newLatestBriefMessage;
+    // if message is set to undefined, don't emit
+    if (newLatestBriefMessage) {
+      this.emit('latestBriefMessageChanged', newLatestBriefMessage);
+    }
+  }
+
   public get interactableEmitter() {
     return this._interactableEmitter;
   }
@@ -714,24 +739,39 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      *
      * If the invite was unique, emits a conversationAreaInvitesChanged event.
      */
-    this._socket.on('conversationAreaRequestSent', conversationAreaInviteRequest => {
-      const affectedPlayers = conversationAreaInviteRequest.requested;
-      // find the index of our player within the list of recipients in this conversationAreaInviteRequest
+    this._socket.on('conversationAreaRequestSent', convAreaInviteRequest => {
+      const affectedPlayers = convAreaInviteRequest.requested;
+      const newRequester = convAreaInviteRequest.requester;
+      const newRequesterLocation = convAreaInviteRequest.requesterLocation;
+      // find the index of our player within the list of recipients in this convAreaInviteRequest
       const ourPlayerIndex: number = affectedPlayers.findIndex(
         invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
       );
 
-      // using the index (if found), add our player to a copy of the current list of _conversationAreaInvitesInternal
-      // and call the setter for _conversationAreaInvitesInternal
+      // If our player is found within the list of recipients, use its index to create a new
+      // singular invite and check for a duplicate invite already in the current list of
+      // conversation area invites. If no duplicate found, add our player to a copy of the current
+      // list of _conversationAreaInvitesInternal and call its setter
       if (ourPlayerIndex !== -1) {
         const newInvite: TeleportInviteSingular = {
-          requester: conversationAreaInviteRequest.requester,
+          requester: convAreaInviteRequest.requester,
           requested: affectedPlayers[ourPlayerIndex],
-          requesterLocation: conversationAreaInviteRequest.requesterLocation,
+          requesterLocation: convAreaInviteRequest.requesterLocation,
         };
-        const newConvoAreaInvites: TeleportInviteSingular[] =
-          this._conversationAreaInvitesInternal.concat([newInvite]);
-        this.conversationAreaInvites = newConvoAreaInvites;
+        // check if our player already has an existing invite from this new requester to this new
+        // location. i.e., this invite is not a functional duplicate of an already existing one
+        const potentialDuplicateInviteIndex: number =
+          this._conversationAreaInvitesInternal.findIndex(
+            invite =>
+              invite.requester === newRequester &&
+              invite.requesterLocation === newRequesterLocation,
+          );
+        // if invite was not found in current list of conversation area invites, add it
+        if (potentialDuplicateInviteIndex === -1) {
+          const newConvoAreaInvites: TeleportInviteSingular[] =
+            this._conversationAreaInvitesInternal.concat([newInvite]);
+          this.conversationAreaInvites = newConvoAreaInvites;
+        }
       }
     });
 
@@ -853,6 +893,22 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       } else if (affected.id === ourPlayerID) {
         // if we are the affected, remove actor
         this._removePlayerControllerFromFriendsList(actor.id);
+      }
+    });
+
+    /**
+     * Whenever a brief message event is recieved, if we are one of the recipients,
+     * update our latestMessage with the new message.
+     */
+    this._socket.on('briefMessageSent', briefMessage => {
+      // search for our player among the list of recipents
+      const ourPlayer = briefMessage.recipients.find(
+        recipientPlayer => recipientPlayer.id === this.ourPlayer.id,
+      );
+
+      // if found our player among the recipients, call the setter for latestBriefMessage
+      if (ourPlayer) {
+        this.latestBriefMessage = briefMessage;
       }
     });
   }
@@ -1063,6 +1119,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         this._selectedFriendsInternal = [];
+        this._latestBriefMessage = undefined;
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -1462,6 +1519,33 @@ export function useSelectedFriends(): PlayerController[] {
   }, [townController]);
 
   return selectedFriends;
+}
+
+/**
+ * A react hook to retrieve the latest brief message sent to this town controller's UI/player.
+ * This hook will re-render any components that use it when the latest brief message
+ * changes.
+ *
+ * @returns the latest brief message sent to this town controller's UI/player
+ */
+export function useLatestBriefMessage(): BriefMessage | undefined {
+  const townController = useTownController();
+  const [latestBriefMessage, setLatestBriefMessage] = useState<BriefMessage | undefined>(
+    townController.latestBriefMessage,
+  );
+
+  useEffect(() => {
+    const updateLatestBriefMessage = (newLatestBriefMessage: BriefMessage) => {
+      setLatestBriefMessage(newLatestBriefMessage);
+    };
+
+    townController.addListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    return () => {
+      townController.removeListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    };
+  }, [townController]);
+
+  return latestBriefMessage;
 }
 
 /**
