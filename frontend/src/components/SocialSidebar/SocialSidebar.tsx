@@ -17,6 +17,7 @@ export default function SocialSidebar(): JSX.Element {
       marginLeft={2}
       borderColor='gray.500'
       height='100%'
+      width='105%'
       divider={<StackDivider borderColor='gray.200' />}
       borderRadius='4px'>
       <Heading fontSize='xl' as='h1'>
