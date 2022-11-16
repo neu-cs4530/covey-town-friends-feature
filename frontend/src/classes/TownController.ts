@@ -899,7 +899,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('briefMessageSent', briefMessage => {
       // search for our player among the list of recipents
       const ourPlayer = briefMessage.recipients.find(
-        recipientPlayer => recipientPlayer.id === this.ourPlayer.id,
+        recipientPlayerID => recipientPlayerID === this.ourPlayer.id,
       );
 
       // if found our player among the recipients, call the setter for latestBriefMessage
