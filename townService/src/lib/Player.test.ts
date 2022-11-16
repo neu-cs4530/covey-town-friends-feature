@@ -52,13 +52,13 @@ describe('Player', () => {
     playerTestData5.moveTo(-3, -3);
     playerLocation = player.location;
     invite = {
-      requester: player,
-      requested: player2,
+      requester: player.id,
+      requested: player2.id,
       requesterLocation: playerLocation,
     };
     invite2 = {
-      requester: player3,
-      requested: player4,
+      requester: player3.id,
+      requested: player4.id,
       requesterLocation: player3.location,
     };
     mockReset(townEmitter);
@@ -164,8 +164,8 @@ describe('Player', () => {
   describe('removeConversationAreaInvite', () => {
     it('Removes an invited player from the list of conversation area invites', () => {
       const invite1: ConversationAreaGroupInvite = {
-        requester: player,
-        requested: [player2],
+        requester: player.id,
+        requested: [player2.id],
         requesterLocation: player.location,
       };
       player.addFriend(player2);
@@ -176,18 +176,18 @@ describe('Player', () => {
     });
     it('Removes the last invited player from the list of conversation area invites', () => {
       const invite1: ConversationAreaGroupInvite = {
-        requester: player,
-        requested: [player4],
+        requester: player.id,
+        requested: [player4.id],
         requesterLocation: player.location,
       };
       const invite3: ConversationAreaGroupInvite = {
-        requester: player2,
-        requested: [player4],
+        requester: player2.id,
+        requested: [player4.id],
         requesterLocation: player2.location,
       };
       const invite4: ConversationAreaGroupInvite = {
-        requester: player3,
-        requested: [player4],
+        requester: player3.id,
+        requested: [player4.id],
         requesterLocation: player3.location,
       };
       player.addFriend(player4);
@@ -203,8 +203,8 @@ describe('Player', () => {
     });
     it('Does nothing if there is no such conversation area invite to remove', () => {
       const invite4: ConversationAreaGroupInvite = {
-        requester: player3,
-        requested: [player4],
+        requester: player3.id,
+        requested: [player4.id],
         requesterLocation: player3.location,
       };
       player.addFriend(player3);
@@ -216,27 +216,27 @@ describe('Player', () => {
     });
     it('Should see 2 invites from the same location but dif players as a different invite', () => {
       const invite1: ConversationAreaGroupInvite = {
-        requester: player4,
-        requested: [player2],
+        requester: player4.id,
+        requested: [player2.id],
         requesterLocation: player4.location,
       };
       const invite3: ConversationAreaGroupInvite = {
-        requester: player5,
-        requested: [player2],
+        requester: player5.id,
+        requested: [player2.id],
         requesterLocation: player5.location,
       };
       town.inviteToConversationArea(invite1);
       town.inviteToConversationArea(invite3);
       expect(player2.conversationAreaInvites.length).toEqual(2);
       player2.removeConversationAreaInvite({
-        requester: player4,
-        requested: player2,
+        requester: player4.id,
+        requested: player2.id,
         requesterLocation: player4.location,
       });
       expect(player2.conversationAreaInvites).toStrictEqual([
         {
-          requester: player5,
-          requested: player2,
+          requester: player5.id,
+          requested: player2.id,
           requesterLocation: player5.location,
         },
       ]);

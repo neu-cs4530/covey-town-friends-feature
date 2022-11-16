@@ -2,7 +2,6 @@ import { cleanup, render, RenderResult } from '@testing-library/react';
 import { MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import * as React from 'react';
-import Player from '../../../townService/src/lib/Player';
 import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import { act } from 'react-dom/test-utils';
 import ConversationAreaController, {
@@ -37,9 +36,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
   // Data to test some of our Final Project hooks:
   let players: PlayerController[];
-  let player1: Player;
-  let player2: Player;
-  let player3: Player;
   let playerTestData1: MockedPlayer;
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
@@ -245,6 +241,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
     let hookReturnValue: TeleportInviteSingular[] = [];
     let renderData: RenderResult;
+    let player1ID: string;
+    let player2ID: string;
+    let player3ID: string;
 
     let player1Location: PlayerLocation;
     let player2Location: PlayerLocation;
@@ -264,28 +263,19 @@ describe('[T3] TownController-Dependent Hooks', () => {
         conversationAreaInvites,
       });
       useTownControllerSpy.mockReturnValue(townController);
-      playerTestData1 = mockPlayer(townController.townID);
-      playerTestData2 = mockPlayer(townController.townID);
-      playerTestData3 = mockPlayer(townController.townID);
-      playerTestData1.id = '001';
-      playerTestData2.id = '002';
-      playerTestData3.id = '003';
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
-      player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
-      player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
-      player3Location = { x: 2, y: 2, rotation: 'left', moving: false };
+      player1ID = '001';
+      player2ID = '002';
+      player3ID = '003';
 
       // Push conversation area invites with requested = townController.ourPlayer
       teleportInvite1 = {
-        requester: player1,
-        requested: townController.ourPlayer,
+        requester: player1ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: player2,
-        requested: townController.ourPlayer,
+        requester: player2ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player2Location,
       };
       conversationAreaInvites.push(teleportInvite1);
@@ -303,8 +293,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
@@ -316,8 +306,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         teleportInvite1,
         teleportInvite2,
         {
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         },
       ]);
@@ -329,8 +319,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
@@ -392,9 +382,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
       playerTestData1 = mockPlayer(townController.townID);
       playerTestData2 = mockPlayer(townController.townID);
       playerTestData3 = mockPlayer(townController.townID);
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
 
       // Push conversation area invites with requested = townController.ourPlayer
       request1 = {
