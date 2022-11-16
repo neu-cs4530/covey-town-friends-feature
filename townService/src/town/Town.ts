@@ -320,11 +320,15 @@ export default class Town {
   public teleportToFriend(teleportInvite: TeleportInviteSingular): void {
     const { requester, requested, requesterLocation } = teleportInvite;
 
-    if (this._getPlayerByID(requester)) {
-      const requestedPlayer = this._getPlayerByID(requested);
-      if (requestedPlayer) {
-        this._updatePlayerLocation(requestedPlayer, requesterLocation);
+    try {
+      if (this._getPlayerByID(requester)) {
+        const requestedPlayer = this._getPlayerByID(requested);
+        if (requestedPlayer) {
+          this._updatePlayerLocation(requestedPlayer, requesterLocation);
+        }
       }
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -342,17 +346,21 @@ export default class Town {
         requested: friendID,
         requesterLocation: invite.requesterLocation,
       };
-      const friendPlayer: Player = this._getPlayerByID(friendID);
-      if (
-        // check to make sure that there is not already an invite from this player to this
-        // specific location before adding it to the conversation area invite list.
-        !friendPlayer.conversationAreaInvites.find(
-          (convInvite: TeleportInviteSingular) =>
-            convInvite.requesterLocation === invite.requesterLocation &&
-            convInvite.requester === invite.requester,
-        )
-      ) {
-        friendPlayer.addConversationAreaInvite(inviteToOne);
+      try {
+        const friendPlayer: Player = this._getPlayerByID(friendID);
+        if (
+          // check to make sure that there is not already an invite from this player to this
+          // specific location before adding it to the conversation area invite list.
+          !friendPlayer.conversationAreaInvites.find(
+            (convInvite: TeleportInviteSingular) =>
+              convInvite.requesterLocation === invite.requesterLocation &&
+              convInvite.requester === invite.requester,
+          )
+        ) {
+          friendPlayer.addConversationAreaInvite(inviteToOne);
+        }
+      } catch (e) {
+        console.log(e);
       }
     });
     this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
@@ -366,9 +374,13 @@ export default class Town {
    * @param teleportInvite the teleport invite request that is being accepted
    */
   public acceptConversationAreaInvite(teleportInvite: TeleportInviteSingular): void {
-    this._getPlayerByID(teleportInvite.requested).removeConversationAreaInvite(teleportInvite);
-    this.teleportToFriend(teleportInvite);
-    this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
+    try {
+      this._getPlayerByID(teleportInvite.requested).removeConversationAreaInvite(teleportInvite);
+      this.teleportToFriend(teleportInvite);
+      this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**
@@ -378,8 +390,12 @@ export default class Town {
    * @param teleportInvite the teleport invite request that is being declined.
    */
   public declineConversationAreaInvite(declinedInvite: TeleportInviteSingular): void {
-    this._getPlayerByID(declinedInvite.requested).removeConversationAreaInvite(declinedInvite);
-    this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+    try {
+      this._getPlayerByID(declinedInvite.requested).removeConversationAreaInvite(declinedInvite);
+      this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**
