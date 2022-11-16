@@ -392,12 +392,12 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
       // Push conversation area invites with requested = townController.ourPlayer
       request1 = {
-        actor: player1,
-        affected: townController.ourPlayer,
+        actor: playerTestData1.id,
+        affected: townController.ourPlayer.id,
       };
       request2 = {
-        actor: townController.ourPlayer,
-        affected: player2,
+        actor: townController.ourPlayer.id,
+        affected: playerTestData2.id,
       };
       playerFriendRequests.push(request1);
       playerFriendRequests.push(request2);
@@ -412,8 +412,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });
@@ -422,8 +422,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         request1,
         request2,
         {
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         },
       ]);
     });
@@ -434,8 +434,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });
@@ -665,6 +665,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
       hookReturnValue = useLatestBriefMessage();
       return null;
     }
+    let player1ID;
+    let player2ID;
+    let player3ID;
     let firstMessageToPlayer1: BriefMessage;
     let secondMessageToPlayer1: BriefMessage;
 
@@ -677,15 +680,18 @@ describe('[T3] TownController-Dependent Hooks', () => {
         players,
       });
       useTownControllerSpy.mockReturnValue(townController);
+      player1ID = '001';
+      player2ID = '002';
+      player3ID = '003';
 
       firstMessageToPlayer1 = {
-        sender: player2,
-        recipients: [player1, player3],
+        sender: player2ID,
+        recipients: [player1ID, player3ID],
         body: nanoid(),
       };
       secondMessageToPlayer1 = {
-        sender: player3,
-        recipients: [player1],
+        sender: player3ID,
+        recipients: [player1ID],
         body: nanoid(),
       };
 

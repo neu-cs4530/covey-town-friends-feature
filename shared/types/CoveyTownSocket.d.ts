@@ -17,23 +17,23 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: Interactable[];
-}
+};
 
 export type Interactable = ViewingArea | ConversationArea;
 
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-}
+};
 
-export type Direction = 'front' | 'back' | 'left' | 'right';
+export type Direction = "front" | "back" | "left" | "right";
 export interface Player {
   id: string;
   userName: string;
   location: PlayerLocation;
-};
+}
 
-export type XY = { x: number, y: number };
+export type XY = { x: number; y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -44,7 +44,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-};
+}
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -56,13 +56,13 @@ export interface ConversationArea {
   id: string;
   topic?: string;
   occupantsByID: string[];
-};
+}
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-};
+}
 
 export interface ViewingArea {
   id: string;
@@ -71,9 +71,10 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 }
 
+// actor and affected are the IDs of players
 export type PlayerToPlayerUpdate = {
-  actor: PlayerSrc;
-  affected: PlayerSrc;
+  actor: string;
+  affected: string;
 };
 
 export type ConversationAreaGroupInvite = {
@@ -90,10 +91,10 @@ export type TeleportInviteSingular = {
 };
 
 export type BriefMessage = {
-  sender: PlayerSrc;
-  recipients: PlayerSrc[];
+  sender: string;
+  recipients: string[];
   body: string;
-}
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
@@ -130,7 +131,7 @@ export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
-  // actor is the Player who clicked accept 
+  // actor is the Player who clicked accept
   acceptFriendRequest(friendRequest: PlayerToPlayerUpdate);
   // actor is the Player who clicked decline
   declineFriendRequest(friendRequest: PlayerToPlayerUpdate);
@@ -140,11 +141,11 @@ export interface ClientToServerEvents {
   cancelFriendRequest: (friendRequest: PlayerToPlayerUpdate) => void;
   // actor is the Player who clicked remove friend
   removeFriend(removeFriend: PlayerToPlayerUpdate);
-  // requester is the Player who clicked to invite selected friends 
+  // requester is the Player who clicked to invite selected friends
   inviteAllToConvArea(invite: ConversationAreaGroupInvite);
   // requester is the Player who originally sent the invite
   acceptConvAreaInvite(convAreaInvite: TeleportInviteSingular);
-  // requester is the Player who originally sent the invite 
+  // requester is the Player who originally sent the invite
   declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
   // sender is the Player who sent the message to their currently selected friends
   sendBriefMessage: (briefMessage: BriefMessage) => void;
