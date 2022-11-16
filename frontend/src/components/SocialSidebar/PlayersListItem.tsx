@@ -26,8 +26,8 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
         onClick={() => {
           console.log('TODO: remove log. Clicked send friend request');
           townController.clickedSendRequest({
-            actor: townController.ourPlayer.toPlayerModel(),
-            affected: player.toPlayerModel(),
+            actor: townController.ourPlayer.id,
+            affected: player.id,
           });
         }}>
         Request as Friend
@@ -43,8 +43,8 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
         onClick={() => {
           console.log('TODO: remove log. Clicked cancel friend request');
           townController.clickedCancelRequest({
-            actor: townController.ourPlayer.toPlayerModel(),
-            affected: player.toPlayerModel(),
+            actor: townController.ourPlayer.id,
+            affected: player.id,
           });
         }}>
         Cancel Friend Request
@@ -62,8 +62,8 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
           onClick={() => {
             console.log('TODO: remove log. Clicked accept friend request');
             townController.clickedAcceptFriendRequest({
-              actor: townController.ourPlayer.toPlayerModel(),
-              affected: player.toPlayerModel(),
+              actor: townController.ourPlayer.id,
+              affected: player.id,
             });
           }}>
           Accept Friend Request
@@ -77,8 +77,8 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
           onClick={() => {
             console.log('TODO: remove log. Clicked decline friend request');
             townController.clickedDeclineFriendRequest({
-              actor: townController.ourPlayer.toPlayerModel(),
-              affected: player.toPlayerModel(),
+              actor: townController.ourPlayer.id,
+              affected: player.id,
             });
           }}>
           Decline Friend Request

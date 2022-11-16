@@ -64,9 +64,9 @@ export default function PlayersInTownList(): JSX.Element {
     }
     // Loop through friend requests and check if given player is in any of them
     for (const request of friendRequests) {
-      if (player.id === request.actor.id) {
+      if (player.id === request.actor) {
         return 'accept/decline';
-      } else if (player.id === request.affected.id) {
+      } else if (player.id === request.affected) {
         return 'cancel';
       }
     }
