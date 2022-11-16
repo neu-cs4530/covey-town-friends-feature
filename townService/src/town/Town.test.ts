@@ -1097,8 +1097,8 @@ describe('Town', () => {
       expect(player2.friends.includes(player)).toBeTruthy();
       town.removeFriend(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRemoved', {
-        actor: player.id,
-        affected: player2.id,
+        actor: player,
+        affected: player2,
       });
     });
     it('Removeds the affected from the actors friends list.', () => {
