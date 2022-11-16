@@ -397,7 +397,7 @@ export default class Town {
    * @param id the id of the player we want to find
    */
   private _getPlayerByID(id: string) {
-    return this.players.find(pl => pl.id === id);
+    return this.players.find(player => player.id === id);
   }
 
   /**
