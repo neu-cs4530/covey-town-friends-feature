@@ -318,6 +318,7 @@ export default class Town {
    */
   public teleportToFriend(teleportInvite: TeleportInviteSingular): void {
     const { requester, requested, requesterLocation } = teleportInvite;
+    console.log('someone see this');
     if (this._players.includes(requester)) {
       this._updatePlayerLocation(requested, requesterLocation);
     }

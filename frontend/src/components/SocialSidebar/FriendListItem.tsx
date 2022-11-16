@@ -41,7 +41,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           outlineColor='black'
           size='xs'
           onClick={() => {
-            console.log('clicked teleport to friend');
+            console.log('TODO: remove log. Clicked teleport to friend');
             townController.clickedTeleportToFriend({
               actor: townController.ourPlayer.toPlayerModel(),
               playerDestinationLocation: player.location,
@@ -55,7 +55,11 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           outlineColor='black'
           size='xs'
           onClick={() => {
-            console.log('clicked unfriend for ' + player.userName);
+            console.log('TODO: remove log. Clicked unfriend for ' + player.userName);
+            townController.clickedRemoveFriend({
+              actor: townController.ourPlayer.toPlayerModel(),
+              affected: player.toPlayerModel(),
+            });
           }}>
           Unfriend
         </Button>
