@@ -57,8 +57,8 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           onClick={() => {
             console.log('TODO: remove log. Clicked unfriend for ' + player.userName);
             townController.clickedRemoveFriend({
-              actor: townController.ourPlayer.toPlayerModel(),
-              affected: player.toPlayerModel(),
+              actor: townController.ourPlayer.id,
+              affected: player.id,
             });
           }}>
           Unfriend
