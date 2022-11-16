@@ -77,15 +77,15 @@ export type PlayerToPlayerUpdate = {
 };
 
 export type ConversationAreaGroupInvite = {
-  requester: PlayerSrc;
-  requested: PlayerSrc[];
+  requester: string;
+  requested: string[];
   // Check whether this is a shallow/deep copy, potentially remove player location
   requesterLocation: PlayerLocation;
 };
 
 export type TeleportInviteSingular = {
-  requester: PlayerSrc;
-  requested: PlayerSrc;
+  requester: string;
+  requested: string;
   requesterLocation: PlayerLocation;
 };
 

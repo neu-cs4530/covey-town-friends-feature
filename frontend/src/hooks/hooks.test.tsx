@@ -245,6 +245,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
     let hookReturnValue: TeleportInviteSingular[] = [];
     let renderData: RenderResult;
+    let player1ID: string;
+    let player2ID: string;
+    let player3ID: string;
 
     let player1Location: PlayerLocation;
     let player2Location: PlayerLocation;
@@ -264,6 +267,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
         conversationAreaInvites,
       });
       useTownControllerSpy.mockReturnValue(townController);
+      player1ID = '001';
+      player2ID = '002';
+      player3ID = '003';
       playerTestData1 = mockPlayer(townController.townID);
       playerTestData2 = mockPlayer(townController.townID);
       playerTestData3 = mockPlayer(townController.townID);
@@ -276,13 +282,13 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
       // Push conversation area invites with requested = townController.ourPlayer
       teleportInvite1 = {
-        requester: player1,
-        requested: townController.ourPlayer,
+        requester: player1ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: player2,
-        requested: townController.ourPlayer,
+        requester: player2ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player2Location,
       };
       conversationAreaInvites.push(teleportInvite1);
@@ -300,8 +306,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
@@ -313,8 +319,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         teleportInvite1,
         teleportInvite2,
         {
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         },
       ]);
@@ -326,8 +332,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
