@@ -50,6 +50,7 @@
   left: 0;
   width: 100%;
   z-index: 20;
+  pointer-events: none;
   height: 200px;
   text-align: center;
 }
@@ -60,5 +61,5 @@
 .participant-wrapper {
   display: inline-block;
   height: 200px;
-  width: 400px;
+  width: 200px;
 }
