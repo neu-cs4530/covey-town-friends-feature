@@ -1,6 +1,6 @@
 import { Box, Heading, OrderedList, Tooltip } from '@chakra-ui/react';
 import React from 'react';
-import { useCurrentPlayerFriends, usePlayers } from '../../classes/TownController';
+import { usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
 import FriendsListItem from './FriendListItem';
 
