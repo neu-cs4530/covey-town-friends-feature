@@ -168,27 +168,27 @@ export class MockedPlayer {
 
   acceptedFriendRequest(actor: Player, affected: Player): void {
     const onAcceptFriendRequestListener = getEventListener(this.socket, 'acceptFriendRequest');
-    onAcceptFriendRequestListener({ actor, affected });
+    onAcceptFriendRequestListener({ actor: actor.id, affected: affected.id });
   }
 
   declinedFriendRequest(actor: Player, affected: Player): void {
     const onDeclineFriendRequestListener = getEventListener(this.socket, 'declineFriendRequest');
-    onDeclineFriendRequestListener({ actor, affected });
+    onDeclineFriendRequestListener({ actor: actor.id, affected: affected.id });
   }
 
   sendFriendRequest(actor: Player, affected: Player): void {
     const onSendFriendRequestListener = getEventListener(this.socket, 'sendFriendRequest');
-    onSendFriendRequestListener({ actor, affected });
+    onSendFriendRequestListener({ actor: actor.id, affected: affected.id });
   }
 
   cancelFriendRequest(actor: Player, affected: Player): void {
     const onCancelFriendRequestListener = getEventListener(this.socket, 'cancelFriendRequest');
-    onCancelFriendRequestListener({ actor, affected });
+    onCancelFriendRequestListener({ actor: actor.id, affected: affected.id });
   }
 
   removedFriend(actor: Player, affected: Player): void {
     const onRemoveFriendListener = getEventListener(this.socket, 'removeFriend');
-    onRemoveFriendListener({ actor, affected });
+    onRemoveFriendListener({ actor: actor.id, affected: affected.id });
   }
 
   invitedAllToConvArea(invite: ConversationAreaGroupInvite): void {
