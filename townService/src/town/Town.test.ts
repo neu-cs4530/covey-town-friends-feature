@@ -382,8 +382,8 @@ describe('Town', () => {
     playerTestData2.moveTo(-5, -5);
     playerTestData3.moveTo(-3, -3);
     friendRequest = {
-      actor: player,
-      affected: player2,
+      actor: player.id,
+      affected: player2.id,
     };
     teleportRequest = {
       requester: player,
