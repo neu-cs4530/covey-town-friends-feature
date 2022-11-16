@@ -2,7 +2,6 @@ import { cleanup, render, RenderResult } from '@testing-library/react';
 import { MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import * as React from 'react';
-import Player from '../../../townService/src/lib/Player';
 import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import { act } from 'react-dom/test-utils';
 import ConversationAreaController, {

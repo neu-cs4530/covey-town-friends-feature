@@ -278,37 +278,38 @@ export default class Town {
    *                             sender of the initial request.
    */
   public acceptFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
-    const actor = this._getPlayerByID(currentFriendRequest.actor);
-    const affected = this._getPlayerByID(currentFriendRequest.affected);
+    try {
+      const actor = this._getPlayerByID(currentFriendRequest.actor);
+      const affected = this._getPlayerByID(currentFriendRequest.affected);
 
-    // if both players exist
-    if (actor && affected) {
       actor.addFriend(affected);
       affected.addFriend(actor);
-    }
 
-    this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
+      this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**
    * Emit a friendRemoved event with the given remover and removed.
    * Removes each player from each other's friends list.
    *
-   * @param currentFriends containts the player removing the affected from their friend's
-   *                       list and the player to be removed from the instigator's friends
-   *                       list.
+   * @param currentFriends containts the player removing the affected from their friend's list
+   *                       and the player to be removed from the actor's friends list.
    */
   public removeFriend(currentFriends: PlayerToPlayerUpdate): void {
-    const actor = this._getPlayerByID(currentFriends.actor);
-    const affected = this._getPlayerByID(currentFriends.affected);
+    try {
+      const actor = this._getPlayerByID(currentFriends.actor);
+      const affected = this._getPlayerByID(currentFriends.affected);
 
-    // if both players exist
-    if (actor && affected) {
       actor.removeFriend(affected);
       affected.removeFriend(actor);
-    }
 
-    this._broadcastEmitter.emit('friendRemoved', currentFriends);
+      this._broadcastEmitter.emit('friendRemoved', currentFriends);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**
