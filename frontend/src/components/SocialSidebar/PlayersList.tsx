@@ -38,7 +38,6 @@ export function isPlayerInList(givenPlayer: PlayerController, playerList: Player
  */
 export default function PlayersInTownList(): JSX.Element {
   const townController = useTownController();
-  const townID = townController.townID;
   const players = usePlayers();
   const friends = useCurrentPlayerFriends();
   const friendRequests = useCurrentPlayerFriendRequests();
@@ -77,11 +76,9 @@ export default function PlayersInTownList(): JSX.Element {
 
   return (
     <Box>
-      <Tooltip label={`Town ID: ${townID}`}>
-        <Heading as='h2' fontSize='l'>
-          Other Players In This Town:
-        </Heading>
-      </Tooltip>
+      <Heading as='h2' fontSize='l'>
+        Other Players In This Town:
+      </Heading>
       <OrderedList>
         {sorted.map(player => (
           <ListItem key={player.id}>

@@ -1,4 +1,4 @@
-import { Heading, StackDivider, VStack } from '@chakra-ui/react';
+import { Heading, StackDivider, Tooltip, VStack } from '@chakra-ui/react';
 import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
 import PlayersList from './PlayersList';
@@ -19,9 +19,11 @@ export default function SocialSidebar(): JSX.Element {
       height='100%'
       divider={<StackDivider borderColor='gray.200' />}
       borderRadius='4px'>
-      <Heading fontSize='xl' as='h1'>
-        Current town: {friendlyName}
-      </Heading>
+      <Tooltip label={`Town ID: ${townID}`}>
+        <Heading as='h1' fontSize='xl'>
+          Current town: {friendlyName}
+        </Heading>
+      </Tooltip>
       <FriendsList />
       <PlayersList />
       <ConversationAreasList />
