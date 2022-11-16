@@ -85,10 +85,7 @@ describe('PlayersInTownList', () => {
     // Spy on console.error and intercept react key warnings to fail test
     consoleErrorSpy = jest.spyOn(global.console, 'error');
     consoleErrorSpy.mockImplementation((message?, ...optionalParams) => {
-      //const stringMessage = message as string;
-      const stringMessage = `${message}`;
-      console.log('MESSAGE');
-      console.log(typeof stringMessage);
+      const stringMessage = message as string;
       if (stringMessage.includes('children with the same key,')) {
         throw new Error(stringMessage.replace('%s', optionalParams[0]));
       } else if (stringMessage.includes('warning-keys')) {
@@ -137,9 +134,32 @@ describe('PlayersInTownList', () => {
     });
   });
   it("Renders a list of all players' user names, without checking sort", async () => {
-    // players array is already sorted correctly
+    // Players array is already sorted correctly
     const renderData = renderPlayersList();
     await expectProperlyRenderedPlayersList(renderData, players);
+    // Check that it re-renders correctly when a new friend is added => tODO: figure out why it breaks
+    // const expectedNotFriends: PlayerController[] = [...players];
+    // expectedNotFriends.splice(0, 1);
+    // const newFriends = friends.concat([players[0]]);
+    // useFriendsSpy.mockReturnValue(newFriends);
+    // renderData.rerender(wrappedPlayersListComponent());
+    // Player param should not have changed
+    // expect(players.length).toBe(10);
+    // Rendered players should have changed
+    // await expectProperlyRenderedPlayersList(renderData, expectedNotFriends);
+  });
+  it('Renders a list of all not-friend players user names, without checking sort', async () => {
+    const expectedNotFriends: PlayerController[] = [...players];
+    expectedNotFriends.splice(0, 1);
+
+    const newFriends = friends.concat([players[0]]);
+    useFriendsSpy.mockReturnValue(newFriends);
+
+    const renderData = renderPlayersList();
+    // Player param should not have changed
+    expect(players.length).toBe(10);
+    // Number of rendered players should have changed to 9
+    await expectProperlyRenderedPlayersList(renderData, expectedNotFriends);
   });
   it("Renders the players' names in a PlayerName component", async () => {
     const mockPlayerName = jest.spyOn(PlayerName, 'default');

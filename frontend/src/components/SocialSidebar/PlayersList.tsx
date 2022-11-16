@@ -1,10 +1,13 @@
 import { Box, Heading, ListItem, OrderedList, Tooltip } from '@chakra-ui/react';
-import { truncate } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
-import { useCurrentPlayerFriends, usePlayers } from '../../classes/TownController';
+import TownController, {
+  useCurrentPlayerFriendRequests,
+  useCurrentPlayerFriends,
+  usePlayers,
+} from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
-import PlayerName from './PlayerName';
+import PlayersListItem from './PlayersListItem';
 
 /**
  * Determines whether or not a given PlayerController is in a given list of PlayerControllers
@@ -34,22 +37,44 @@ export function isPlayerInList(givenPlayer: PlayerController, playerList: Player
  *
  */
 export default function PlayersInTownList(): JSX.Element {
-  const { townID } = useTownController();
+  // const { townID } = useTownController();
+  const townController = useTownController();
+  const townID = townController.townID;
   const players = usePlayers();
   const friends = useCurrentPlayerFriends();
+  const friendRequests = useCurrentPlayerFriendRequests();
 
-  // Set up a not-friends list to be updated every time player & friends is
+  // Set up a not-friends list to be updated every time the players and/or friends list changes
   const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
+    // the new not-friends list should include any player in the Town that is not the friends list
     const newNotFriends = players.filter(player => !isPlayerInList(player, friends));
     setPlayerNotFriends(newNotFriends);
   }, [friends, players]);
 
   // Sort the not-friends list to be passed in
-  const sorted = players.concat([]); // TODO, once sure tests work: replace with playerNotFriends
+  const sorted = playerNotFriends.concat([]);
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),
   );
+
+  // Determine which button to use/render for the given player
+  function associatedButton(player: PlayerController): string {
+    // If the given Player is "me", we don't want to render any button next to it
+    if (player.id == townController.ourPlayer.id) {
+      return 'me';
+    }
+    // Loop through friend requests and check if given player is in any of them
+    for (const request of friendRequests) {
+      if (player.id === request.actor.id) {
+        return 'accept/decline';
+      } else if (player.id === request.affected.id) {
+        return 'cancel';
+      }
+    }
+    // If the player is not found in the friend requests' list
+    return 'send';
+  }
 
   return (
     <Box>
@@ -61,7 +86,11 @@ export default function PlayersInTownList(): JSX.Element {
       <OrderedList>
         {sorted.map(player => (
           <ListItem key={player.id}>
-            <PlayerName player={player} />
+            <PlayersListItem
+              player={player}
+              key={player.id}
+              buttonType={associatedButton(player)}
+            />
           </ListItem>
         ))}
       </OrderedList>
