@@ -479,19 +479,9 @@ describe('TownController', () => {
       emitEventAndExpectListenerFiring('chatMessage', message, 'chatMessage', message);
     });
     it('Emits a sendBriefMessage event when clickedSendBriefMessage is called', () => {
-      const testPlayer1 = {
-        id: nanoid(),
-        location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
-        userName: nanoid(),
-      };
-      const testPlayer2 = {
-        id: nanoid(),
-        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
-        userName: nanoid(),
-      };
       const testMessage: BriefMessage = {
-        sender: testPlayer1,
-        recipients: [testPlayer2],
+        sender: '001',
+        recipients: ['002'],
         body: nanoid(),
       };
       testController.clickedSendBriefMessage(testMessage);
@@ -1520,18 +1510,18 @@ describe('TownController', () => {
       beforeEach(() => {
         briefMessageSentEventListener = getEventListener(mockSocket, 'briefMessageSent');
         testMessageToOurPlayer = {
-          sender: playerTestData2,
-          recipients: [playerTestData, testController.ourPlayer, playerTestData3],
+          sender: playerTestData2.id,
+          recipients: [playerTestData.id, testController.ourPlayer.id, playerTestData3.id],
           body: 'Hi',
         };
         testMessageToOurPlayer2 = {
-          sender: playerTestData3,
-          recipients: [testController.ourPlayer],
+          sender: playerTestData3.id,
+          recipients: [testController.ourPlayer.id],
           body: nanoid(),
         };
         testMessageNotToOurPlayer = {
-          sender: playerTestData3,
-          recipients: [playerTestData, playerTestData2],
+          sender: playerTestData3.id,
+          recipients: [playerTestData.id, playerTestData2.id],
           body: nanoid(),
         };
 

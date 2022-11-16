@@ -96,8 +96,8 @@ export type TeleportAction = {
 };
 
 export type BriefMessage = {
-  sender: PlayerSrc;
-  recipients: PlayerSrc[];
+  sender: string;
+  recipients: string[];
   body: string;
 };
 
