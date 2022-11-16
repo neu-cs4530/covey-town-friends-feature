@@ -354,14 +354,15 @@ export default class Town {
    * @param invitedFriends the players invited.
    */
   public inviteToConversationArea(invite: ConversationAreaGroupInvite): void {
-    // For each requested player, add the corresponding teleport request to their invite list.
-    invite.requested.forEach(friendID => {
-      const inviteToOne: TeleportInviteSingular = {
-        requester: invite.requester,
-        requested: friendID,
-        requesterLocation: invite.requesterLocation,
-      };
-      try {
+    try {
+      // For each requested player, add the corresponding teleport request to their invite list.
+      invite.requested.forEach(friendID => {
+        const inviteToOne: TeleportInviteSingular = {
+          requester: invite.requester,
+          requested: friendID,
+          requesterLocation: invite.requesterLocation,
+        };
+
         const friendPlayer: Player = this._getPlayerByID(friendID);
         if (
           // check to make sure that there is not already an invite from this player to this
@@ -374,11 +375,11 @@ export default class Town {
         ) {
           friendPlayer.addConversationAreaInvite(inviteToOne);
         }
-      } catch (e) {
-        console.log(e);
-      }
-    });
-    this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
+      });
+      this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /**
@@ -421,11 +422,10 @@ export default class Town {
    */
   private _getPlayerByID(id: string): Player {
     const playerFromID = this.players.find(player => player.id === id);
-    if (playerFromID === undefined) {
-      throw new Error(`No player associated with ID ${id}.`);
-    } else {
+    if (playerFromID) {
       return playerFromID;
     }
+    throw new Error(`No player associated with ID ${id}.`);
   }
 
   /**
