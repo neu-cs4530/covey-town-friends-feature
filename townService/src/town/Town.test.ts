@@ -826,8 +826,8 @@ describe('Town', () => {
     it('Forwards brief message events to all players in the same town', async () => {
       const briefMessageHandler = getEventListener(playerTestData.socket, 'sendBriefMessage');
       const testBriefMessage: BriefMessage = {
-        sender: player,
-        recipients: [player2, player3],
+        sender: player.id,
+        recipients: [player2.id, player3.id],
         body: nanoid(),
       };
 
