@@ -89,11 +89,6 @@ export type TeleportInviteSingular = {
   requesterLocation: PlayerLocation;
 };
 
-export type TeleportAction = {
-  actor: PlayerSrc;
-  playerDestinationLocation: PlayerLocation;
-}
-
 export type BriefMessage = {
   sender: PlayerSrc;
   recipients: PlayerSrc[];

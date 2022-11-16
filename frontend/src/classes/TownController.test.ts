@@ -18,7 +18,6 @@ import {
   PlayerToPlayerUpdate,
   ServerToClientEvents,
   ConversationAreaGroupInvite,
-  TeleportAction,
   TeleportInviteSingular,
   TownJoinResponse,
   BriefMessage,
@@ -585,11 +584,7 @@ describe('TownController', () => {
         y: 1,
         interactableID: nanoid(),
       };
-      const testTeleportAction: TeleportAction = {
-        actor: playerTestData.player,
-        playerDestinationLocation: testPlayerLocation,
-      };
-      testController.clickedTeleportToFriend(testTeleportAction);
+      testController.clickedTeleportToFriend(testPlayerLocation);
       expect(mockSocket.emit).toBeCalledWith('playerMovement', testPlayerLocation);
     });
     it('Emits removeFriend when clickedRemoveFriend is called', () => {
