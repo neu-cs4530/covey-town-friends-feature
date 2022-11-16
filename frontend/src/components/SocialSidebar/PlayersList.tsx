@@ -1,7 +1,7 @@
 import { Box, Heading, ListItem, OrderedList, Tooltip } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
-import TownController, {
+import {
   useCurrentPlayerFriendRequests,
   useCurrentPlayerFriends,
   usePlayers,
@@ -10,7 +10,7 @@ import useTownController from '../../hooks/useTownController';
 import PlayersListItem from './PlayersListItem';
 
 /**
- * Determines whether or not a given PlayerController is in a given list of PlayerControllers
+ * Determine whether or not a given PlayerController is in a given list of PlayerControllers
  * @param givenPlayer the PlayerController to check for in the provided list
  * @param playerList the list of PlayerControllers
  * @returns true if the player is in the list, false otherwise
@@ -37,7 +37,6 @@ export function isPlayerInList(givenPlayer: PlayerController, playerList: Player
  *
  */
 export default function PlayersInTownList(): JSX.Element {
-  // const { townID } = useTownController();
   const townController = useTownController();
   const townID = townController.townID;
   const players = usePlayers();

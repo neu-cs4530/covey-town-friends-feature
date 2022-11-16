@@ -15,7 +15,6 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
   // determine which button to render
   let button;
   if (buttonType === 'me') {
-    // button = `(${buttonType})`; // TODO: figure out how to render this
     button = <span> ({buttonType}) &nbsp; </span>;
   } else if (buttonType === 'send') {
     button = (
