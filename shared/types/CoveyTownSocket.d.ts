@@ -1,5 +1,3 @@
-import { Player as PlayerSrc } from "covey-town-townService/src/lib/Player";
-
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;

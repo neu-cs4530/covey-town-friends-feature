@@ -37,9 +37,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
   // Data to test some of our Final Project hooks:
   let players: PlayerController[];
-  let player1: Player;
-  let player2: Player;
-  let player3: Player;
   let playerTestData1: MockedPlayer;
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
@@ -386,9 +383,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
       playerTestData1 = mockPlayer(townController.townID);
       playerTestData2 = mockPlayer(townController.townID);
       playerTestData3 = mockPlayer(townController.townID);
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
 
       // Push conversation area invites with requested = townController.ourPlayer
       request1 = {

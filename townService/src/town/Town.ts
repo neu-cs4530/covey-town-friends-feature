@@ -428,15 +428,6 @@ export default class Town {
   }
 
   /**
-   * Returns the Player in this Town with given ID, or undefined if it is not presentƒ
-   *
-   * @param id the id of the player we want to find
-   */
-  private _getPlayerByID(id: string): Player | undefined {
-    return this.players.find(player => player.id === id);
-  }
-
-  /**
    * Updates the location of a player within the town.
    *
    * If the player has changed conversation areas, this method also updates the
