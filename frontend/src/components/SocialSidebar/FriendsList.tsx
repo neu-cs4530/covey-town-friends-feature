@@ -36,7 +36,6 @@ function FriendsList(): JSX.Element {
  */
 export default function FriendsInTownList(): JSX.Element {
   const { friendlyName, townID } = useTownController();
-  const friends = useCurrentPlayerFriends();
 
   // IMPORTANT NOTE: Remember that you can define buttons elsewhere, and then just import them
   // and add them where necessary here.
