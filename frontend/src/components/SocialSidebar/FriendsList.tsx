@@ -1,14 +1,11 @@
-import { Box, Heading, ListItem, OrderedList, Tooltip } from '@chakra-ui/react';
+import { Box, Heading, OrderedList, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import { useCurrentPlayerFriends, usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
 import FriendsListItem from './FriendListItem';
-import PlayerName from './PlayerName';
-import useSelectedFriends from './useSelectedFriends';
 
 function FriendsList(): JSX.Element {
   const friends = usePlayers();
-  const selectedFriends = useSelectedFriends();
   const sorted = friends.concat([]);
 
   sorted.sort((p1, p2) =>
@@ -39,7 +36,7 @@ function FriendsList(): JSX.Element {
  */
 export default function FriendsInTownList(): JSX.Element {
   const { friendlyName, townID } = useTownController();
-  // const friends = useCurrentPlayerFriends();
+  const friends = useCurrentPlayerFriends();
 
   // IMPORTANT NOTE: Remember that you can define buttons elsewhere, and then just import them
   // and add them where necessary here.

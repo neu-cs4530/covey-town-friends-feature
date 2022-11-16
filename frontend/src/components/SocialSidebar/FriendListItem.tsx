@@ -49,7 +49,14 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           }}>
           Teleport To Friend
         </Button>
-        <Button background='red.200' outlineOffset={'--px'} outlineColor='black' size='xs'>
+        <Button
+          background='red.200'
+          outlineOffset={'--px'}
+          outlineColor='black'
+          size='xs'
+          onClick={() => {
+            console.log('clicked unfriend for ' + player.userName);
+          }}>
           Unfriend
         </Button>
       </HStack>
