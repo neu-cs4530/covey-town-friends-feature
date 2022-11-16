@@ -745,7 +745,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const newRequesterLocation = convAreaInviteRequest.requesterLocation;
       // find the index of our player within the list of recipients in this convAreaInviteRequest
       const ourPlayerIndex: number = affectedPlayers.findIndex(
-        invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
+        invitedPlayerID => invitedPlayerID === this.ourPlayer.id,
       );
 
       // If our player is found within the list of recipients, use its index to create a new
@@ -993,13 +993,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param teleportInviteToRemove the teleport invite to remove, if found
    */
   private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
-    if (teleportInviteToRemove.requested.id === this.ourPlayer.id) {
+    if (teleportInviteToRemove.requested === this.ourPlayer.id) {
       const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
         invite =>
           !(
             invite.requesterLocation.x === teleportInviteToRemove.requesterLocation.x &&
             invite.requesterLocation.y === teleportInviteToRemove.requesterLocation.y &&
-            invite.requester.id === teleportInviteToRemove.requester.id
+            invite.requester === teleportInviteToRemove.requester
           ),
       );
       this.conversationAreaInvites = newInvitesFiltered;
@@ -1315,7 +1315,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (
       // check that the player is in a conversation areas before allowing the invite to be sent
       this.conversationAreas.find(area =>
-        area.occupants.find(player => player.id === invite.requester.id),
+        area.occupants.find(player => player.id === invite.requester),
       )
     ) {
       this._socket.emit('inviteAllToConvArea', invite);

@@ -115,13 +115,13 @@ describe('TownController', () => {
       player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
       player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
       teleportInvite1 = {
-        requester: playerTestData,
-        requested: playerTestData3,
+        requester: playerTestData.id,
+        requested: playerTestData3.id,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: playerTestData2,
-        requested: playerTestData3,
+        requester: playerTestData2.id,
+        requested: playerTestData3.id,
         requesterLocation: player2Location,
       };
       newInvites = [teleportInvite1, teleportInvite2];
@@ -602,8 +602,8 @@ describe('TownController', () => {
     });
     it('Does not emit inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is not in a conversation area', () => {
       const testInvite: ConversationAreaGroupInvite = {
-        requester: playerTestData,
-        requested: [playerTestData2],
+        requester: playerTestData.id,
+        requested: [playerTestData2.id],
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
@@ -618,8 +618,8 @@ describe('TownController', () => {
         }),
       );
       const testInvite: ConversationAreaGroupInvite = {
-        requester: playerTestData,
-        requested: [playerTestData2],
+        requester: playerTestData.id,
+        requested: [playerTestData2.id],
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
@@ -627,8 +627,8 @@ describe('TownController', () => {
     });
     it('Emits acceptConvAreaInvite when clickedAcceptConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
-        requester: playerTestData.player,
-        requested: playerTestData2.player,
+        requester: playerTestData.id,
+        requested: playerTestData2.id,
         requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
       };
       testController.clickedAcceptConvAreaInvite(testInvite);
@@ -636,8 +636,8 @@ describe('TownController', () => {
     });
     it('Emits declineConvAreaInvite when clickedDeclineConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
-        requester: playerTestData.player,
-        requested: playerTestData2.player,
+        requester: playerTestData.id,
+        requested: playerTestData2.id,
         requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
       };
       testController.clickedDeclineConvAreaInvite(testInvite);
@@ -1371,28 +1371,28 @@ describe('TownController', () => {
         player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
         player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
         convAreaGroupInviteOurPlayer = {
-          requester: playerTestData,
-          requested: [testController.ourPlayer],
+          requester: playerTestData.id,
+          requested: [testController.ourPlayer.id],
           requesterLocation: player1Location,
         };
         convAreaGroupInviteNotOurPlayer = {
-          requester: playerTestData,
-          requested: [playerTestData3],
+          requester: playerTestData.id,
+          requested: [playerTestData3.id],
           requesterLocation: player1Location,
         };
         teleportInviteOurPlayer = {
-          requester: playerTestData,
-          requested: testController.ourPlayer,
+          requester: playerTestData.id,
+          requested: testController.ourPlayer.id,
           requesterLocation: player1Location,
         };
         teleportInviteOurPlayer2 = {
-          requester: playerTestData2,
-          requested: testController.ourPlayer,
+          requester: playerTestData2.id,
+          requested: testController.ourPlayer.id,
           requesterLocation: player2Location,
         };
         teleportInviteNotOurPlayer = {
-          requester: playerTestData,
-          requested: playerTestData3,
+          requester: playerTestData.id,
+          requested: playerTestData3.id,
           requesterLocation: player1Location,
         };
         ourPlayerInvites = [teleportInviteOurPlayer, teleportInviteOurPlayer2];
