@@ -270,15 +270,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
       player1ID = '001';
       player2ID = '002';
       player3ID = '003';
-      playerTestData1 = mockPlayer(townController.townID);
-      playerTestData2 = mockPlayer(townController.townID);
-      playerTestData3 = mockPlayer(townController.townID);
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
-      player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
-      player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
-      player3Location = { x: 2, y: 2, rotation: 'left', moving: false };
 
       // Push conversation area invites with requested = townController.ourPlayer
       teleportInvite1 = {
