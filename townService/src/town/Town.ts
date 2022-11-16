@@ -314,12 +314,17 @@ export default class Town {
    * Assumes that UI enforces teleportation only between friends.
    *
    * @param teleportInvite the invite representing the teleportation information:
-   * the player to teleport to, the player doing the teleporting, and the teleport location.
+   *                       the player to teleport to, the player doing the teleporting, and the
+   *                       teleport location.
    */
   public teleportToFriend(teleportInvite: TeleportInviteSingular): void {
     const { requester, requested, requesterLocation } = teleportInvite;
-    if (this._players.includes(requester)) {
-      this._updatePlayerLocation(requested, requesterLocation);
+
+    if (this._getPlayerByID(requester)) {
+      const requestedPlayer = this._getPlayerByID(requested);
+      if (requestedPlayer) {
+        this._updatePlayerLocation(requestedPlayer, requesterLocation);
+      }
     }
   }
 
@@ -331,22 +336,23 @@ export default class Town {
    */
   public inviteToConversationArea(invite: ConversationAreaGroupInvite): void {
     // For each requested player, add the corresponding teleport request to their invite list.
-    invite.requested.forEach(friend => {
+    invite.requested.forEach(friendID => {
       const inviteToOne: TeleportInviteSingular = {
         requester: invite.requester,
-        requested: friend,
+        requested: friendID,
         requesterLocation: invite.requesterLocation,
       };
+      const friendPlayer: Player = this._getPlayerByID(friendID);
       if (
-        // check to make sure that there is not already an invite from this player to this specific location
-        // before adding it to the conversation area invite list.
-        !friend.conversationAreaInvites.find(
+        // check to make sure that there is not already an invite from this player to this
+        // specific location before adding it to the conversation area invite list.
+        !friendPlayer.conversationAreaInvites.find(
           (convInvite: TeleportInviteSingular) =>
             convInvite.requesterLocation === invite.requesterLocation &&
             convInvite.requester === invite.requester,
         )
       ) {
-        friend.addConversationAreaInvite(inviteToOne);
+        friendPlayer.addConversationAreaInvite(inviteToOne);
       }
     });
     this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
@@ -360,8 +366,7 @@ export default class Town {
    * @param teleportInvite the teleport invite request that is being accepted
    */
   public acceptConversationAreaInvite(teleportInvite: TeleportInviteSingular): void {
-    const { requested } = teleportInvite;
-    requested.removeConversationAreaInvite(teleportInvite);
+    this._getPlayerByID(teleportInvite.requested).removeConversationAreaInvite(teleportInvite);
     this.teleportToFriend(teleportInvite);
     this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
   }
@@ -373,8 +378,23 @@ export default class Town {
    * @param teleportInvite the teleport invite request that is being declined.
    */
   public declineConversationAreaInvite(declinedInvite: TeleportInviteSingular): void {
-    declinedInvite.requested.removeConversationAreaInvite(declinedInvite);
+    this._getPlayerByID(declinedInvite.requested).removeConversationAreaInvite(declinedInvite);
     this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+  }
+
+  /**
+   * Returns the Player in this Town with given ID, or undefined if it is not presentƒ
+   *
+   * @param id the id of the player we want to find
+   * @throws error if the given ID does not match any of the current players
+   */
+  private _getPlayerByID(id: string): Player {
+    const playerFromID = this.players.find(player => player.id === id);
+    if (playerFromID === undefined) {
+      throw new Error(`No player associated with ID ${id}.`);
+    } else {
+      return playerFromID;
+    }
   }
 
   /**
