@@ -18,7 +18,6 @@ import {
   TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
-  Player,
   ConversationAreaGroupInvite,
   BriefMessage,
 } from '../types/CoveyTownSocket';
@@ -653,10 +652,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const updatedRequestList = [...this.playerFriendRequests];
       this.playerFriendRequests = updatedRequestList.filter(
         request =>
-          !(
-            request.actor.id === disconnectedPlayer.id ||
-            request.affected.id === disconnectedPlayer.id
-          ),
+          !(request.actor === disconnectedPlayer.id || request.affected === disconnectedPlayer.id),
       );
     });
     /**
@@ -811,7 +807,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const ourPlayerID = this.ourPlayer.id;
 
       // if our player is involved in the incoming request, save it
-      if (actor.id === ourPlayerID || affected.id === ourPlayerID) {
+      if (actor === ourPlayerID || affected === ourPlayerID) {
         const updatedFriendRequests = [...this.playerFriendRequests];
         updatedFriendRequests.push(friendRequest);
         // use setter because it emits necessary event
@@ -853,15 +849,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const { actor, affected } = friendRequest;
       const ourPlayerID = this.ourPlayer.id;
 
-      // // if our player is involved in the accepted request, remove it
+      // if our player is involved in the accepted request, remove it
       this._removeFriendRequestIfInvolved(affected, actor);
 
       // update friends list
       // only needs to be done on this controller because the other controller will also receive this event
-      if (actor.id === ourPlayerID) {
-        this._addPlayerControllerToFriendsList(affected.id);
-      } else if (affected.id === ourPlayerID) {
-        this._addPlayerControllerToFriendsList(actor.id);
+      if (actor === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(affected);
+      } else if (affected === ourPlayerID) {
+        this._addPlayerControllerToFriendsList(actor);
       }
     });
 
@@ -887,12 +883,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const ourPlayerID = this.ourPlayer.id;
 
       // if our player is involved in the removal
-      if (actor.id === ourPlayerID) {
+      if (actor === ourPlayerID) {
         // if we are the actor, remove affected
-        this._removePlayerControllerFromFriendsList(affected.id);
-      } else if (affected.id === ourPlayerID) {
+        this._removePlayerControllerFromFriendsList(affected);
+      } else if (affected === ourPlayerID) {
         // if we are the affected, remove actor
-        this._removePlayerControllerFromFriendsList(actor.id);
+        this._removePlayerControllerFromFriendsList(actor);
       }
     });
 
@@ -919,15 +915,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param requestToRemove the friend request from actor to affected to remove
    */
-  private _removeFriendRequestIfInvolved(initialSender: Player, initialReceiver: Player) {
+  private _removeFriendRequestIfInvolved(initialSenderID: string, initialReceiverID: string) {
     const ourPlayerID = this.ourPlayer.id;
 
-    if (initialSender.id === ourPlayerID || initialReceiver.id === ourPlayerID) {
+    if (initialSenderID === ourPlayerID || initialReceiverID === ourPlayerID) {
       const updatedRequestList = this.playerFriendRequests.filter(
         // the person being accepted (affected) is the sender of the original request (request.actor)
         // the accepter (actor) is the recipient (request.affected) of the request we want to remove
-        request =>
-          !(request.actor.id === initialSender.id && request.affected.id === initialReceiver.id),
+        request => !(request.actor === initialSenderID && request.affected === initialReceiverID),
       );
       this.playerFriendRequests = [...updatedRequestList];
     }
