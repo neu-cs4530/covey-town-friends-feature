@@ -382,8 +382,8 @@ describe('Town', () => {
     playerTestData2.moveTo(-5, -5);
     playerTestData3.moveTo(-3, -3);
     friendRequest = {
-      actor: player,
-      affected: player2,
+      actor: player.id,
+      affected: player2.id,
     };
     teleportRequest = {
       requester: player,
@@ -628,8 +628,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestAccepted event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -643,8 +643,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestDeclined event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -658,8 +658,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestSent event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -674,15 +674,15 @@ describe('Town', () => {
       it('TownService should emit a canceledFriendRequest event', () => {
         // expect the request was sent
         expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
         // cancel the request
         playerTestData.cancelFriendRequest(player, player2);
         // expect it to be canceled
         expect(townEmitter.emit).toBeCalledWith('friendRequestCanceled', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -700,8 +700,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRemoved event', () => {
         expect(townEmitter.emit).toHaveBeenCalledWith('friendRemoved', {
-          actor: player,
-          affected: player3,
+          actor: player.id,
+          affected: player3.id,
         });
       });
     });
@@ -1035,8 +1035,8 @@ describe('Town', () => {
     it('Emits a friendRequestSent event when called.', () => {
       town.inviteFriend(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Does not change the actors friends lists.', () => {
@@ -1054,8 +1054,8 @@ describe('Town', () => {
     it('Emits a friendRequestAccepted event when called.', () => {
       town.acceptFriendRequest(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Expects the affected to be added to the actors friend list.', () => {
@@ -1073,8 +1073,8 @@ describe('Town', () => {
       mockClear(townEmitter);
       town.declineFriendRequest(friendRequest);
       expect(townEmitter.emit).toHaveBeenCalledWith('friendRequestDeclined', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Does not change the actors friends lists.', () => {
@@ -1097,8 +1097,8 @@ describe('Town', () => {
       expect(player2.friends.includes(player)).toBeTruthy();
       town.removeFriend(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRemoved', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Removeds the affected from the actors friends list.', () => {

@@ -278,8 +278,15 @@ export default class Town {
    *                             sender of the initial request.
    */
   public acceptFriendRequest(currentFriendRequest: PlayerToPlayerUpdate): void {
-    currentFriendRequest.actor.addFriend(currentFriendRequest.affected);
-    currentFriendRequest.affected.addFriend(currentFriendRequest.actor);
+    const actor = this._getPlayerByID(currentFriendRequest.actor);
+    const affected = this._getPlayerByID(currentFriendRequest.affected);
+
+    // if both players exist
+    if (actor && affected) {
+      actor.addFriend(affected);
+      affected.addFriend(actor);
+    }
+
     this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
   }
 
@@ -292,8 +299,15 @@ export default class Town {
    *                       list.
    */
   public removeFriend(currentFriends: PlayerToPlayerUpdate): void {
-    currentFriends.actor.removeFriend(currentFriends.affected);
-    currentFriends.affected.removeFriend(currentFriends.actor);
+    const actor = this._getPlayerByID(currentFriends.actor);
+    const affected = this._getPlayerByID(currentFriends.affected);
+
+    // if both players exist
+    if (actor && affected) {
+      actor.removeFriend(affected);
+      affected.removeFriend(actor);
+    }
+
     this._broadcastEmitter.emit('friendRemoved', currentFriends);
   }
 
@@ -376,6 +390,15 @@ export default class Town {
   public declineConversationAreaInvite(declinedInvite: TeleportInviteSingular): void {
     declinedInvite.requested.removeConversationAreaInvite(declinedInvite);
     this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
+  }
+
+  /**
+   * Returns the Player in this Town with given ID, or undefined if it is not presentƒ
+   *
+   * @param id the id of the player we want to find
+   */
+  private _getPlayerByID(id: string): Player | undefined {
+    return this.players.find(player => player.id === id);
   }
 
   /**

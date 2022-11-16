@@ -267,6 +267,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
       playerTestData1 = mockPlayer(townController.townID);
       playerTestData2 = mockPlayer(townController.townID);
       playerTestData3 = mockPlayer(townController.townID);
+      playerTestData1.id = '001';
+      playerTestData2.id = '002';
+      playerTestData3.id = '003';
       player1 = playerTestData1.player as Player;
       player2 = playerTestData2.player as Player;
       player3 = playerTestData3.player as Player;
@@ -395,12 +398,12 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
       // Push conversation area invites with requested = townController.ourPlayer
       request1 = {
-        actor: player1,
-        affected: townController.ourPlayer,
+        actor: playerTestData1.id,
+        affected: townController.ourPlayer.id,
       };
       request2 = {
-        actor: townController.ourPlayer,
-        affected: player2,
+        actor: townController.ourPlayer.id,
+        affected: playerTestData2.id,
       };
       playerFriendRequests.push(request1);
       playerFriendRequests.push(request2);
@@ -415,8 +418,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });
@@ -425,8 +428,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         request1,
         request2,
         {
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         },
       ]);
     });
@@ -437,8 +440,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });

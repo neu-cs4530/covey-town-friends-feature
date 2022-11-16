@@ -152,12 +152,12 @@ describe('TownController', () => {
     let newFriendRequests: PlayerToPlayerUpdate[];
     beforeEach(() => {
       request1 = {
-        actor: playerTestData,
-        affected: playerTestData3,
+        actor: playerTestData.id,
+        affected: playerTestData3.id,
       };
       request2 = {
-        actor: playerTestData3,
-        affected: playerTestData2,
+        actor: playerTestData3.id,
+        affected: playerTestData2.id,
       };
       newFriendRequests = [request1, request2];
       mockClear(mockListeners.playerFriendRequestsChanged);
@@ -547,32 +547,32 @@ describe('TownController', () => {
     });
     it('Emits acceptFriendRequest when clickedAcceptFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedAcceptFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('acceptFriendRequest', testRequest);
     });
     it('Emits declineFriendRequest when clickedDeclineFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedDeclineFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
     });
     it('Emits sendFriendRequest event when clickedSendFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedSendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('sendFriendRequest', testRequest);
     });
     it('Emits cancelFriendRequest event when clickedCancelFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedCancelRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('cancelFriendRequest', testRequest);
@@ -594,8 +594,8 @@ describe('TownController', () => {
     });
     it('Emits removeFriend when clickedRemoveFriend is called', () => {
       const testRemoveFriend: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedRemoveFriend(testRemoveFriend);
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
@@ -897,13 +897,13 @@ describe('TownController', () => {
 
         // create a P2PUpdate with testController.ourPlayer as actor and playerTestData2 as affected
         updateFromOurPlayerToPlayer2 = {
-          actor: testController.ourPlayer,
-          affected: playerTestData2,
+          actor: testController.ourPlayer.id,
+          affected: playerTestData2.id,
         };
         // create a P2PUpdate with playerTestData2 as actor and testController.ourPlayer as affected
         updateFromPlayer2ToOurPlayer = {
-          actor: playerTestData2,
-          affected: testController.ourPlayer,
+          actor: playerTestData2.id,
+          affected: testController.ourPlayer.id,
         };
       });
       describe('friendRequestSent events', () => {
@@ -942,8 +942,8 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
 
           expect(testController.playerFriendRequests).toEqual([]);
@@ -1004,12 +1004,12 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
           const testDecline: PlayerToPlayerUpdate = {
-            actor: playerTestData,
-            affected: playerTestData2,
+            actor: playerTestData.id,
+            affected: playerTestData2.id,
           };
 
           // expect our stored friend requests to remain empty
@@ -1051,18 +1051,24 @@ describe('TownController', () => {
           playerTestData2.id = 'id2';
           // creates a PlayerToPlayer update from playerTestData to the testController's ourPlayer
           player1ToOurPlayer = {
-            actor: playerTestData,
-            affected: testController.ourPlayer,
+            actor: playerTestData.id,
+            affected: testController.ourPlayer.id,
           };
           // creates a PlayerToPlayer update from the testController's ourPlayer to playerTestData2
           ourPlayerToPlayer2 = {
-            actor: testController.ourPlayer,
-            affected: playerTestData2,
+            actor: testController.ourPlayer.id,
+            affected: playerTestData2.id,
           };
           // creates a PlayerToPlayer update from the testController's ourPlayer to playerTestData
-          ourPlayerAcceptPlayer1 = { actor: testController.ourPlayer, affected: playerTestData };
+          ourPlayerAcceptPlayer1 = {
+            actor: testController.ourPlayer.id,
+            affected: playerTestData.id,
+          };
           // creates a PlayerToPlayer update from playerTestData2 to the testController's ourPlayer
-          player2AcceptOurPlayer = { actor: playerTestData2, affected: testController.ourPlayer };
+          player2AcceptOurPlayer = {
+            actor: playerTestData2.id,
+            affected: testController.ourPlayer.id,
+          };
 
           // set up two outgoing requests, one from player1 to our player and one from our player to player2
           friendRequestSentEventListener(player1ToOurPlayer);
@@ -1144,7 +1150,10 @@ describe('TownController', () => {
           ]);
 
           // player 1 accepts a request from player 2
-          friendRequestAcceptedEventListener({ actor: playerTestData, affected: playerTestData2 });
+          friendRequestAcceptedEventListener({
+            actor: playerTestData.id,
+            affected: playerTestData2.id,
+          });
 
           // check our players, friends and friends requests haven't changed
           expect(testController.playerFriends).toEqual([]);
@@ -1206,8 +1215,8 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
 
           // make sure we don't have any requests before, during, or after
@@ -1253,15 +1262,21 @@ describe('TownController', () => {
           playerTestData2.id = 'id2';
           // define the P2PUpdates
           player1ToOurPlayer = {
-            actor: playerTestData,
-            affected: testController.ourPlayer,
+            actor: playerTestData.id,
+            affected: testController.ourPlayer.id,
           };
           ourPlayerToPlayer2 = {
-            actor: testController.ourPlayer,
-            affected: playerTestData2,
+            actor: testController.ourPlayer.id,
+            affected: playerTestData2.id,
           };
-          ourPlayerAcceptPlayer1 = { actor: testController.ourPlayer, affected: playerTestData };
-          player2AcceptOurPlayer = { actor: playerTestData2, affected: testController.ourPlayer };
+          ourPlayerAcceptPlayer1 = {
+            actor: testController.ourPlayer.id,
+            affected: playerTestData.id,
+          };
+          player2AcceptOurPlayer = {
+            actor: playerTestData2.id,
+            affected: testController.ourPlayer.id,
+          };
 
           // send a request from player 1 to our player and from our player to player 2
           friendRequestSentEventListener(player1ToOurPlayer);
@@ -1330,7 +1345,7 @@ describe('TownController', () => {
           expect(testController.playerFriends).toEqual([player1PC, player2PC]);
 
           // player 1 removes player 2 as friend
-          friendRemovedEventListener({ actor: playerTestData, affected: playerTestData2 });
+          friendRemovedEventListener({ actor: playerTestData.id, affected: playerTestData2.id });
 
           // make sure that it doesn't change
           expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
@@ -1635,8 +1650,8 @@ describe('TownController', () => {
       emitEventAndExpectListenerFiring('playerJoined', testPlayer2, 'playersChanged');
       // create a request from player 1 to player 2 and store it and store it in the friend request list
       const requestFromPlayer1ToPlayer2 = {
-        actor: testPlayer,
-        affected: testPlayer2,
+        actor: testPlayer.id,
+        affected: testPlayer2.id,
       };
       testController.playerFriendRequests = [requestFromPlayer1ToPlayer2];
 
