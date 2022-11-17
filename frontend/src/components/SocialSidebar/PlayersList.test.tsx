@@ -131,11 +131,11 @@ describe('PlayersInTownList', () => {
     });
   });
   describe('Adding a friend', () => {
-    let expectedNotFriends: PlayerController[];
+    let expectedNonFriends: PlayerController[];
     beforeEach(() => {
       // Set up the expected not-friends list
-      expectedNotFriends = [...players];
-      expectedNotFriends.splice(0, 1);
+      expectedNonFriends = [...players];
+      expectedNonFriends.splice(0, 1);
 
       // Add a new friend
       const newFriends = friends.concat([players[0]]);
@@ -146,24 +146,24 @@ describe('PlayersInTownList', () => {
       // Player param should not have changed
       expect(players.length).toBe(10);
       // Number of rendered players should have changed to 9
-      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNonFriends);
     });
     it("Displays players' usernames in ascending alphabetical order, once friend added", async () => {
-      expectedNotFriends.reverse();
+      expectedNonFriends.reverse();
       const renderData = renderPlayersList();
-      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNonFriends);
     });
     it('Does not mutate the array returned by useCurrentPlayerFriends', async () => {
       // Add two friends
       const newFriends2 = friends.concat([players[0], players[1]]);
       useFriendsSpy.mockReturnValue(newFriends2);
-      expectedNotFriends.splice(0, 1);
+      expectedNonFriends.splice(0, 1);
 
       friends.reverse();
       const copyOfArrayPassedToComponent = friends.concat([]);
 
       const renderData = renderPlayersList();
-      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNonFriends);
       expect(friends).toEqual(copyOfArrayPassedToComponent); // expect that the players array is unchanged by the compoennt
     });
   });
