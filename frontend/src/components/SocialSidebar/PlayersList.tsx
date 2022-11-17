@@ -1,4 +1,4 @@
-import { Box, Heading, ListItem, OrderedList, Tooltip } from '@chakra-ui/react';
+import { Box, Heading, ListItem, OrderedList } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
 import {
@@ -30,7 +30,8 @@ export function isPlayerInList(givenPlayer: PlayerController, playerList: Player
 }
 
 /**
- * Lists the current players in the town, along with the current town's name and ID
+ * Lists the current not-friended players in the town (via their username), along with buttons
+ * to send/cancel/accept/decline friend requests.
  *
  * See relevant hooks: `usePlayersInTown`, `useCoveyAppState`, `useCurrentPlayerFriends` and
  * `useCurrentPlayerFriendRequests`

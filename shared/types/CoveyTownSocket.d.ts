@@ -75,6 +75,7 @@ export type PlayerToPlayerUpdate = {
   affected: string;
 };
 
+// requester and requested are the IDs of players
 export type ConversationAreaGroupInvite = {
   requester: string;
   requested: string[];
@@ -82,12 +83,14 @@ export type ConversationAreaGroupInvite = {
   requesterLocation: PlayerLocation;
 };
 
+// requester and requested are the IDs of players
 export type TeleportInviteSingular = {
   requester: string;
   requested: string;
   requesterLocation: PlayerLocation;
 };
 
+// sender and recipients are the IDs of players
 export type BriefMessage = {
   sender: string;
   recipients: string[];

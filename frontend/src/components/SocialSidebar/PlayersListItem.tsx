@@ -4,15 +4,22 @@ import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import PlayerName from './PlayerName';
 
-type FriendNameProps = {
+type NotFriendPlayerProps = {
   player: PlayerController;
   buttonType: string;
 };
 
-export default function PlayersListItem({ player, buttonType }: FriendNameProps): JSX.Element {
+/**
+ * Represents a singular item in the list of not-friended players. Contains the player's username,
+ * and associated button (send, cancel, accept/decline) OR the descriptive "(me)" to indicate
+ * this particular player is the TownController.ourPlayer.
+ *
+ * @param param0 contains the player and a string indicating the button type to render
+ */
+export default function PlayersListItem({ player, buttonType }: NotFriendPlayerProps): JSX.Element {
   const townController = useTownController();
 
-  // determine which button to render
+  // Determine which HTML element/button to render
   let button;
   if (buttonType === 'me') {
     button = <span> ({buttonType}) &nbsp; </span>;
@@ -87,6 +94,7 @@ export default function PlayersListItem({ player, buttonType }: FriendNameProps)
     );
   }
 
+  // Includes a space between PlayerName and button so they're not glued to each other
   return (
     <ListItem>
       <HStack>

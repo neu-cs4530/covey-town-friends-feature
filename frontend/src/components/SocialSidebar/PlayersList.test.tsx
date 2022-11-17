@@ -2,14 +2,13 @@ import { ChakraProvider } from '@chakra-ui/react';
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';
 import { render, RenderResult, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import TownController, * as TownControllerHooks from '../../classes/TownController';
 import PlayerController from '../../classes/PlayerController';
 import * as useTownController from '../../hooks/useTownController';
 import { mockTownController } from '../../TestUtils';
-import { Player, PlayerLocation } from '../../types/CoveyTownSocket';
+import { Player, PlayerLocation, PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
 import * as PlayerName from './PlayerName';
 import PlayersList, { isPlayerInList } from './PlayersList';
 
@@ -60,22 +59,25 @@ describe('PlayersInTownList', () => {
   let usePlayersSpy: jest.SpyInstance<PlayerController[], []>;
   let useTownControllerSpy: jest.SpyInstance<TownController, []>;
   let useFriendsSpy: jest.SpyInstance<PlayerController[], []>;
+  let useFriendRequestsSpy: jest.SpyInstance<PlayerToPlayerUpdate[], []>;
   let players: PlayerController[] = [];
   let friends: PlayerController[] = [];
+  let friendRequests: PlayerToPlayerUpdate[] = [];
   let townID: string;
   let townFriendlyName: string;
-  const expectProperlyRenderedPlayersList = async (
+  const expectProperlyRenderedNotFriendsList = async (
     renderData: RenderResult,
     playersToExpect: PlayerController[],
   ) => {
     const listEntries = await renderData.findAllByRole('listitem');
-    expect(listEntries.length).toBe(playersToExpect.length); // expect same number of players
+    // expect same # of players * 3 (one for each part of the player list element)
+    expect(listEntries.length).toBe(playersToExpect.length * 3); // expect same number of players
     const playersSortedCorrectly = playersToExpect
       .map(p => p.userName)
       .sort((p1, p2) => p1.localeCompare(p2, undefined, { numeric: true, sensitivity: 'base' }));
     for (let i = 0; i < playersSortedCorrectly.length; i += 1) {
-      expect(listEntries[i]).toHaveTextContent(playersSortedCorrectly[i]);
-      const parentComponent = listEntries[i].parentNode;
+      expect(listEntries[i + 2 * i]).toHaveTextContent(playersSortedCorrectly[i]);
+      const parentComponent = listEntries[i + 2 * i].parentNode;
       if (parentComponent) {
         expect(parentComponent.nodeName).toBe('OL'); // list items expected to be directly nested in an ordered list
       }
@@ -85,10 +87,9 @@ describe('PlayersInTownList', () => {
     // Spy on console.error and intercept react key warnings to fail test
     consoleErrorSpy = jest.spyOn(global.console, 'error');
     consoleErrorSpy.mockImplementation((message?, ...optionalParams) => {
-      //const stringMessage = message as string;
-      const stringMessage = `${message}`;
+      const stringMessage = message as string;
       console.log('MESSAGE');
-      console.log(typeof stringMessage);
+      console.log(stringMessage);
       if (stringMessage.includes('children with the same key,')) {
         throw new Error(stringMessage.replace('%s', optionalParams[0]));
       } else if (stringMessage.includes('warning-keys')) {
@@ -100,6 +101,7 @@ describe('PlayersInTownList', () => {
     usePlayersSpy = jest.spyOn(TownControllerHooks, 'usePlayers');
     useTownControllerSpy = jest.spyOn(useTownController, 'default');
     useFriendsSpy = jest.spyOn(TownControllerHooks, 'useCurrentPlayerFriends');
+    useFriendRequestsSpy = jest.spyOn(TownControllerHooks, 'useCurrentPlayerFriendRequests');
   });
 
   beforeEach(() => {
@@ -114,8 +116,10 @@ describe('PlayersInTownList', () => {
       );
     }
     friends = [];
+    friendRequests = [];
     usePlayersSpy.mockReturnValue(players);
     useFriendsSpy.mockReturnValue(friends);
+    useFriendRequestsSpy.mockReturnValue(friendRequests);
     townID = nanoid();
     townFriendlyName = nanoid();
     const mockedTownController = mockTownController({ friendlyName: townFriendlyName, townID });
@@ -127,26 +131,56 @@ describe('PlayersInTownList', () => {
       const heading = await renderData.findByRole('heading', { level: 2 });
       expect(heading).toHaveTextContent(`Other Players In This Town`);
     });
-    it('Includes a tooltip that has the town ID', async () => {
+  });
+  describe('Adding a friend', () => {
+    let expectedNotFriends: PlayerController[];
+    beforeEach(() => {
+      // Set up the expected not-friends list
+      expectedNotFriends = [...players];
+      expectedNotFriends.splice(0, 1);
+
+      // Add a new friend
+      const newFriends = friends.concat([players[0]]);
+      useFriendsSpy.mockReturnValue(newFriends);
+    });
+    it('Renders a list of all not-friend user names w/o checking sort', async () => {
       const renderData = renderPlayersList();
-      const heading = await renderData.findByRole('heading', { level: 2 });
-      expect(renderData.queryByRole('tooltip')).toBeNull(); // no tooltip visible yet
-      userEvent.hover(heading);
-      const toolTip = await renderData.findByRole('tooltip'); // should be just one...
-      expect(toolTip).toHaveTextContent(`Town ID: ${townID}`);
+      // Player param should not have changed
+      expect(players.length).toBe(10);
+      // Number of rendered players should have changed to 9
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+    });
+    it("Displays players' usernames in ascending alphabetical order, once friend added", async () => {
+      expectedNotFriends.reverse();
+      const renderData = renderPlayersList();
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+    });
+    it('Does not mutate the array returned by useCurrentPlayerFriends', async () => {
+      // Add two friends
+      const newFriends2 = friends.concat([players[0], players[1]]);
+      useFriendsSpy.mockReturnValue(newFriends2);
+      expectedNotFriends.splice(0, 1);
+
+      friends.reverse();
+      const copyOfArrayPassedToComponent = friends.concat([]);
+
+      const renderData = renderPlayersList();
+      await expectProperlyRenderedNotFriendsList(renderData, expectedNotFriends);
+      expect(friends).toEqual(copyOfArrayPassedToComponent); // expect that the players array is unchanged by the compoennt
     });
   });
-  it("Renders a list of all players' user names, without checking sort", async () => {
-    // players array is already sorted correctly
+  it('Renders a list of all not-friend user names, w/o checking sort', async () => {
+    // Players array is already sorted correctly
     const renderData = renderPlayersList();
-    await expectProperlyRenderedPlayersList(renderData, players);
+    await expectProperlyRenderedNotFriendsList(renderData, players);
   });
   it("Renders the players' names in a PlayerName component", async () => {
     const mockPlayerName = jest.spyOn(PlayerName, 'default');
     try {
       renderPlayersList();
       await waitFor(() => {
-        expect(mockPlayerName).toBeCalledTimes(players.length);
+        // length * 2 due to useEffect dependencies leading to a double call
+        expect(mockPlayerName).toBeCalledTimes(players.length * 2);
       });
     } finally {
       mockPlayerName.mockRestore();
@@ -155,18 +189,18 @@ describe('PlayersInTownList', () => {
   it("Displays players' usernames in ascending alphabetical order", async () => {
     players.reverse();
     const renderData = renderPlayersList();
-    await expectProperlyRenderedPlayersList(renderData, players);
+    await expectProperlyRenderedNotFriendsList(renderData, players);
   });
   it('Does not mutate the array returned by usePlayersInTown', async () => {
     players.reverse();
     const copyOfArrayPassedToComponent = players.concat([]);
     const renderData = renderPlayersList();
-    await expectProperlyRenderedPlayersList(renderData, players);
+    await expectProperlyRenderedNotFriendsList(renderData, players);
     expect(players).toEqual(copyOfArrayPassedToComponent); // expect that the players array is unchanged by the compoennt
   });
   it('Adds players to the list when they are added to the town', async () => {
     const renderData = renderPlayersList();
-    await expectProperlyRenderedPlayersList(renderData, players);
+    await expectProperlyRenderedNotFriendsList(renderData, players);
     for (let i = 0; i < players.length; i += 1) {
       const newPlayers = players.concat([
         new PlayerController(
@@ -177,17 +211,17 @@ describe('PlayersInTownList', () => {
       ]);
       usePlayersSpy.mockReturnValue(newPlayers);
       renderData.rerender(wrappedPlayersListComponent());
-      await expectProperlyRenderedPlayersList(renderData, newPlayers);
+      await expectProperlyRenderedNotFriendsList(renderData, newPlayers);
     }
   });
   it('Removes players from the list when they are removed from the town', async () => {
     const renderData = renderPlayersList();
-    await expectProperlyRenderedPlayersList(renderData, players);
+    await expectProperlyRenderedNotFriendsList(renderData, players);
     for (let i = 0; i < players.length; i += 1) {
       const newPlayers = players.splice(i, 1);
       usePlayersSpy.mockReturnValue(newPlayers);
       renderData.rerender(wrappedPlayersListComponent());
-      await expectProperlyRenderedPlayersList(renderData, newPlayers);
+      await expectProperlyRenderedNotFriendsList(renderData, newPlayers);
     }
   });
 });
