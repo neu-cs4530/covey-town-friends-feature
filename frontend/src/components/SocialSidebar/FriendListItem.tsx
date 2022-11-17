@@ -44,10 +44,14 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
             console.log('TODO: remove log. Clicked teleport to friend');
             console.log(townController.ourPlayer.location);
 
-            townController.ourPlayer.gameObjects?.sprite.setX(player.location.x);
-            townController.ourPlayer.gameObjects?.sprite.setY(player.location.y);
-            townController.ourPlayer.gameObjects?.label.setX(player.location.x);
-            townController.ourPlayer.gameObjects?.label.setY(player.location.y - 20);
+            // const label = townController.ourPlayer.gameObjects?.label;
+
+            // if (sprite) {
+            // townController.ourPlayer.gameObjects?.sprite.setX(player.location.x);
+            // townController.ourPlayer.gameObjects?.sprite.setY(player.location.y);
+            // label.setX(sprite.body.position.x);
+            // label.setY(sprite.body.position.y - 20);
+            // }
 
             townController.clickedTeleportToFriend({
               actor: townController.ourPlayer.id,
