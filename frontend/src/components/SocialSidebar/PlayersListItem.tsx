@@ -4,7 +4,7 @@ import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import PlayerName from './PlayerName';
 
-type NotFriendPlayerProps = {
+type NonFriendPlayerProps = {
   player: PlayerController;
   buttonType: string;
 };
@@ -18,7 +18,7 @@ type NotFriendPlayerProps = {
  *
  * @param props contains the player and a string indicating the button type to render
  */
-export default function PlayersListItem({ player, buttonType }: NotFriendPlayerProps): JSX.Element {
+export default function PlayersListItem({ player, buttonType }: NonFriendPlayerProps): JSX.Element {
   const townController = useTownController();
 
   // Determine which HTML element/button to render

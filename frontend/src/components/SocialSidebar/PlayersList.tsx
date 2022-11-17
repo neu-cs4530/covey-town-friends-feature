@@ -40,15 +40,15 @@ export default function PlayersInTownList(): JSX.Element {
   const friendRequests = useCurrentPlayerFriendRequests();
 
   // Set up a not-friends list to be updated every time the players and/or friends list changes
-  const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
+  const [nonFriendPlayers, setPlayerNotFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
     // the new not-friends list should include any player in the Town that is not the friends list
-    const newNotFriends = players.filter(player => !playerIsInList(player, friends));
-    setPlayerNotFriends(newNotFriends);
+    const newNonFriends = players.filter(player => !playerIsInList(player, friends));
+    setPlayerNotFriends(newNonFriends);
   }, [friends, players]);
 
   // Make a copy to ensure we don't modify the original & then sort the not-friends list
-  const sorted = playerNotFriends.concat([]);
+  const sorted = nonFriendPlayers.concat([]);
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),
   );
