@@ -1253,7 +1253,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Indicates that the ourPlayer has declined a friend Request.
+   * Indicates that ourPlayer has declined a friend Request.
    * Emits a acceptConvAreaInvite event to the townService.
    * @param acceptedInvite the conv area invite - holds the player who accepted, the player whose
    *                       conv area invite was accepted, and the teleport destination.
