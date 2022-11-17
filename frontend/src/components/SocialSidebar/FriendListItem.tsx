@@ -42,10 +42,19 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           size='xs'
           onClick={() => {
             console.log('TODO: remove log. Clicked teleport to friend');
+            console.log(townController.ourPlayer.location);
+
+            townController.ourPlayer.gameObjects?.sprite.setX(player.location.x);
+            townController.ourPlayer.gameObjects?.sprite.setY(player.location.y);
+            townController.ourPlayer.gameObjects?.label.setX(player.location.x);
+            townController.ourPlayer.gameObjects?.label.setY(player.location.y - 20);
+
             townController.clickedTeleportToFriend({
-              actor: townController.ourPlayer.toPlayerModel(),
+              actor: townController.ourPlayer.id,
               playerDestinationLocation: player.location,
             });
+
+            console.log(townController.ourPlayer.location);
           }}>
           Teleport To Friend
         </Button>
