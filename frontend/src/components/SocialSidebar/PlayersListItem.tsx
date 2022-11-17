@@ -16,7 +16,7 @@ type NotFriendPlayerProps = {
  *
  * See relevant hooks: `useTownController`
  *
- * @param param0 contains the player and a string indicating the button type to render
+ * @param props contains the player and a string indicating the button type to render
  */
 export default function PlayersListItem({ player, buttonType }: NotFriendPlayerProps): JSX.Element {
   const townController = useTownController();
@@ -33,7 +33,6 @@ export default function PlayersListItem({ player, buttonType }: NotFriendPlayerP
         style={{ height: '15px' }}
         size='xs'
         onClick={() => {
-          console.log('TODO: remove log. Clicked send friend request');
           townController.clickedSendRequest({
             actor: townController.ourPlayer.id,
             affected: player.id,
@@ -50,7 +49,6 @@ export default function PlayersListItem({ player, buttonType }: NotFriendPlayerP
         style={{ height: '15px' }}
         size='xs'
         onClick={() => {
-          console.log('TODO: remove log. Clicked cancel friend request');
           townController.clickedCancelRequest({
             actor: townController.ourPlayer.id,
             affected: player.id,
@@ -69,7 +67,6 @@ export default function PlayersListItem({ player, buttonType }: NotFriendPlayerP
           style={{ height: '15px' }}
           size='xs'
           onClick={() => {
-            console.log('TODO: remove log. Clicked accept friend request');
             townController.clickedAcceptFriendRequest({
               actor: townController.ourPlayer.id,
               affected: player.id,
@@ -84,7 +81,6 @@ export default function PlayersListItem({ player, buttonType }: NotFriendPlayerP
           style={{ height: '15px' }}
           size='xs'
           onClick={() => {
-            console.log('TODO: remove log. Clicked decline friend request');
             townController.clickedDeclineFriendRequest({
               actor: townController.ourPlayer.id,
               affected: player.id,

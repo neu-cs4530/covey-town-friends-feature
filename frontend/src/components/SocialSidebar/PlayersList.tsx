@@ -10,23 +10,19 @@ import useTownController from '../../hooks/useTownController';
 import PlayersListItem from './PlayersListItem';
 
 /**
- * Determine whether or not a given PlayerController is in a given list of PlayerControllers
+ * Determines whether or not the given PlayerController is in tje given list of PlayerControllers
  * @param givenPlayer the PlayerController to check for in the provided list
- * @param playerList the list of PlayerControllers
+ * @param playerList the list of PlayerControllers to check
  * @returns true if the player is in the list, false otherwise
  */
 export function playerIsInList(givenPlayer: PlayerController, playerList: PlayerController[]) {
   // attempt to find the equivalent givenPlayer in playerList
   const givenPlayerInList = playerList.find(
-    controller => controller.id === givenPlayer.id,
+    playerController => playerController.id === givenPlayer.id,
   ) as PlayerController;
 
   // If found, return true, else false
-  if (givenPlayerInList) {
-    return true;
-  } else {
-    return false;
-  }
+  return Boolean(givenPlayerInList);
 }
 
 /**
@@ -51,7 +47,7 @@ export default function PlayersInTownList(): JSX.Element {
     setPlayerNotFriends(newNotFriends);
   }, [friends, players]);
 
-  // Sort the not-friends list to be passed in
+  // Make a copy to ensure we don't modify the original & then sort the not-friends list
   const sorted = playerNotFriends.concat([]);
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),
@@ -61,7 +57,7 @@ export default function PlayersInTownList(): JSX.Element {
   function associatedButton(player: PlayerController): string {
     // If the given Player is "me", we don't want to render any button next to it
     if (player.id == townController.ourPlayer.id) {
-      return 'me';
+      return 'you';
     }
     // Loop through friend requests and check if given player is in any of them
     for (const request of friendRequests) {
