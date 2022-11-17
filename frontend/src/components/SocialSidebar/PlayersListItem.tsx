@@ -14,6 +14,8 @@ type NotFriendPlayerProps = {
  * and associated button (send, cancel, accept/decline) OR the descriptive "(me)" to indicate
  * this particular player is the TownController.ourPlayer.
  *
+ * See relevant hooks: `useTownController`
+ *
  * @param param0 contains the player and a string indicating the button type to render
  */
 export default function PlayersListItem({ player, buttonType }: NotFriendPlayerProps): JSX.Element {

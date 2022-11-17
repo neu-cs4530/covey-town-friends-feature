@@ -8,6 +8,7 @@ import useTownController from '../../hooks/useTownController';
 /**
  * Displays the current town name & ID, lists the not-friended players in the Town, lists
  * the friended players in the Town, and lists the active conversation areas.
+ *
  * Also includes buttons for sending mini-messages to friends, teleporting to them, and opening
  * a list of conversation area invites.
  *
