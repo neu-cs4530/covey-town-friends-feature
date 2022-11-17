@@ -12,10 +12,10 @@ import { Player, PlayerLocation, PlayerToPlayerUpdate } from '../../types/CoveyT
 import * as PlayerName from './PlayerName';
 import PlayersList, { playerIsInList } from './PlayersList';
 
-describe('isPlayerInList', () => {
-  let testList: PlayerController[];
-  let contPlayer1: PlayerController;
-  let contPlayer2: PlayerController;
+describe('playerIsInList', () => {
+  let testPCList: PlayerController[];
+  let playerController1: PlayerController;
+  let playerController2: PlayerController;
   const player1: Player = {
     id: nanoid(),
     location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
@@ -27,16 +27,16 @@ describe('isPlayerInList', () => {
     userName: nanoid(),
   };
   beforeEach(() => {
-    contPlayer1 = PlayerController.fromPlayerModel(player1);
-    contPlayer2 = PlayerController.fromPlayerModel(player2);
-    testList = [contPlayer1];
+    playerController1 = PlayerController.fromPlayerModel(player1);
+    playerController2 = PlayerController.fromPlayerModel(player2);
+    testPCList = [playerController1];
   });
   it('Should return true if the given player is in the list', () => {
-    expect(playerIsInList(contPlayer1, testList)).toBe(true);
+    expect(playerIsInList(playerController1, testPCList)).toBe(true);
   });
   it('Should return false if the given player is NOT in the list', () => {
-    expect(playerIsInList(contPlayer2, testList)).toBe(false);
-    expect(playerIsInList(contPlayer1, [])).toBe(false);
+    expect(playerIsInList(playerController2, testPCList)).toBe(false);
+    expect(playerIsInList(playerController1, [])).toBe(false);
   });
 });
 
