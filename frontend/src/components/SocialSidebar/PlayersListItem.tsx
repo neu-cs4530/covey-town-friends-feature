@@ -98,10 +98,10 @@ export default function PlayersListItem({ player, buttonType }: NotFriendPlayerP
 
   // Includes a space between PlayerName and button so they're not glued to each other
   return (
-    <ListItem>
+    <ListItem key={player.id}>
       <HStack>
         <PlayerName player={player} />
-        <li></li>
+        <span> </span>
         {button}
       </HStack>
     </ListItem>

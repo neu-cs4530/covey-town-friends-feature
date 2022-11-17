@@ -70,14 +70,14 @@ describe('PlayersInTownList', () => {
     playersToExpect: PlayerController[],
   ) => {
     const listEntries = await renderData.findAllByRole('listitem');
-    // expect same # of players * 3 (one for each part of the player list element)
-    expect(listEntries.length).toBe(playersToExpect.length * 3); // expect same number of players
+    // expect same # of players * 2 (one for each part of the player list element: name & button)
+    expect(listEntries.length).toBe(playersToExpect.length); // expect same number of players
     const playersSortedCorrectly = playersToExpect
       .map(p => p.userName)
       .sort((p1, p2) => p1.localeCompare(p2, undefined, { numeric: true, sensitivity: 'base' }));
     for (let i = 0; i < playersSortedCorrectly.length; i += 1) {
-      expect(listEntries[i + 2 * i]).toHaveTextContent(playersSortedCorrectly[i]);
-      const parentComponent = listEntries[i + 2 * i].parentNode;
+      expect(listEntries[i]).toHaveTextContent(playersSortedCorrectly[i]);
+      const parentComponent = listEntries[i].parentNode;
       if (parentComponent) {
         expect(parentComponent.nodeName).toBe('OL'); // list items expected to be directly nested in an ordered list
       }
@@ -88,8 +88,6 @@ describe('PlayersInTownList', () => {
     consoleErrorSpy = jest.spyOn(global.console, 'error');
     consoleErrorSpy.mockImplementation((message?, ...optionalParams) => {
       const stringMessage = message as string;
-      console.log('MESSAGE');
-      console.log(stringMessage);
       if (stringMessage.includes('children with the same key,')) {
         throw new Error(stringMessage.replace('%s', optionalParams[0]));
       } else if (stringMessage.includes('warning-keys')) {
