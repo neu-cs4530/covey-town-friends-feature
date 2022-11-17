@@ -141,7 +141,7 @@ describe('PlayersInTownList', () => {
       const newFriends = friends.concat([players[0]]);
       useFriendsSpy.mockReturnValue(newFriends);
     });
-    it('Renders a list of all not-friend user names w/o checking sort', async () => {
+    it('Renders a list of all not-friend user names without checking sort', async () => {
       const renderData = renderPlayersList();
       // Player param should not have changed
       expect(players.length).toBe(10);
@@ -167,7 +167,7 @@ describe('PlayersInTownList', () => {
       expect(friends).toEqual(copyOfArrayPassedToComponent); // expect that the players array is unchanged by the compoennt
     });
   });
-  it('Renders a list of all not-friend user names, w/o checking sort', async () => {
+  it('Renders a list of all not-friend user names, without checking sort', async () => {
     // Players array is already sorted correctly
     const renderData = renderPlayersList();
     await expectProperlyRenderedNotFriendsList(renderData, players);
