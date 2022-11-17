@@ -10,7 +10,7 @@ import * as useTownController from '../../hooks/useTownController';
 import { mockTownController } from '../../TestUtils';
 import { Player, PlayerLocation, PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
 import * as PlayerName from './PlayerName';
-import PlayersList, { isPlayerInList } from './PlayersList';
+import PlayersList, { playerIsInList } from './PlayersList';
 
 describe('isPlayerInList', () => {
   let testList: PlayerController[];
@@ -32,11 +32,11 @@ describe('isPlayerInList', () => {
     testList = [contPlayer1];
   });
   it('Should return true if the given player is in the list', () => {
-    expect(isPlayerInList(contPlayer1, testList)).toBe(true);
+    expect(playerIsInList(contPlayer1, testList)).toBe(true);
   });
   it('Should return false if the given player is NOT in the list', () => {
-    expect(isPlayerInList(contPlayer2, testList)).toBe(false);
-    expect(isPlayerInList(contPlayer1, [])).toBe(false);
+    expect(playerIsInList(contPlayer2, testList)).toBe(false);
+    expect(playerIsInList(contPlayer1, [])).toBe(false);
   });
 });
 

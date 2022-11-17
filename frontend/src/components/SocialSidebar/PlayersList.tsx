@@ -15,7 +15,7 @@ import PlayersListItem from './PlayersListItem';
  * @param playerList the list of PlayerControllers
  * @returns true if the player is in the list, false otherwise
  */
-export function isPlayerInList(givenPlayer: PlayerController, playerList: PlayerController[]) {
+export function playerIsInList(givenPlayer: PlayerController, playerList: PlayerController[]) {
   // attempt to find the equivalent givenPlayer in playerList
   const givenPlayerInList = playerList.find(
     controller => controller.id === givenPlayer.id,
@@ -47,7 +47,7 @@ export default function PlayersInTownList(): JSX.Element {
   const [playerNotFriends, setPlayerNotFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
     // the new not-friends list should include any player in the Town that is not the friends list
-    const newNotFriends = players.filter(player => !isPlayerInList(player, friends));
+    const newNotFriends = players.filter(player => !playerIsInList(player, friends));
     setPlayerNotFriends(newNotFriends);
   }, [friends, players]);
 
