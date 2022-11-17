@@ -1225,7 +1225,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Indicates that the player has sent a friend Request.
+   * Indicates that our player has sent a friend Request.
    * Emits a sendFriendRequest event to the townService.
    * @param sentRequest the friend request - holds the current player and the player whose
    *                    who is being requested
