@@ -1,7 +1,7 @@
 import { Heading, StackDivider, Tooltip, VStack } from '@chakra-ui/react';
 import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
-import PlayersList from './PlayersList';
+import PlayersList from './NonFriendsListArea';
 import FriendsList from './FriendsList';
 import useTownController from '../../hooks/useTownController';
 
