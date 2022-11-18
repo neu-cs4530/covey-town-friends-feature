@@ -49,6 +49,19 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return { id: this.id, userName: this.userName, location: this.location };
   }
 
+  // function that moves the sprite for this player
+  // assumes this sprite exists
+  public updateSpritePosition(destinationLocation: PlayerLocation) {
+    if (this.gameObjects) {
+      const { sprite, label } = this.gameObjects;
+
+      sprite.setX(destinationLocation.x);
+      sprite.setY(destinationLocation.y);
+      label.setX(sprite.body.position.x);
+      label.setY(sprite.body.position.y - 20);
+    }
+  }
+
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
       const { sprite, label } = this.gameObjects;
