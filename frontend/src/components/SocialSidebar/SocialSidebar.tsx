@@ -1,9 +1,9 @@
 import { Heading, StackDivider, Tooltip, VStack } from '@chakra-ui/react';
 import React from 'react';
 import ConversationAreasList from './ConversationAreasList';
-import FriendsList from './FriendsList';
 import useTownController from '../../hooks/useTownController';
 import NonFriendsInTownList from './NonFriendsListArea';
+import FriendsInTownList from './FriendsListArea';
 
 /**
  * Displays the current town name & ID, lists the not-friended players in the Town, lists
@@ -33,7 +33,7 @@ export default function SocialSidebar(): JSX.Element {
           Current town: {friendlyName}
         </Heading>
       </Tooltip>
-      <FriendsList />
+      <FriendsInTownList />
       <NonFriendsInTownList />
       <ConversationAreasList />
     </VStack>
