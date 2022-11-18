@@ -1,13 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Phaser from 'phaser';
 import { useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
+import { useCurrentPlayerFriends } from '../../classes/TownController';
+import { useToast } from '@chakra-ui/react';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
+  const friends = useCurrentPlayerFriends();
+
+  // Set up a toast message to be displayed when ourPlayer gains a friend
+  const toast = useToast();
+  const [friendsLength, setFriendsLength] = useState<number>(friends.length);
+  useEffect(() => {
+    // Make sure we don't enter an infinite loop
+    if (friendsLength !== friends.length) {
+      const dif = friends.length - friendsLength;
+      // Render toast message if friend list has increased
+      if (dif > 0) {
+        toast({
+          title: `You have a new friend!`,
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+      // Update friends length - this will cause this use effect to be called again, but the if-
+      // statement prevents a duplicate toast rendering
+      setFriendsLength(friends.length);
+    }
+  }, [friends, friendsLength, toast]);
 
   useEffect(() => {
     const config = {
