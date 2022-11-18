@@ -1,11 +1,11 @@
 import { Box, Heading, OrderedList, Tooltip } from '@chakra-ui/react';
 import React from 'react';
-import { usePlayers } from '../../classes/TownController';
+import { useCurrentPlayerFriends, usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
 import FriendsListItem from './FriendListItem';
 
 function FriendsList(): JSX.Element {
-  const friends = usePlayers();
+  const friends = useCurrentPlayerFriends();
   const sorted = friends.concat([]);
 
   sorted.sort((p1, p2) =>
@@ -13,16 +13,11 @@ function FriendsList(): JSX.Element {
   );
 
   return (
-    <Box>
-      <Box height='200px' color='black'>
-        buffer
-      </Box>
-      <OrderedList>
-        {sorted.map(player => (
-          <FriendsListItem player={player} key={player.id} />
-        ))}
-      </OrderedList>
-    </Box>
+    <OrderedList>
+      {sorted.map(player => (
+        <FriendsListItem player={player} key={player.id} />
+      ))}
+    </OrderedList>
   );
 }
 
