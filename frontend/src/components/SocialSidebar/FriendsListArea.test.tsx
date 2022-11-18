@@ -12,6 +12,10 @@ import { Player, PlayerLocation, PlayerToPlayerUpdate } from '../../types/CoveyT
 import * as PlayerName from './PlayerName';
 import FriendsList from './FriendsList';
 
+// TODO: !!!!
+/**
+ * This entire test file is not written yet, it is currently a placeholder copied from NonFriendsListArea.test.ts
+ */
 describe('FriendsInTownList', () => {
   const randomLocation = (): PlayerLocation => ({
     moving: Math.random() < 0.5,
