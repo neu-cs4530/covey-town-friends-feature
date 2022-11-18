@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
 import { useSelectedFriends } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
+import PlayerName from './PlayerName';
 
 type FriendNameProps = {
   player: PlayerController;
@@ -26,7 +27,6 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
 
   // handle selecting or deselecting a friend
   function selectOrDeslect(newValue: boolean) {
-    console.log('newValue is ' + newValue + ' for ' + player.userName);
     setChecked(newValue);
     if (newValue) {
       townController.selectFriend(player);
@@ -38,14 +38,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
   return (
     <ListItem>
       <HStack>
-        <Checkbox
-          size='md'
-          isChecked={checked}
-          onChange={e => {
-            selectOrDeslect(e.target.checked);
-          }}>
-          {player.userName}
-        </Checkbox>
+        <PlayerName player={player}></PlayerName>
         <Button
           outlineOffset={'--px'}
           outlineColor='black'
@@ -73,6 +66,12 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           }}>
           Unfriend
         </Button>
+        <Checkbox
+          size='md'
+          isChecked={checked}
+          onChange={e => {
+            selectOrDeslect(e.target.checked);
+          }}></Checkbox>
       </HStack>
     </ListItem>
   );
