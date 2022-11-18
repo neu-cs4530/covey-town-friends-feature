@@ -31,6 +31,8 @@ export function playerIsInList(givenPlayer: PlayerController, playerList: Player
  *
  * See relevant hooks: `usePlayersInTown`, `useCoveyAppState`, `useCurrentPlayerFriends` and
  * `useCurrentPlayerFriendRequests`
+ * 
+ * Uses NonFriendsListItem component to render list and is used in SocialSidebar
  *
  */
 export default function NonFriendsInTownList(): JSX.Element {
