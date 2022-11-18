@@ -35,10 +35,12 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
     }
   }
 
+  // space between playername and button is so separate button from name
   return (
     <ListItem>
       <HStack>
         <PlayerName player={player}></PlayerName>
+        <span> </span>
         <Button
           outlineOffset={'--px'}
           outlineColor='black'
