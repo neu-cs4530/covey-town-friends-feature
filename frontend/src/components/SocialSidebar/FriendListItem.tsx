@@ -39,8 +39,14 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
   return (
     <ListItem>
       <HStack>
-        <PlayerName player={player}></PlayerName>
-        <span> </span>
+        <Checkbox
+          size='md'
+          isChecked={checked}
+          onChange={e => {
+            selectOrDeslect(e.target.checked);
+          }}>
+          {player.userName}
+        </Checkbox>
         <Button
           outlineOffset={'--px'}
           outlineColor='black'
@@ -68,12 +74,6 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           }}>
           Unfriend
         </Button>
-        <Checkbox
-          size='md'
-          isChecked={checked}
-          onChange={e => {
-            selectOrDeslect(e.target.checked);
-          }}></Checkbox>
       </HStack>
     </ListItem>
   );
