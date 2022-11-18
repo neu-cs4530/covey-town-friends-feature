@@ -12,7 +12,7 @@ type FriendNameProps = {
 /**
  * A React Component to render one PlayerController in the FriendsList
  *
- * @param param0 PlayerController that we are rendering as a friend
+ * @param props PlayerController that we are rendering as a friend
  * @returns JSX.Element Representing one item for a friend on our FriendsList
  *
  * See useTownController(), useSelectedFriends()
