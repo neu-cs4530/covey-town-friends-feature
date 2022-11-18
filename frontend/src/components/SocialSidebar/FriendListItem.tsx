@@ -8,6 +8,16 @@ type FriendNameProps = {
   player: PlayerController;
 };
 
+/**
+ * A React Component to render one PlayerController in the FriendsList
+ *
+ * @param param0 PlayerController that we are rendering as a friend
+ * @returns JSX.Element Representing one item for a friend on our FriendsList
+ *
+ * See useTownController(), useSelectedFriends()
+ *
+ * Used in FriendsList component
+ */
 export default function FriendsListItem({ player }: FriendNameProps): JSX.Element {
   const townController = useTownController();
   const selectedFriends = useSelectedFriends();
@@ -39,11 +49,12 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
         <Button
           outlineOffset={'--px'}
           outlineColor='black'
+          style={{ height: '15px' }}
           size='xs'
           onClick={() => {
-            // move the sprite and label
+            // move ourPlayer sprite and label
             townController.ourPlayer.updateSpritePosition(player.location);
-            // tell the town we teleported
+            // tells the town we moved, letting other players know, rendering us correctly on their end
             townController.clickedTeleportToFriend(player.location);
           }}>
           Teleport To Friend
@@ -52,6 +63,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           background='red.200'
           outlineOffset={'--px'}
           outlineColor='black'
+          style={{ height: '15px' }}
           size='xs'
           onClick={() => {
             townController.clickedRemoveFriend({
