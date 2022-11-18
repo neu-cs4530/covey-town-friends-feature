@@ -13,7 +13,7 @@ import FriendsListItem from './FriendListItem';
  * Used in FriendsListArea component
  * Uses FriendsListItem component
  */
-function FriendsList(): JSX.Element {
+export default function FriendsList(): JSX.Element {
   const friends = useCurrentPlayerFriends();
   const sorted = friends.concat([]);
 
