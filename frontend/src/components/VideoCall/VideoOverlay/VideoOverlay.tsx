@@ -113,7 +113,7 @@ export default function VideoGrid(props: Props) {
   return (
     <>
       <Prompt when={roomState !== 'disconnected'} message="Are you sure you want to leave the video room?" />
-      <Container style={{ height: '100%' }}>
+      <Container style={{ height: '100%'}}>
         {roomState === 'disconnected' ? (
           <div>Connecting...</div>
         ) : (

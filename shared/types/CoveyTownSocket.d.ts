@@ -1,5 +1,3 @@
-import { Player as PlayerSrc } from "covey-town-townService/src/lib/Player";
-
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -77,24 +75,22 @@ export type PlayerToPlayerUpdate = {
   affected: string;
 };
 
+// requester and requested are the IDs of players
 export type ConversationAreaGroupInvite = {
-  requester: PlayerSrc;
-  requested: PlayerSrc[];
+  requester: string;
+  requested: string[];
   // Check whether this is a shallow/deep copy, potentially remove player location
   requesterLocation: PlayerLocation;
 };
 
+// requester and requested are the IDs of players
 export type TeleportInviteSingular = {
-  requester: PlayerSrc;
-  requested: PlayerSrc;
+  requester: string;
+  requested: string;
   requesterLocation: PlayerLocation;
 };
 
-export type TeleportAction = {
-  actor: PlayerSrc;
-  playerDestinationLocation: PlayerLocation;
-};
-
+// sender and recipients are the IDs of players
 export type BriefMessage = {
   sender: string;
   recipients: string[];

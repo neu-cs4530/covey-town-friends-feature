@@ -14,7 +14,6 @@ import {
   CoveyTownSocket,
   PlayerLocation,
   PlayerToPlayerUpdate,
-  TeleportAction,
   TeleportInviteSingular,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
@@ -139,39 +138,10 @@ export type TownEvents = {
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
 
   /**
-   * An event that indicates that the player has accepted a friend Request.
-   * The request object contains the current Player and the Player whose friend
-   * request was accepted.
+   * An event that indicates that the current player wants to teleport to the destination player's
+   * location. The playerDestinationLocation object is the location of the player to teleport to.
    */
-  clickedAcceptFriendRequest: (acceptedRequest: PlayerToPlayerUpdate) => void;
-
-  /**
-   * An event that indicates that the player has declined a friend Request.
-   * The request object contains the current Player and the Player whose friend
-   * request was declined.
-   */
-  clickedDeclineFriendRequest: (declinedRequest: PlayerToPlayerUpdate) => void;
-
-  /**
-   * An event that indicates that the actor player wants to teleport to
-   * the destination player's location. The request object contains the current Player
-   * and the location of the player to teleport to.
-   */
-  clickedTeleportToFriend: (teleportAction: TeleportAction) => void;
-
-  /**
-   * An event that indicates that the player has sent a friend Request.
-   * @param sentRequest object containing the current Player and the Player who
-   * is being requested
-   */
-  clickedSendFriendRequest: (sentRequest: PlayerToPlayerUpdate) => void;
-
-  /**
-   * An event that indicates that the player is canceling a friend Request.
-   * @param canceledRequest object containing the current Player and the Player who
-   * the canceled request was intended for
-   */
-  clickedCancelRequest: (canceledRequest: PlayerToPlayerUpdate) => void;
+  clickedTeleportToFriend: (playerDestinationLocation: PlayerLocation) => void;
 
   /**
    * An event that indicates that the player has requested to unfriend the affected.
@@ -741,7 +711,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const newRequesterLocation = convAreaInviteRequest.requesterLocation;
       // find the index of our player within the list of recipients in this convAreaInviteRequest
       const ourPlayerIndex: number = affectedPlayers.findIndex(
-        invitedPlayer => invitedPlayer.id === this.ourPlayer.id,
+        invitedPlayerID => invitedPlayerID === this.ourPlayer.id,
       );
 
       // If our player is found within the list of recipients, use its index to create a new
@@ -988,13 +958,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param teleportInviteToRemove the teleport invite to remove, if found
    */
   private _removeTeleportInviteFromInvites(teleportInviteToRemove: TeleportInviteSingular) {
-    if (teleportInviteToRemove.requested.id === this.ourPlayer.id) {
+    if (teleportInviteToRemove.requested === this.ourPlayer.id) {
       const newInvitesFiltered = this._conversationAreaInvitesInternal.filter(
         invite =>
           !(
             invite.requesterLocation.x === teleportInviteToRemove.requesterLocation.x &&
             invite.requesterLocation.y === teleportInviteToRemove.requesterLocation.y &&
-            invite.requester.id === teleportInviteToRemove.requester.id
+            invite.requester === teleportInviteToRemove.requester
           ),
       );
       this.conversationAreaInvites = newInvitesFiltered;
@@ -1248,13 +1218,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   /**
    * Emits a playerMovement event to the TownService.
-   * @param teleportAction the teleport action to complete - whom to teleport and to where
+   * @param playerDestinationLocation the location to teleport the current player to
    */
-  public clickedTeleportToFriend(teleportAction: TeleportAction): void {
-    this._socket.emit('playerMovement', teleportAction.playerDestinationLocation);
+  public clickedTeleportToFriend(playerDestinationLocation: PlayerLocation): void {
+    this._socket.emit('playerMovement', playerDestinationLocation);
   }
 
   /**
+   * Indicates that our player has sent a friend Request.
    * Emits a sendFriendRequest event to the townService.
    * @param sentRequest the friend request - holds the current player and the player whose
    *                    who is being requested
@@ -1264,6 +1235,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Indicates that ourPlayer has canceled a friend Request.
    * Emits a cancelFriendRequest event to the townService.
    * @param canceledRequest the friend request being canceled - holds the current player and the player whose
    *                        who is being requested
@@ -1281,6 +1253,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Indicates that ourPlayer has declined a friend Request.
    * Emits a acceptConvAreaInvite event to the townService.
    * @param acceptedInvite the conv area invite - holds the player who accepted, the player whose
    *                       conv area invite was accepted, and the teleport destination.
@@ -1290,6 +1263,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Indicates that ourPlayer has declined a friend Request.
    * Emits a declineConvAreaInvite event to the townService.
    * @param declinedInvite the friend reqeust - holds the player who declined, the player whose
    *                       conv area invite was declined, and what would have been the teleport
@@ -1310,7 +1284,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (
       // check that the player is in a conversation areas before allowing the invite to be sent
       this.conversationAreas.find(area =>
-        area.occupants.find(player => player.id === invite.requester.id),
+        area.occupants.find(player => player.id === invite.requester),
       )
     ) {
       this._socket.emit('inviteAllToConvArea', invite);
