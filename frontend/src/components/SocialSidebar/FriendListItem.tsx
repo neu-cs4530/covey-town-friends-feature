@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import PlayerController from '../../classes/PlayerController';
 import { useSelectedFriends } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
-import PlayerName from './PlayerName';
 
 type FriendNameProps = {
   player: PlayerController;
