@@ -1,4 +1,4 @@
-import { Button, HStack, ListItem } from '@chakra-ui/react';
+import { Button, HStack, ListItem, useToast } from '@chakra-ui/react';
 import React from 'react';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
@@ -20,6 +20,7 @@ type NonFriendPlayerProps = {
  */
 export default function PlayersListItem({ player, buttonType }: NonFriendPlayerProps): JSX.Element {
   const townController = useTownController();
+  const toast = useToast();
 
   // Determine which HTML element/button to render
   let button;
@@ -70,6 +71,13 @@ export default function PlayersListItem({ player, buttonType }: NonFriendPlayerP
             townController.clickedAcceptFriendRequest({
               actor: townController.ourPlayer.id,
               affected: player.id,
+            });
+            // Display a toast message indicating our player gained a friend
+            toast({
+              title: `You have a new friend: ${player.userName}!`,
+              status: 'success',
+              duration: 9000,
+              isClosable: true,
             });
           }}>
           Accept Friend Request

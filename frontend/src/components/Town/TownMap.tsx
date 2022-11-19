@@ -1,38 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Phaser from 'phaser';
 import { useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
-import { useCurrentPlayerFriends } from '../../classes/TownController';
+import { usePlayers } from '../../classes/TownController';
 import { useToast } from '@chakra-ui/react';
+import { PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
+import PlayerController from '../../classes/PlayerController';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
-  const friends = useCurrentPlayerFriends();
+  const townController = useTownController();
+  const players = usePlayers();
 
-  // Set up a toast message to be displayed when ourPlayer gains a friend
+  // Set up a toast message to be displayed when ourPlayer gains a friend via a friend
+  // request being accepted.
   const toast = useToast();
-  const [friendsLength, setFriendsLength] = useState<number>(friends.length);
   useEffect(() => {
-    // Make sure we don't enter an infinite loop
-    if (friendsLength !== friends.length) {
-      const dif = friends.length - friendsLength;
-      // Render toast message if friend list has increased
-      if (dif > 0) {
-        toast({
-          title: `You have a new friend!`,
-          status: 'success',
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-      // Update friends length - this will cause this use effect to be called again, but the if-
-      // statement prevents a duplicate toast rendering
-      setFriendsLength(friends.length);
-    }
-  }, [friends, friendsLength, toast]);
+    const renderFriendGainedToast = (acceptedRequest: PlayerToPlayerUpdate) => {
+      // Find the new friend by ID, in order to get its username
+      const newFriend = players.find(
+        playerController => playerController.id === acceptedRequest.actor,
+      ) as PlayerController;
+      // Display the toast message
+      toast({
+        title: `You have a new friend: ${newFriend.userName}!`,
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+      });
+    };
+    // Event only gets emitted if ourPlayer is the affected so no need to check for that here
+    townController.addListener('friendRequestAccepted', renderFriendGainedToast);
+    return () => {
+      townController.removeListener('friendRequestAccepted', renderFriendGainedToast);
+    };
+  }, [townController, toast, players]);
 
   useEffect(() => {
     const config = {

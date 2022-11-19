@@ -197,6 +197,13 @@ export type TownEvents = {
    * already selected.
    */
   deselectFriend: (friendToDeselect: PlayerController) => void;
+
+  /**
+   * An event that indicates that one of the affected player's friend requests has been accepted.
+   * The request object contains the Player who accepted (actor) and the Player whose friend
+   * request was accepted (affected).
+   */
+  friendRequestAccepted: (acceptedRequest: PlayerToPlayerUpdate) => void;
 };
 
 /**
@@ -828,6 +835,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this._addPlayerControllerToFriendsList(affected);
       } else if (affected === ourPlayerID) {
         this._addPlayerControllerToFriendsList(actor);
+        // Emit the event to the TownController itself so it can be caught in TownMap to render
+        // a toast message indicating we gained a friend
+        this.emit('friendRequestAccepted', friendRequest);
       }
     });
 
