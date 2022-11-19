@@ -831,15 +831,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
       // update friends list (only needs to be done on this controller becuase the other controller
       // will also receive this event)
-      // Also emits the event to the TownController itself so it can be caught in TownMap to render
-      // a toast message indicating we gained a friend
       if (actor === ourPlayerID) {
         this._addPlayerControllerToFriendsList(affected);
-        this.emit('friendRequestAccepted', friendRequest);
       } else if (affected === ourPlayerID) {
         this._addPlayerControllerToFriendsList(actor);
-        this.emit('friendRequestAccepted', friendRequest);
       }
+
+      // Emits the event to the TownController itself so it can be caught in TownMap to render
+      // a toast message indicating we gained a friend IF we are actor or affected
+      this.emit('friendRequestAccepted', friendRequest);
     });
 
     /**

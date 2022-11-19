@@ -21,26 +21,27 @@ export default function TownMap(): JSX.Element {
   useEffect(() => {
     const renderFriendGainedToast = (acceptedRequest: PlayerToPlayerUpdate) => {
       // Find the new friend by ID, in order to get its username
-      let newFriend: PlayerController;
-      // OurPlayer has to be either actor or affected (otherwise event wouldn't be emitted)
+      let newFriend: PlayerController | undefined;
+      // OurPlayer has to be either actor or affected (otherwise no toast should be rendered)
       if (townController.ourPlayer.id === acceptedRequest.affected) {
         newFriend = players.find(
           playerController => playerController.id === acceptedRequest.actor,
         ) as PlayerController;
-      } else {
+      } else if (townController.ourPlayer.id === acceptedRequest.actor) {
         newFriend = players.find(
           playerController => playerController.id === acceptedRequest.affected,
         ) as PlayerController;
       }
-      // Display the toast message
-      toast({
-        title: `You have a new friend: ${newFriend.userName}!`,
-        status: 'success',
-        duration: 9000,
-        isClosable: true,
-      });
+      // Display the toast message if newFriend exists
+      if (newFriend) {
+        toast({
+          title: `You have a new friend: ${newFriend.userName}!`,
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        });
+      }
     };
-    // Event only gets emitted if ourPlayer is the affected so no need to check for that here
     townController.addListener('friendRequestAccepted', renderFriendGainedToast);
     return () => {
       townController.removeListener('friendRequestAccepted', renderFriendGainedToast);
