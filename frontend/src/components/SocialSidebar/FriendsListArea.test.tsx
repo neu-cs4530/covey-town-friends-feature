@@ -61,14 +61,13 @@ describe('FriendsInTownList', () => {
     consoleErrorSpy = jest.spyOn(global.console, 'error');
     consoleErrorSpy.mockImplementation((message?, ...optionalParams) => {
       const stringMessage = message as string;
-      console.log(stringMessage);
-      // if (stringMessage.includes('children with the same key,')) {
-      //   throw new Error(stringMessage.replace('%s', optionalParams[0]));
-      // } else if (stringMessage.includes('warning-keys')) {
-      //   throw new Error(stringMessage.replace('%s', optionalParams[0]));
-      // }
+      if (stringMessage.includes('children with the same key,')) {
+        throw new Error(stringMessage.replace('%s', optionalParams[0]));
+      } else if (stringMessage.includes('warning-keys')) {
+        throw new Error(stringMessage.replace('%s', optionalParams[0]));
+      }
       // eslint-disable-next-line no-console -- we are wrapping the console with a spy to find react warnings
-      // console.warn(message, ...optionalParams);
+      console.warn(message, ...optionalParams);
     });
     usePlayersSpy = jest.spyOn(TownControllerHooks, 'usePlayers');
     useTownControllerSpy = jest.spyOn(useTownController, 'default');

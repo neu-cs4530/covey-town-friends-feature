@@ -26,7 +26,7 @@ export default function NonFriendsListItem({
 
   // Determine which HTML element/button to render
   let button;
-  if (buttonType === 'me') {
+  if (buttonType === 'you') {
     button = <span> ({buttonType}) &nbsp; </span>;
   } else if (buttonType === 'send') {
     button = (
