@@ -25,9 +25,9 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
   const [checked, setChecked] = useState<boolean>(selectedFriends.includes(player));
 
   // handle selecting or deselecting a friend
-  function selectOrDeselect(newValue: boolean) {
-    setChecked(newValue);
-    if (newValue) {
+  function selectOrDeselect(newSelectedValue: boolean) {
+    setChecked(newSelectedValue);
+    if (newSelectedValue) {
       townController.selectFriend(player);
     } else {
       townController.deselectFriend(player);
@@ -42,7 +42,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           size='md'
           isChecked={checked}
           onChange={e => {
-            selectOrDeslect(e.target.checked);
+            selectOrDeselect(e.target.checked);
           }}>
           {player.userName}
         </Checkbox>
