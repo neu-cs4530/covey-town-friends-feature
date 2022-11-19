@@ -27,10 +27,10 @@ export default function FriendsInTownList(): JSX.Element {
         </Heading>
       </Tooltip>
       {FriendsList()}
-      {console.log(
+      {/* {console.log(
         'This is where the create conversation area button would go. Add a button somewhere to open the drawer holding the invites.',
-      )}
-      {console.log('This is where the text entry box + associated button would go.')}
+      )} */}
+      {/* {console.log('This is where the text entry box + associated button would go.')} */}
     </Box>
   );
 }
