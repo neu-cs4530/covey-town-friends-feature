@@ -24,13 +24,11 @@ export default function TownMap(): JSX.Element {
       let newFriend: PlayerController | undefined;
       // OurPlayer has to be either actor or affected (otherwise no toast should be rendered)
       if (townController.ourPlayer.id === acceptedRequest.affected) {
-        newFriend = players.find(
-          playerController => playerController.id === acceptedRequest.actor,
-        ) as PlayerController;
+        newFriend = players.find(playerController => playerController.id === acceptedRequest.actor);
       } else if (townController.ourPlayer.id === acceptedRequest.actor) {
         newFriend = players.find(
           playerController => playerController.id === acceptedRequest.affected,
-        ) as PlayerController;
+        );
       }
       // Display the toast message if newFriend exists
       if (newFriend) {
