@@ -77,22 +77,20 @@ export default function NonFriendsListItem({
           }}>
           Accept Friend Request
         </Button>
-        <Tooltip label='Remove Friend'>
-          <Button
-            background='red.200'
-            outlineOffset={'--px'}
-            outlineColor='black'
-            style={{ height: '15px' }}
-            size='xs'
-            onClick={() => {
-              townController.clickedDeclineFriendRequest({
-                actor: townController.ourPlayer.id,
-                affected: player.id,
-              });
-            }}>
-            Decline
-          </Button>
-        </Tooltip>
+        <Button
+          background='red.200'
+          outlineOffset={'--px'}
+          outlineColor='black'
+          style={{ height: '15px' }}
+          size='xs'
+          onClick={() => {
+            townController.clickedDeclineFriendRequest({
+              actor: townController.ourPlayer.id,
+              affected: player.id,
+            });
+          }}>
+          Decline
+        </Button>
       </HStack>
     );
   }
