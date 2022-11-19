@@ -161,17 +161,4 @@ describe('FriendsInTownList', () => {
       });
     });
   });
-  // TODO remove: my item doesn't do this but does it really need to?
-  // it("Renders the players' names in a PlayerName component", async () => {
-  //   const mockPlayerName = jest.spyOn(PlayerName, 'default');
-  //   try {
-  //     renderFriendsListArea();
-  //     await waitFor(() => {
-  //       // length * 2 due to useEffect dependencies leading to a double call
-  //       expect(mockPlayerName).toBeCalledTimes(players.length * 2);
-  //     });
-  //   } finally {
-  //     mockPlayerName.mockRestore();
-  //   }
-  // });
 });
