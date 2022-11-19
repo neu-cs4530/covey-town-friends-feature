@@ -46,7 +46,7 @@ describe('FriendsInTownList', () => {
     // expect same # of players * 2 (one for each part of the player list element: name & button)
     expect(listEntries.length).toBe(playersToExpect.length); // expect same number of players
     const playersSortedCorrectly = playersToExpect
-      .map(p => p.userName + 'Teleport To FriendUnfriend')
+      .map(p => p.userName + 'TeleportUnfriend')
       .sort((p1, p2) => p1.localeCompare(p2, undefined, { numeric: true, sensitivity: 'base' }));
     for (let i = 0; i < playersSortedCorrectly.length; i += 1) {
       expect(listEntries[i]).toHaveTextContent(playersSortedCorrectly[i]);

@@ -1,4 +1,4 @@
-import { Button, HStack, ListItem } from '@chakra-ui/react';
+import { Button, HStack, ListItem, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
@@ -41,7 +41,7 @@ export default function NonFriendsListItem({
             affected: player.id,
           });
         }}>
-        Request as Friend
+        Send Friend Request
       </Button>
     );
   } else if (buttonType === 'cancel') {
@@ -57,7 +57,7 @@ export default function NonFriendsListItem({
             affected: player.id,
           });
         }}>
-        Cancel Friend Request
+        Cancel
       </Button>
     );
   } else if (buttonType === 'accept/decline') {
@@ -77,20 +77,22 @@ export default function NonFriendsListItem({
           }}>
           Accept Friend Request
         </Button>
-        <Button
-          background='red.200'
-          outlineOffset={'--px'}
-          outlineColor='black'
-          style={{ height: '15px' }}
-          size='xs'
-          onClick={() => {
-            townController.clickedDeclineFriendRequest({
-              actor: townController.ourPlayer.id,
-              affected: player.id,
-            });
-          }}>
-          Decline Friend Request
-        </Button>
+        <Tooltip label='Remove Friend'>
+          <Button
+            background='red.200'
+            outlineOffset={'--px'}
+            outlineColor='black'
+            style={{ height: '15px' }}
+            size='xs'
+            onClick={() => {
+              townController.clickedDeclineFriendRequest({
+                actor: townController.ourPlayer.id,
+                affected: player.id,
+              });
+            }}>
+            Decline
+          </Button>
+        </Tooltip>
       </HStack>
     );
   }

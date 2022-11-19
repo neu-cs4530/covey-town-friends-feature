@@ -52,13 +52,14 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           outlineColor='black'
           style={{ height: '15px' }}
           size='xs'
+          title='Teleport to this friend'
           onClick={() => {
             // move ourPlayer sprite and label
             townController.ourPlayer.updateSpritePosition(player.location);
             // tells the town we moved, letting other players know, rendering us correctly on their end
             townController.clickedTeleportToFriend(player.location);
           }}>
-          Teleport To Friend
+          Teleport
         </Button>
         <Button
           background='red.200'
