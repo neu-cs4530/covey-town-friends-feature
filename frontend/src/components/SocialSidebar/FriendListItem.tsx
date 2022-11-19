@@ -25,7 +25,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
   const [checked, setChecked] = useState<boolean>(selectedFriends.includes(player));
 
   // handle selecting or deselecting a friend
-  function selectOrDeslect(newValue: boolean) {
+  function selectOrDeselect(newValue: boolean) {
     setChecked(newValue);
     if (newValue) {
       townController.selectFriend(player);
@@ -34,7 +34,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
     }
   }
 
-  // space between playername and button is so separate button from name
+  // space between playername and button is to separate button from name
   return (
     <ListItem>
       <HStack>

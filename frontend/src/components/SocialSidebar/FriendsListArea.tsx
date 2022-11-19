@@ -5,7 +5,7 @@ import FriendsList from './FriendsList';
 
 /**
  * Lists the current friends of this TownController.ourPlayer, along with the buttons to invite
- * selected friends to a conversation area, view conversation area invites, and send a brief
+ * selected friends to a conversation area, view conversation area invites, and send a mini
  * message to all selected friends.
  *
  * See relevant hooks: 'useTownController', + ADD IN OTHERS YOU USE

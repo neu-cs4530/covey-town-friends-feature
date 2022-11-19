@@ -5,7 +5,7 @@ import FriendsListItem from './FriendListItem';
 
 /**
  * This is a function component for just the elements in the friends section of the UI.
- * Renders their buttons for select/deselect, Teleport To Friend and Remove Friend
+ * Renders their buttons for select/deselect, Teleport, and Unfriend
  *
  * @returns JSX.Element for the OrderedListItem for the Friends section
  *
