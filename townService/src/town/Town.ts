@@ -17,7 +17,7 @@ import {
   ConversationAreaGroupInvite,
   TeleportInviteSingular,
   PlayerToPlayerUpdate,
-  BriefMessage,
+  MiniMessage,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
@@ -164,7 +164,7 @@ export default class Town {
 
     // Sprint 3 Potential TODO: Check to see if we should be removing the invite/send/cancel
     // friend request methods and instead just emitting directly from their listeners, like
-    // in the 'chatMessage' and 'sendBriefMessage' listeners.
+    // in the 'chatMessage' and 'sendMiniMessage' listeners.
 
     // Set up a listener to process accepted friend requests.
     // Makes the necessary backend changes & then emits an event to let the TownController know
@@ -224,9 +224,9 @@ export default class Town {
       this.declineConversationAreaInvite(convAreaInvite);
     });
 
-    // Set up a listener to forward all brief messages to all clients in the town.
-    socket.on('sendBriefMessage', (briefMessage: BriefMessage) => {
-      this._broadcastEmitter.emit('briefMessageSent', briefMessage);
+    // Set up a listener to forward all mini messages to all clients in the town.
+    socket.on('sendMiniMessage', (miniMessage: MiniMessage) => {
+      this._broadcastEmitter.emit('miniMessageSent', miniMessage);
     });
 
     return newPlayer;

@@ -12,7 +12,7 @@ import {
   mockPlayer,
 } from '../TestUtils';
 import {
-  BriefMessage,
+  MiniMessage,
   ChatMessage,
   ConversationAreaGroupInvite,
   Interactable,
@@ -430,7 +430,7 @@ describe('Town', () => {
         'inviteAllToConvArea',
         'acceptConvAreaInvite',
         'declineConvAreaInvite',
-        'sendBriefMessage',
+        'sendMiniMessage',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -819,18 +819,18 @@ describe('Town', () => {
       const emittedMessage = getLastEmittedEvent(townEmitter, 'chatMessage');
       expect(emittedMessage).toEqual(chatMessage);
     });
-    it('Forwards brief message events to all players in the same town', async () => {
-      const briefMessageHandler = getEventListener(playerTestData.socket, 'sendBriefMessage');
-      const testBriefMessage: BriefMessage = {
+    it('Forwards mini message events to all players in the same town', async () => {
+      const miniMessageHandler = getEventListener(playerTestData.socket, 'sendMiniMessage');
+      const testMiniMessage: MiniMessage = {
         sender: player.id,
         recipients: [player2.id, player3.id],
         body: nanoid(),
       };
 
-      briefMessageHandler(testBriefMessage);
+      miniMessageHandler(testMiniMessage);
 
-      const emittedMessage = getLastEmittedEvent(townEmitter, 'briefMessageSent');
-      expect(emittedMessage).toEqual(testBriefMessage);
+      const emittedMessage = getLastEmittedEvent(townEmitter, 'miniMessageSent');
+      expect(emittedMessage).toEqual(testMiniMessage);
     });
   });
   describe('addConversationArea', () => {
