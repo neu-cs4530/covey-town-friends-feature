@@ -20,7 +20,7 @@ export default function TownMap(): JSX.Element {
   const toast = useToast();
   useEffect(() => {
     const renderFriendGainedToast = (acceptedRequest: PlayerToPlayerUpdate) => {
-      // Find the new friend by ID, in order to get its username
+      // Find the new friend by ID, in order to get their username
       let newFriend: PlayerController | undefined;
       // OurPlayer has to be either actor or affected (otherwise no toast should be rendered)
       if (townController.ourPlayer.id === acceptedRequest.affected) {
