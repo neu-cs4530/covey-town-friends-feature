@@ -5,9 +5,46 @@ import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
+import { usePlayers } from '../../classes/TownController';
+import { useToast } from '@chakra-ui/react';
+import { PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
+import PlayerController from '../../classes/PlayerController';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
+  const townController = useTownController();
+  const players = usePlayers();
+
+  // Set up a toast message to be displayed when ourPlayer gains a friend via a friend
+  // request being accepted.
+  const toast = useToast();
+  useEffect(() => {
+    const renderFriendGainedToast = (acceptedRequest: PlayerToPlayerUpdate) => {
+      // Find the new friend by ID, in order to get their username
+      let newFriend: PlayerController | undefined;
+      // OurPlayer has to be either actor or affected (otherwise no toast should be rendered)
+      if (townController.ourPlayer.id === acceptedRequest.affected) {
+        newFriend = players.find(playerController => playerController.id === acceptedRequest.actor);
+      } else if (townController.ourPlayer.id === acceptedRequest.actor) {
+        newFriend = players.find(
+          playerController => playerController.id === acceptedRequest.affected,
+        );
+      }
+      // Display the toast message if newFriend exists
+      if (newFriend) {
+        toast({
+          title: `You have a new friend: ${newFriend.userName}!`,
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    };
+    townController.addListener('friendRequestAccepted', renderFriendGainedToast);
+    return () => {
+      townController.removeListener('friendRequestAccepted', renderFriendGainedToast);
+    };
+  }, [townController, toast, players]);
 
   useEffect(() => {
     const config = {

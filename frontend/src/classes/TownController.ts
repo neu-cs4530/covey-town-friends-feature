@@ -167,6 +167,13 @@ export type TownEvents = {
    * and the message itself (body).
    */
   clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
+
+  /**
+   * An event that indicates that one of the affected player's friend requests has been accepted.
+   * The request object contains the Player who accepted (actor) and the Player whose friend
+   * request was accepted (affected).
+   */
+  friendRequestAccepted: (acceptedRequest: PlayerToPlayerUpdate) => void;
 };
 
 /**
@@ -792,13 +799,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       // if our player is involved in the accepted request, remove it
       this._removeFriendRequestIfInvolved(affected, actor);
 
-      // update friends list
-      // only needs to be done on this controller because the other controller will also receive this event
+      // update friends list (only needs to be done on this controller because the other controller
+      // will also receive this event)
       if (actor === ourPlayerID) {
         this._addPlayerControllerToFriendsList(affected);
       } else if (affected === ourPlayerID) {
         this._addPlayerControllerToFriendsList(actor);
       }
+
+      // Emits the event to the TownController itself so it can be caught in TownMap to render
+      // a toast message indicating we gained a friend IF we are actor or affected
+      this.emit('friendRequestAccepted', friendRequest);
     });
 
     /**

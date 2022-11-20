@@ -1,4 +1,4 @@
-import { Button, HStack, ListItem, Tooltip } from '@chakra-ui/react';
+import { Button, HStack, ListItem } from '@chakra-ui/react';
 import React from 'react';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
