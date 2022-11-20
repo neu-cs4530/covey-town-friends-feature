@@ -22,6 +22,7 @@ import {
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import { logError } from '../Utils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -262,7 +263,7 @@ export default class Town {
 
       this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -283,7 +284,7 @@ export default class Town {
 
       this._broadcastEmitter.emit('friendRemoved', currentFriends);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -306,7 +307,7 @@ export default class Town {
         }
       }
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -341,7 +342,7 @@ export default class Town {
       });
       this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -358,7 +359,7 @@ export default class Town {
       this.teleportToFriend(teleportInvite);
       this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -373,7 +374,7 @@ export default class Town {
       this._getPlayerByID(declinedInvite.requested).removeConversationAreaInvite(declinedInvite);
       this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
