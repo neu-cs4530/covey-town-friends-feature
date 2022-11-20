@@ -1,4 +1,4 @@
-import { Button, HStack, ListItem } from '@chakra-ui/react';
+import { Button, HStack, ListItem, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
@@ -10,7 +10,7 @@ type NonFriendPlayerProps = {
 };
 
 /**
- * Represents a singular item in the list of not-friended players. Contains the player's username,
+ * Represents a singular item in the list of non-friended players. Contains the player's username,
  * and associated button (send, cancel, accept/decline) OR the descriptive "(me)" to indicate
  * this particular player is the TownController.ourPlayer.
  *
@@ -18,12 +18,15 @@ type NonFriendPlayerProps = {
  *
  * @param props contains the player and a string indicating the button type to render
  */
-export default function PlayersListItem({ player, buttonType }: NonFriendPlayerProps): JSX.Element {
+export default function NonFriendsListItem({
+  player,
+  buttonType,
+}: NonFriendPlayerProps): JSX.Element {
   const townController = useTownController();
 
   // Determine which HTML element/button to render
   let button;
-  if (buttonType === 'me') {
+  if (buttonType === 'you') {
     button = <span> ({buttonType}) &nbsp; </span>;
   } else if (buttonType === 'send') {
     button = (
@@ -38,7 +41,7 @@ export default function PlayersListItem({ player, buttonType }: NonFriendPlayerP
             affected: player.id,
           });
         }}>
-        Request as Friend
+        Send Friend Request
       </Button>
     );
   } else if (buttonType === 'cancel') {
@@ -54,7 +57,7 @@ export default function PlayersListItem({ player, buttonType }: NonFriendPlayerP
             affected: player.id,
           });
         }}>
-        Cancel Friend Request
+        Cancel
       </Button>
     );
   } else if (buttonType === 'accept/decline') {
@@ -86,7 +89,7 @@ export default function PlayersListItem({ player, buttonType }: NonFriendPlayerP
               affected: player.id,
             });
           }}>
-          Decline Friend Request
+          Decline
         </Button>
       </HStack>
     );
