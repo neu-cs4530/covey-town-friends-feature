@@ -7,10 +7,10 @@ import {
   usePlayers,
 } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
-import PlayersListItem from './PlayersListItem';
+import NonFriendsListItem from './NonFriendsListItem';
 
 /**
- * Determines whether or not the given PlayerController is in tje given list of PlayerControllers
+ * Determines whether or not the given PlayerController is in the given list of PlayerControllers
  * @param givenPlayer the PlayerController to check for in the provided list
  * @param playerList the list of PlayerControllers to check
  * @returns true if the player is in the list, false otherwise
@@ -32,19 +32,21 @@ export function playerIsInList(givenPlayer: PlayerController, playerList: Player
  * See relevant hooks: `usePlayersInTown`, `useCoveyAppState`, `useCurrentPlayerFriends` and
  * `useCurrentPlayerFriendRequests`
  *
+ * Uses NonFriendsListItem component to render list and is used in SocialSidebar
+ *
  */
-export default function PlayersInTownList(): JSX.Element {
+export default function NonFriendsInTownList(): JSX.Element {
   const townController = useTownController();
   const players = usePlayers();
   const friends = useCurrentPlayerFriends();
   const friendRequests = useCurrentPlayerFriendRequests();
 
   // Set up a not-friends list to be updated every time the players and/or friends list changes
-  const [nonFriendPlayers, setPlayerNotFriends] = useState<PlayerController[]>(players);
+  const [nonFriendPlayers, setPlayerNonFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
     // the new not-friends list should include any player in the Town that is not the friends list
     const newNonFriends = players.filter(player => !playerIsInList(player, friends));
-    setPlayerNotFriends(newNonFriends);
+    setPlayerNonFriends(newNonFriends);
   }, [friends, players]);
 
   // Make a copy to ensure we don't modify the original & then sort the not-friends list
@@ -78,7 +80,11 @@ export default function PlayersInTownList(): JSX.Element {
       </Heading>
       <OrderedList>
         {sorted.map(player => (
-          <PlayersListItem player={player} key={player.id} buttonType={associatedButton(player)} />
+          <NonFriendsListItem
+            player={player}
+            key={player.id}
+            buttonType={associatedButton(player)}
+          />
         ))}
       </OrderedList>
     </Box>

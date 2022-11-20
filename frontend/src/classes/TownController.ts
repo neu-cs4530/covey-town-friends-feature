@@ -138,19 +138,6 @@ export type TownEvents = {
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
 
   /**
-   * An event that indicates that the current player wants to teleport to the destination player's
-   * location. The playerDestinationLocation object is the location of the player to teleport to.
-   */
-  clickedTeleportToFriend: (playerDestinationLocation: PlayerLocation) => void;
-
-  /**
-   * An event that indicates that the player has requested to unfriend the affected.
-   * The request object contains the current Player and the Player who is
-   * being un-friended.
-   */
-  clickedRemoveFriend: (removeFriend: PlayerToPlayerUpdate) => void;
-
-  /**
    * An event that indicates that the player has requested the list of players to
    * join them in a given conversation area. The request contains a requester Player,
    * a list of requested Players, as well as a PlayerLocation that the requested
@@ -180,23 +167,6 @@ export type TownEvents = {
    * and the message itself (body).
    */
   clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
-
-  // Sprint 3 Potential TODO: assess whether these need to be here
-  /**
-   * A function that indicates that a friend has been selected in the UI.
-   * The request object contains the PlayerController of the friend to select.
-   * It assumes that the PC is already a friend. Does nothing if friend is already selected
-   */
-  selectFriend: (friendToSelect: PlayerController) => void;
-
-  // Sprint 3 Potential TODO: assess whether these need to be here
-  /**
-   * A function that indicates that a friend has been deselected in the UI.
-   * The request object contains the PlayerController of the friend to deselect.
-   * It assumes that the PC is already a friend. Does nothing if the friend is not
-   * already selected.
-   */
-  deselectFriend: (friendToDeselect: PlayerController) => void;
 
   /**
    * An event that indicates that one of the affected player's friend requests has been accepted.
