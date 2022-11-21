@@ -24,15 +24,6 @@ export default function FriendsInTownList(): JSX.Element {
           Friends:
         </Heading>
       </Tooltip>
-      <OrderedList>
-        {console.log(
-          'This is where the friends list & associated buttons would go. See PlayersList for inspiration',
-        )}
-      </OrderedList>
-      {console.log(
-        'This is where the create conversation area button would go. Add a button somewhere to open the drawer holding the invites.',
-      )}
-      {console.log('This is where the text entry box + associated button would go.')}
     </Box>
   );
 }
