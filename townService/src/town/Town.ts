@@ -17,11 +17,12 @@ import {
   ConversationAreaGroupInvite,
   TeleportInviteSingular,
   PlayerToPlayerUpdate,
-  BriefMessage,
+  MiniMessage,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import { logError } from '../Utils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -163,7 +164,7 @@ export default class Town {
 
     // Sprint 3 Potential TODO: Check to see if we should be removing the invite/send/cancel
     // friend request methods and instead just emitting directly from their listeners, like
-    // in the 'chatMessage' and 'sendBriefMessage' listeners.
+    // in the 'chatMessage' and 'sendMiniMessage' listeners.
 
     // Set up a listener to process accepted friend requests.
     // Makes the necessary backend changes & then emits an event to let the TownController know
@@ -223,9 +224,9 @@ export default class Town {
       this.declineConversationAreaInvite(convAreaInvite);
     });
 
-    // Set up a listener to forward all brief messages to all clients in the town.
-    socket.on('sendBriefMessage', (briefMessage: BriefMessage) => {
-      this._broadcastEmitter.emit('briefMessageSent', briefMessage);
+    // Set up a listener to forward all mini messages to all clients in the town.
+    socket.on('sendMiniMessage', (miniMessage: MiniMessage) => {
+      this._broadcastEmitter.emit('miniMessageSent', miniMessage);
     });
 
     return newPlayer;
@@ -262,7 +263,7 @@ export default class Town {
 
       this._broadcastEmitter.emit('friendRequestAccepted', currentFriendRequest);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -283,7 +284,7 @@ export default class Town {
 
       this._broadcastEmitter.emit('friendRemoved', currentFriends);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -306,7 +307,7 @@ export default class Town {
         }
       }
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -341,7 +342,7 @@ export default class Town {
       });
       this._broadcastEmitter.emit('conversationAreaRequestSent', invite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -358,7 +359,7 @@ export default class Town {
       this.teleportToFriend(teleportInvite);
       this._broadcastEmitter.emit('conversationAreaRequestAccepted', teleportInvite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 
@@ -373,7 +374,7 @@ export default class Town {
       this._getPlayerByID(declinedInvite.requested).removeConversationAreaInvite(declinedInvite);
       this._broadcastEmitter.emit('conversationAreaRequestDeclined', declinedInvite);
     } catch (e) {
-      console.log(e);
+      logError(e);
     }
   }
 

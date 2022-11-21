@@ -20,11 +20,11 @@ import TownController, {
   useTownSettings,
   useCurrentPlayerFriends,
   useSelectedFriends,
-  useLatestBriefMessage,
+  useLatestMiniMessage,
 } from '../classes/TownController';
 import { EventNames, getTownEventListener, mockTownController } from '../TestUtils';
 import {
-  BriefMessage,
+  MiniMessage,
   PlayerLocation,
   PlayerToPlayerUpdate,
   TeleportInviteSingular,
@@ -649,20 +649,20 @@ describe('[T3] TownController-Dependent Hooks', () => {
       getSingleListenerAdded('selectedFriendsChanged', newController.addListener);
     });
   });
-  describe('useLatestBriefMessage', () => {
+  describe('useLatestMiniMessage', () => {
     let friendlyName: string;
     let townIsPubliclyListed: boolean;
-    let hookReturnValue: BriefMessage | undefined;
+    let hookReturnValue: MiniMessage | undefined;
     let renderData: RenderResult;
     function TestComponent() {
-      hookReturnValue = useLatestBriefMessage();
+      hookReturnValue = useLatestMiniMessage();
       return null;
     }
     let player1ID;
     let player2ID;
     let player3ID;
-    let firstMessageToPlayer1: BriefMessage;
-    let secondMessageToPlayer1: BriefMessage;
+    let firstMessageToPlayer1: MiniMessage;
+    let secondMessageToPlayer1: MiniMessage;
 
     beforeEach(() => {
       friendlyName = nanoid();
@@ -690,11 +690,11 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
       renderData = render(<TestComponent />);
     });
-    it('Returns initial state of latestBriefMessage for the town', () => {
+    it('Returns initial state of latestMiniMessage for the town', () => {
       expect(hookReturnValue).toEqual(undefined);
     });
-    it('Updates latestBriefMessage in response to latestBriefMessageChanged events', () => {
-      const listener = getSingleListenerAdded('latestBriefMessageChanged');
+    it('Updates latestMiniMessage in response to latestMiniMessageChanged events', () => {
+      const listener = getSingleListenerAdded('latestMiniMessageChanged');
       act(() => {
         listener(firstMessageToPlayer1);
       });
@@ -705,31 +705,31 @@ describe('[T3] TownController-Dependent Hooks', () => {
       expect(hookReturnValue).toEqual(secondMessageToPlayer1);
     });
     it('Adds exactly one listener', () => {
-      const listener = getSingleListenerAdded('latestBriefMessageChanged');
+      const listener = getSingleListenerAdded('latestMiniMessageChanged');
       act(() => {
         listener(firstMessageToPlayer1);
       });
-      getSingleListenerAdded('latestBriefMessageChanged');
+      getSingleListenerAdded('latestMiniMessageChanged');
     });
     it('Removes the listener when the component is unmounted', () => {
-      const listenerAdded = getSingleListenerAdded('latestBriefMessageChanged');
+      const listenerAdded = getSingleListenerAdded('latestMiniMessageChanged');
       act(() => {
         listenerAdded(firstMessageToPlayer1);
       });
       cleanup();
-      const listenerRemoved = getSingleListenerRemoved('latestBriefMessageChanged');
+      const listenerRemoved = getSingleListenerRemoved('latestMiniMessageChanged');
       expect(listenerRemoved).toBe(listenerAdded);
     });
     it('Adds a listener on first render and does not re-register a listener on each render', () => {
-      getSingleListenerAdded('latestBriefMessageChanged');
+      getSingleListenerAdded('latestMiniMessageChanged');
       renderData.rerender(<TestComponent />);
       renderData.rerender(<TestComponent />);
       renderData.rerender(<TestComponent />);
-      getSingleListenerAdded('latestBriefMessageChanged');
+      getSingleListenerAdded('latestMiniMessageChanged');
     });
 
     it('Removes the listener if the townController changes and adds one to the new controller', () => {
-      const addCall = getSingleListenerAdded('latestBriefMessageChanged');
+      const addCall = getSingleListenerAdded('latestMiniMessageChanged');
       const newController = mockTownController({
         friendlyName: nanoid(),
         townID: nanoid(),
@@ -738,9 +738,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
       useTownControllerSpy.mockReturnValue(newController);
       renderData.rerender(<TestComponent />);
-      expect(getSingleListenerRemoved('latestBriefMessageChanged')).toBe(addCall);
+      expect(getSingleListenerRemoved('latestMiniMessageChanged')).toBe(addCall);
 
-      getSingleListenerAdded('latestBriefMessageChanged', newController.addListener);
+      getSingleListenerAdded('latestMiniMessageChanged', newController.addListener);
     });
   });
   describe('[T3] useTownSettings', () => {

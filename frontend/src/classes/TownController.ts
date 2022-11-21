@@ -18,7 +18,7 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
   ConversationAreaGroupInvite,
-  BriefMessage,
+  MiniMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
@@ -103,10 +103,10 @@ export type TownEvents = {
   selectedFriendsChanged: (selectedFriends: PlayerController[]) => void;
 
   /**
-   * An event that indicates that the latest brief message to this player has changed. This event
-   * is dispatched after updating the player's latest brief message.
+   * An event that indicates that the latest mini message to this player has changed. This event
+   * is dispatched after updating the player's latest mini message.
    */
-  latestBriefMessageChanged: (latestBriefMessage: BriefMessage) => void;
+  latestMiniMessageChanged: (latestMiniMessage: MiniMessage) => void;
 
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
@@ -161,12 +161,12 @@ export type TownEvents = {
   clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
 
   /**
-   * An event that indicates that a new brief message has been sent, which is the parameter
+   * An event that indicates that a new mini message has been sent, which is the parameter
    * passed to the listener. The message object contains the player who is sending the
    * message (sender), the list of selected friends meant to receive it (recipients),
    * and the message itself (body).
    */
-  clickedSendBriefMessage: (briefMessage: BriefMessage) => void;
+  clickedSendMiniMessage: (miniMessage: MiniMessage) => void;
 
   /**
    * An event that indicates that one of the affected player's friend requests has been accepted.
@@ -242,11 +242,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   private _selectedFriendsInternal: PlayerController[] = [];
 
   /**
-   * The latest brief message that this TownController.ourPlayer has recieved. Updates every time
-   * a new brief message is sent to this player, regardless of whether it has the same content. If
-   * this player has not recieved any brief messages yet, it remains undefined.
+   * The latest mini message that this TownController.ourPlayer has recieved. Updates every time
+   * a new mini message is sent to this player, regardless of whether it has the same content. If
+   * this player has not recieved any mini messages yet, it remains undefined.
    */
-  private _latestBriefMessage: BriefMessage | undefined;
+  private _latestMiniMessage: MiniMessage | undefined;
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -493,15 +493,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public get latestBriefMessage(): BriefMessage | undefined {
-    return this._latestBriefMessage;
+  public get latestMiniMessage(): MiniMessage | undefined {
+    return this._latestMiniMessage;
   }
 
-  public set latestBriefMessage(newLatestBriefMessage: BriefMessage | undefined) {
-    this._latestBriefMessage = newLatestBriefMessage;
+  public set latestMiniMessage(newLatestMiniMessage: MiniMessage | undefined) {
+    this._latestMiniMessage = newLatestMiniMessage;
     // if message is set to undefined, don't emit
-    if (newLatestBriefMessage) {
-      this.emit('latestBriefMessageChanged', newLatestBriefMessage);
+    if (newLatestMiniMessage) {
+      this.emit('latestMiniMessageChanged', newLatestMiniMessage);
     }
   }
 
@@ -844,18 +844,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * Whenever a brief message event is recieved, if we are one of the recipients,
+     * Whenever a mini message event is recieved, if we are one of the recipients,
      * update our latestMessage with the new message.
      */
-    this._socket.on('briefMessageSent', briefMessage => {
+    this._socket.on('miniMessageSent', miniMessage => {
       // search for our player among the list of recipents
-      const ourPlayer = briefMessage.recipients.find(
+      const ourPlayer = miniMessage.recipients.find(
         recipientPlayerID => recipientPlayerID === this.ourPlayer.id,
       );
 
-      // if found our player among the recipients, call the setter for latestBriefMessage
+      // if found our player among the recipients, call the setter for latestMiniMessage
       if (ourPlayer) {
-        this.latestBriefMessage = briefMessage;
+        this.latestMiniMessage = miniMessage;
       }
     });
   }
@@ -1065,7 +1065,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         this._selectedFriendsInternal = [];
-        this._latestBriefMessage = undefined;
+        this._latestMiniMessage = undefined;
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -1273,12 +1273,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Emits a sendBriefMessage event to the townService.
-   * @param briefMessage The message to be sent - holds the sender, list of recipients (the
+   * Emits a sendMiniMessage event to the townService.
+   * @param miniMessage The message to be sent - holds the sender, list of recipients (the
    *                     sender's currently selected friends), and the body of the message.
    */
-  public clickedSendBriefMessage(briefMessage: BriefMessage): void {
-    this._socket.emit('sendBriefMessage', briefMessage);
+  public clickedSendMiniMessage(miniMessage: MiniMessage): void {
+    this._socket.emit('sendMiniMessage', miniMessage);
   }
 }
 
@@ -1472,30 +1472,30 @@ export function useSelectedFriends(): PlayerController[] {
 }
 
 /**
- * A react hook to retrieve the latest brief message sent to this town controller's UI/player.
- * This hook will re-render any components that use it when the latest brief message
+ * A react hook to retrieve the latest mini message sent to this town controller's UI/player.
+ * This hook will re-render any components that use it when the latest mini message
  * changes.
  *
- * @returns the latest brief message sent to this town controller's UI/player
+ * @returns the latest mini message sent to this town controller's UI/player
  */
-export function useLatestBriefMessage(): BriefMessage | undefined {
+export function useLatestMiniMessage(): MiniMessage | undefined {
   const townController = useTownController();
-  const [latestBriefMessage, setLatestBriefMessage] = useState<BriefMessage | undefined>(
-    townController.latestBriefMessage,
+  const [latestMiniMessage, setLatestMiniMessage] = useState<MiniMessage | undefined>(
+    townController.latestMiniMessage,
   );
 
   useEffect(() => {
-    const updateLatestBriefMessage = (newLatestBriefMessage: BriefMessage) => {
-      setLatestBriefMessage(newLatestBriefMessage);
+    const updateLatestMiniMessage = (newLatestMiniMessage: MiniMessage) => {
+      setLatestMiniMessage(newLatestMiniMessage);
     };
 
-    townController.addListener('latestBriefMessageChanged', updateLatestBriefMessage);
+    townController.addListener('latestMiniMessageChanged', updateLatestMiniMessage);
     return () => {
-      townController.removeListener('latestBriefMessageChanged', updateLatestBriefMessage);
+      townController.removeListener('latestMiniMessageChanged', updateLatestMiniMessage);
     };
   }, [townController]);
 
-  return latestBriefMessage;
+  return latestMiniMessage;
 }
 
 /**

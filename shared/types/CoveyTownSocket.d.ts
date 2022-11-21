@@ -91,7 +91,7 @@ export type TeleportInviteSingular = {
 };
 
 // sender and recipients are the IDs of players
-export type BriefMessage = {
+export type MiniMessage = {
   sender: string;
   recipients: string[];
   body: string;
@@ -126,7 +126,7 @@ export interface ServerToClientEvents {
     conversationAreaInviteRequest: TeleportInviteSingular
   ) => void;
   // sender is the Player who sent the message to their currently selected friends
-  briefMessageSent: (briefMessage: BriefMessage) => void;
+  miniMessageSent: (miniMessage: MiniMessage) => void;
 }
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
@@ -149,5 +149,5 @@ export interface ClientToServerEvents {
   // requester is the Player who originally sent the invite
   declineConvAreaInvite(convAreaInvite: TeleportInviteSingular);
   // sender is the Player who sent the message to their currently selected friends
-  sendBriefMessage: (briefMessage: BriefMessage) => void;
+  sendMiniMessage: (miniMessage: MiniMessage) => void;
 }
