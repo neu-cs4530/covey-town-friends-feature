@@ -6,7 +6,7 @@ import FriendsList from './FriendsList';
 import useTownController from '../../hooks/useTownController';
 
 export default function SocialSidebar(): JSX.Element {
-  const { friendlyName, townID } = useTownController();
+  const { friendlyName } = useTownController();
 
   return (
     <VStack

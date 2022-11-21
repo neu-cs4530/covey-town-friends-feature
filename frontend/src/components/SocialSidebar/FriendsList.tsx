@@ -1,4 +1,4 @@
-import { Box, Heading, OrderedList, Tooltip } from '@chakra-ui/react';
+import { Box, Heading, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import useTownController from '../../hooks/useTownController';
 
@@ -11,7 +11,7 @@ import useTownController from '../../hooks/useTownController';
  *
  */
 export default function FriendsInTownList(): JSX.Element {
-  const { friendlyName, townID } = useTownController();
+  const { townID } = useTownController();
 
   // IMPORTANT NOTE: Remember that you can define buttons elsewhere, and then just import them
   // and add them where necessary here.
