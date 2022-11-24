@@ -697,9 +697,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       // list of _conversationAreaInvitesInternal and call its setter
       if (ourPlayerIndex !== -1) {
         const newInvite: TeleportInviteSingular = {
-          requester: convAreaInviteRequest.requester,
+          requester: newRequester,
           requested: affectedPlayers[ourPlayerIndex],
-          requesterLocation: convAreaInviteRequest.requesterLocation,
+          requesterLocation: newRequesterLocation,
         };
         // check if our player already has an existing invite from this new requester to this new
         // location. i.e., this invite is not a functional duplicate of an already existing one

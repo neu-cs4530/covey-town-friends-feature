@@ -8,7 +8,7 @@
         "heroku-postbuild": "cd townService && CI= NODE_ENV=development npm install && npm run build",
         "run-townservice": "heroku local -p 3001 web",
         "lint": "cd townService && npm run-script lint && cd ../frontend && npm run-script lint && cd ../shared && npm run-script lint",
-		"zip": "npm-pack-zip"
+        "zip": "npm-pack-zip"
     },
     "repository": {
         "type": "git",
@@ -47,9 +47,16 @@
         "node": "16.x.x"
     },
     "dependencies": {
+        "@chakra-ui/icon": "^3.0.12",
+        "@chakra-ui/icons": "^2.0.12",
+        "@chakra-ui/react": "^2.4.1",
+        "@emotion/react": "^11.10.5",
+        "@emotion/styled": "^11.10.5",
         "@types/ramda": "^0.27.34",
+        "framer-motion": "^7.6.9",
         "ramda": "^0.27.1",
-        "typescript-is": "^0.17.0"
+        "typescript-is": "^0.17.0",
+        "yarn": "^1.22.19"
     },
     "files": [
         "townService/src/town/Town.ts",

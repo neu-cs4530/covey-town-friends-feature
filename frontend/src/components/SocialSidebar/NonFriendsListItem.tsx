@@ -23,6 +23,7 @@ export default function NonFriendsListItem({
   buttonType,
 }: NonFriendPlayerProps): JSX.Element {
   const townController = useTownController();
+  const buttonSize = 'xs';
 
   // Determine which HTML element/button to render
   let button;
@@ -31,10 +32,9 @@ export default function NonFriendsListItem({
   } else if (buttonType === 'send') {
     button = (
       <Button
-        outlineOffset={'--px'}
-        outlineColor='black'
-        style={{ height: '15px' }}
-        size='xs'
+        variant={'outline'}
+        colorScheme={'blue'}
+        size={buttonSize}
         onClick={() => {
           townController.clickedSendRequest({
             actor: townController.ourPlayer.id,
@@ -47,28 +47,24 @@ export default function NonFriendsListItem({
   } else if (buttonType === 'cancel') {
     button = (
       <Button
-        outlineOffset={'--px'}
-        outlineColor='black'
-        style={{ height: '15px' }}
-        size='xs'
+        colorScheme={'red'}
+        variant={'outline'}
+        size={buttonSize}
         onClick={() => {
           townController.clickedCancelRequest({
             actor: townController.ourPlayer.id,
             affected: player.id,
           });
         }}>
-        Cancel
+        Cancel Friend Request
       </Button>
     );
   } else if (buttonType === 'accept/decline') {
     button = (
       <HStack>
         <Button
-          background='green.200'
-          outlineOffset={'--px'}
-          outlineColor='black'
-          style={{ height: '15px' }}
-          size='xs'
+          colorScheme={'blue'}
+          size={buttonSize}
           onClick={() => {
             townController.clickedAcceptFriendRequest({
               actor: townController.ourPlayer.id,
@@ -78,10 +74,7 @@ export default function NonFriendsListItem({
           Accept Friend Request
         </Button>
         <Button
-          background='red.200'
-          outlineOffset={'--px'}
-          outlineColor='black'
-          style={{ height: '15px' }}
+          colorScheme={'red'}
           size='xs'
           onClick={() => {
             townController.clickedDeclineFriendRequest({
@@ -97,7 +90,7 @@ export default function NonFriendsListItem({
 
   // Includes a space between PlayerName and button so they're not glued to each other
   return (
-    <ListItem key={player.id}>
+    <ListItem key={player.id} style={{ paddingTop: '5px' }}>
       <HStack>
         <PlayerName player={player} />
         <span> </span>
