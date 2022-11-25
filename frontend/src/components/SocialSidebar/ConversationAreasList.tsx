@@ -5,7 +5,7 @@ import ConversationAreaController, {
   useConversationAreaTopic,
 } from '../../classes/ConversationAreaController';
 import { useActiveConversationAreas } from '../../classes/TownController';
-import ConversationAreaInviteList from './ConversationAreaInviteListContainer';
+import ConversationAreaInviteListContainer from './ConversationAreaInviteListContainer';
 import PlayerName from './PlayerName';
 
 type ConversationAreaViewProps = {
@@ -61,7 +61,7 @@ export default function ConversationAreasList(): JSX.Element {
       <Heading as='h2' fontSize='l' style={{ paddingTop: '5px' }}>
         Your Conversation Areas Invitations:
       </Heading>
-      <ConversationAreaInviteList />
+      <ConversationAreaInviteListContainer />
     </Box>
   );
 }

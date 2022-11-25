@@ -8,7 +8,8 @@ import { usePendingConversationAreaInvites } from '../../classes/TownController'
  * Area invites by requester, Conversation Area Name, and with associated accept or decline
  * request Buttons.
  * @returns {JSX.Element} a Table representing this Player's pending Conversation
- *                        Area invites.
+ *                        Area invites, or text letting the Player know that they
+ *                        do not have any current requests.
  */
 export default function ConversationAreaInviteList(): JSX.Element {
   const conversationAreaInvites = usePendingConversationAreaInvites();
@@ -19,16 +20,16 @@ export default function ConversationAreaInviteList(): JSX.Element {
       {requestCount === 0 ? (
         <Center>You Have No Current Requests</Center>
       ) : (
-        <TableContainer>
+        <TableContainer aria-label={'convAreaRequestsTable'}>
           <Table variant={'simple'}>
-            <Thead>
+            <Thead aria-label={'convAreaRequestsTableHeader'}>
               <Tr>
                 <Th>Requester</Th>
                 <Th>Destination Location</Th>
                 <Th>Actions</Th>
               </Tr>
             </Thead>
-            <Tbody>
+            <Tbody aria-label={'convAreaRequestsTableBody'}>
               {conversationAreaInvites.map(request => (
                 <>
                   <ConversationAreaInviteItem

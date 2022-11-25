@@ -19,6 +19,8 @@ export default function ConversationAreaInviteItem({
   const townController = useTownController();
   const conversationAreas = townController.conversationAreas;
   const invite = { requester, requested, requesterLocation };
+  const buttonColor = 'blue';
+  const buttonSize = 'xs';
 
   // this allows us to get the requesting Player's userName, as the TeleportInviteSingular
   // only includes an id as the 'requester' and this would not be enough information
@@ -27,16 +29,14 @@ export default function ConversationAreaInviteItem({
     .find(area => area.occupants.map(player => player.id).includes(requester))
     ?.occupants.find(occupant => occupant.id === requester)?.userName;
 
-  const buttonColor = 'blue';
-  const buttonSize = 'xs';
-
   return (
-    <Tr>
+    <Tr aria-label={'convAreaRequestsTableRow'}>
       <Td>{requestingPlayerUserName}</Td>
       <Td>{requesterLocation.interactableID}</Td>
       <Td>
         <ButtonGroup isAttached variant={'outline'}>
           <Button
+            aria-label={'acceptConvAreaRequestButtton'}
             colorScheme={buttonColor}
             variant={'solid'}
             size={buttonSize}
@@ -47,6 +47,7 @@ export default function ConversationAreaInviteItem({
             Accept and Go
           </Button>
           <Button
+            aria-label={'declineConvAreaRequestButtton'}
             colorScheme={buttonColor}
             size={buttonSize}
             onClick={() => townController.clickedDeclineConvAreaInvite(invite)}>
