@@ -49,7 +49,7 @@ export default function InviteToConversationArea(): JSX.Element {
   };
 
   return (
-    <div style={{ paddingTop: '5px', paddingLeft: '15px' }}>
+    <div style={{ paddingTop: '10px', paddingLeft: '15px' }}>
       <Button size={'sm'} onClick={tryToInvite} aria-label={'inviteSelectedToConvAreaButton'}>
         Invite Selected to Conversation Area
       </Button>
