@@ -17,31 +17,47 @@ export default function InviteToConversationAreaButton(): JSX.Element {
   const insideArea = activeConversations.find(area => area.occupants.includes(ourPlayer));
   const toast = useToast();
 
-  const tryToInvite = () => {
-    let status = true; // the default status of the success of the action being requested
-    let toastTitle = 'Conversation Area Request Sent';
-    let toastDescription = `For each of the following players, a request to join you in this conversation area has been sent: ${selectedFriends.map(
+  // our player is allowed to send an invitation if they are inside an active
+  // Conversation Area and they have selected friends to invite.
+  const isAllowedToInvite = insideArea && friendsSelected;
+  let toastTitle: string;
+  let toastDescription: string;
+
+  if (isAllowedToInvite) {
+    // change the toast to inform the requester (ourPlayer) that their
+    // invitation is a success (in a active area and selected friends)
+    toastTitle = 'Conversation Area Request Sent';
+    toastDescription = `For each of the following players, a request to join you in this conversation area has been sent: ${selectedFriends.map(
       friend => ' ' + friend.userName,
     )}`;
-    if (insideArea && friendsSelected) {
+  } else if (!insideArea) {
+    // change the toast to inform the requester (ourPlayer) that their
+    // invitation is unsuccessful (not in active area)
+    toastTitle = 'Start or Join a Conversation Area to Send an Invitation';
+    toastDescription =
+      'If you are not inside an ACTIVE Conversation Area (an area with a topic defined), you cannot send an invitation. Move to a conversation area for instructions to initiate a conversation and try again.';
+  } else if (!friendsSelected) {
+    // change the toast to inform the requester (ourPlayer) that their
+    // invitation is unsuccessful (no selected friends)
+    toastTitle = 'Select Friends to Send an Invitation to this Active Conversation Area';
+    toastDescription =
+      'If you have not selected any friends, you cannot send an invitation. Use the checkboxes to select desired friends and try again.';
+  }
+
+  const clickedInviteToConvArea = () => {
+    if (isAllowedToInvite) {
       // send the request to the TownService
       townController.clickedInviteAllToConvArea({
         requester: ourPlayer.id,
         requested: selectedFriends.map(friend => friend.id),
         requesterLocation: ourPlayer.location,
       });
-    } else {
-      // our player is not inside an active Conversation Area or has not selected friends
-      toastTitle = 'Start or Join a Conversation to Send an Invitation';
-      toastDescription =
-        'If you are not inside an active Conversation Area (an area with a topic defined) or have not selected any friends, you cannot send an invite to join you in a conversation. Move to a conversation area for instructions to initiate a conversation, use the checkboxes to select desired friends, and try again.';
-      status = false;
     }
     // inform the player of the result of clicking the Invite Selected to Conversation Area Button
     toast({
       title: toastTitle,
       description: toastDescription,
-      status: status ? 'success' : 'error',
+      status: isAllowedToInvite ? 'success' : 'error',
       duration: 9000,
       isClosable: true,
       position: 'top',
@@ -50,7 +66,10 @@ export default function InviteToConversationAreaButton(): JSX.Element {
 
   return (
     <div style={{ paddingTop: '10px', paddingLeft: '15px' }}>
-      <Button size={'sm'} onClick={tryToInvite} aria-label={'inviteSelectedToConvAreaButton'}>
+      <Button
+        size={'sm'}
+        onClick={clickedInviteToConvArea}
+        aria-label={'inviteSelectedToConvAreaButton'}>
         Invite Selected to Conversation Area
       </Button>
     </div>
