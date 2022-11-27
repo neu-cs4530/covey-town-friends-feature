@@ -20,7 +20,7 @@ import useTownController from '../../hooks/useTownController';
  * This function renders the number of Conversation Area Invites and displays that number on a
  * Button. This Button, when clicked, opens a Chakra Drawer that displayes this Player's Conversation
  * Area Invites, if this player has any, otherwise notifies this Player that they have none.
- * @returns {JSX.Element} A Button that opens a Drawer with a tag showing the number or requests
+ * @returns {JSX.Element} A Button that opens a Drawer with a tag showing the number of requests
  *                        that a Player has, or no tag if they have no requests. The drawer will
  *                        have a Button allowing the Player to decline all requests if there are
  *                        greater than zero requests.
