@@ -20,7 +20,7 @@ export default function InviteToConversationArea(): JSX.Element {
   const tryToInvite = () => {
     let status = true; // the default status of the success of the action being requested
     let toastTitle = 'Conversation Area Request Sent';
-    let toastDescription = `For each of the following players, a request a request to join you in this conversation area has been sent: ${selectedFriends.map(
+    let toastDescription = `For each of the following players, a request to join you in this conversation area has been sent: ${selectedFriends.map(
       friend => ' ' + friend.userName,
     )}`;
     if (insideArea && friendsSelected) {
