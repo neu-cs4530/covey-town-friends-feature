@@ -15,10 +15,12 @@ export default function ConversationAreaInviteList(): JSX.Element {
   const conversationAreaInvites = usePendingConversationAreaInvites();
   const requestCount = conversationAreaInvites.length;
 
-  const drawerContents =
-    requestCount === 0 ? (
-      <Center aria-label={'noCurrentRequestsText'}>You Have No Current Requests</Center>
-    ) : (
+  let drawerContents = (
+    <Center aria-label={'noCurrentRequestsText'}>You Have No Current Requests</Center>
+  );
+
+  if (requestCount) {
+    drawerContents = (
       <TableContainer aria-label={'convAreaRequestsTable'}>
         <Table variant={'simple'}>
           <Thead aria-label={'convAreaRequestsTableHeader'}>
@@ -43,6 +45,7 @@ export default function ConversationAreaInviteList(): JSX.Element {
         </Table>
       </TableContainer>
     );
+  }
 
   return <>{drawerContents}</>;
 }

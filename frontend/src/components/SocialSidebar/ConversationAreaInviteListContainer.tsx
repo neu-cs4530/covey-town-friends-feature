@@ -31,6 +31,36 @@ export default function ConversationAreaInviteListContainer(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [requestCount, setRequestCount] = useState<number>(conversationAreaInvites.length);
 
+  let requestTag = <></>;
+  let declineAllButton = <></>;
+
+  if (requestCount) {
+    requestTag = (
+      <Tag
+        size='sm'
+        borderRadius='full'
+        variant='solid'
+        colorScheme='red'
+        style={{ marginLeft: '5px' }}>
+        <TagLabel aria-label={'requestCountTag'}>{requestCount}</TagLabel>
+      </Tag>
+    );
+    declineAllButton = (
+      <Button
+        aria-label={'declineAllConvAreaRequestsButton'}
+        colorScheme={'red'}
+        variant={'solid'}
+        size={'xs'}
+        onClick={() =>
+          townController.conversationAreaInvites.forEach(invite =>
+            townController.clickedDeclineConvAreaInvite(invite),
+          )
+        }>
+        Decline All Invitations
+      </Button>
+    );
+  }
+
   useEffect(() => {
     setRequestCount(conversationAreaInvites.length);
   }, [conversationAreaInvites]);
@@ -38,19 +68,7 @@ export default function ConversationAreaInviteListContainer(): JSX.Element {
   return (
     <div style={{ paddingTop: '5px', paddingLeft: '15px' }}>
       <Button size='sm' onClick={onOpen} aria-label={'viewYourInvitesButton'}>
-        View Your Invites
-        {requestCount === 0 ? (
-          <></>
-        ) : (
-          <Tag
-            size='sm'
-            borderRadius='full'
-            variant='solid'
-            colorScheme='red'
-            style={{ marginLeft: '5px' }}>
-            <TagLabel aria-label={'requestCountTag'}>{requestCount}</TagLabel>
-          </Tag>
-        )}
+        View Your Invites {requestTag}
       </Button>
       <Drawer isOpen={isOpen} placement='left' onClose={onClose} size='lg'>
         <DrawerOverlay />
@@ -58,24 +76,7 @@ export default function ConversationAreaInviteListContainer(): JSX.Element {
           <DrawerCloseButton />
           <DrawerHeader aria-label={'convAreaRequestsDrawerHeader'}>
             <Center>Your Conversation Area Invites</Center>
-            <Center style={{ paddingTop: '10px' }}>
-              {requestCount === 0 ? (
-                <></>
-              ) : (
-                <Button
-                  aria-label={'declineAllConvAreaRequestsButton'}
-                  colorScheme={'red'}
-                  variant={'solid'}
-                  size={'xs'}
-                  onClick={() =>
-                    townController.conversationAreaInvites.forEach(invite =>
-                      townController.clickedDeclineConvAreaInvite(invite),
-                    )
-                  }>
-                  Decline All Invitations
-                </Button>
-              )}
-            </Center>
+            <Center style={{ paddingTop: '10px' }}>{declineAllButton}</Center>
           </DrawerHeader>
           <DrawerBody aria-label={'convAreaRequestsDrawerBody'}>
             <ConversationAreaInviteList />
