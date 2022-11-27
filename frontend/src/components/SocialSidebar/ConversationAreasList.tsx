@@ -63,7 +63,7 @@ export default function ConversationAreasList(): JSX.Element {
         fontSize='l'
         style={{ paddingTop: '5px' }}
         aria-label={'yourConvAreaInvites'}>
-        Your Conversation Areas Invitations:
+        Your Conversation Area Invitations:
       </Heading>
       <ConversationAreaInviteListContainer />
     </Box>
