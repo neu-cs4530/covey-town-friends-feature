@@ -2,6 +2,7 @@ import { Box, Heading, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import FriendsList from './FriendsList';
+import InviteToConversationAreaButton from './InviteToConversationAreaButton';
 
 /**
  * Lists the current friends of this TownController.ourPlayer, along with the buttons to invite
@@ -13,7 +14,7 @@ import FriendsList from './FriendsList';
  * Called in the SocialSidebar component. Uses the FriendsList component
  */
 export default function FriendsInTownList(): JSX.Element {
-  const { friendlyName, townID } = useTownController();
+  const { townID } = useTownController();
 
   // IMPORTANT NOTE: Remember that you can define buttons elsewhere, and then just import them
   // and add them where necessary here.
@@ -26,10 +27,8 @@ export default function FriendsInTownList(): JSX.Element {
           Friends:
         </Heading>
       </Tooltip>
-      {FriendsList()}
-      {/* {console.log(
-        'This is where the create conversation area button would go. Add a button somewhere to open the drawer holding the invites.',
-      )} */}
+      <FriendsList />
+      <InviteToConversationAreaButton />
       {/* {console.log('This is where the text entry box + associated button would go.')} */}
     </Box>
   );

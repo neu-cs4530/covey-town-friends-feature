@@ -138,29 +138,6 @@ export type TownEvents = {
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
 
   /**
-   * An event that indicates that the player has requested the list of players to
-   * join them in a given conversation area. The request contains a requester Player,
-   * a list of requested Players, as well as a PlayerLocation that the requested
-   * will be transported to if they accept the request.
-   */
-  clickedInviteAllToConvArea: (invite: ConversationAreaGroupInvite) => void;
-
-  /**
-   * An event that indicates that the player has accepted a conversation area invite.
-   * The request object contains the player who originally sent the request (requester), the
-   * player who received it and is now accepting it (requested), and the requester's location
-   * (the destination the requested will be teleported to).
-   */
-  clickedAcceptConvAreaInvite: (acceptedInvite: TeleportInviteSingular) => void;
-
-  /**
-   * An event that indicates that the player has declined a conversation area invite.
-   * The request object contains the player who originally sent the request (requester), the
-   * player who received it and is now declining it (requested), and the requester's location.
-   */
-  clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
-
-  /**
    * An event that indicates that a new mini message has been sent, which is the parameter
    * passed to the listener. The message object contains the player who is sending the
    * message (sender), the list of selected friends meant to receive it (recipients),
@@ -697,9 +674,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       // list of _conversationAreaInvitesInternal and call its setter
       if (ourPlayerIndex !== -1) {
         const newInvite: TeleportInviteSingular = {
-          requester: convAreaInviteRequest.requester,
+          requester: newRequester,
           requested: affectedPlayers[ourPlayerIndex],
-          requesterLocation: convAreaInviteRequest.requesterLocation,
+          requesterLocation: newRequesterLocation,
         };
         // check if our player already has an existing invite from this new requester to this new
         // location. i.e., this invite is not a functional duplicate of an already existing one
@@ -707,7 +684,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           this._conversationAreaInvitesInternal.findIndex(
             invite =>
               invite.requester === newRequester &&
-              invite.requesterLocation === newRequesterLocation,
+              invite.requesterLocation.interactableID === newRequesterLocation.interactableID,
           );
         // if invite was not found in current list of conversation area invites, add it
         if (potentialDuplicateInviteIndex === -1) {
