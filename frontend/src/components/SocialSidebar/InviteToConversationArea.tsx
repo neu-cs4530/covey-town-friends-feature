@@ -4,7 +4,7 @@ import useTownController from '../../hooks/useTownController';
 import { useActiveConversationAreas, useSelectedFriends } from '../../classes/TownController';
 
 /**
- * Creates a Chakra Button element that allows a given player to request their other
+ * Creates a Chakra Button element that allows a given player to request their selected
  * friends to enter the conversation area that they are currently in, if they are in one.
  * @returns {JSX.Element} a Chakra Button that invites friends to this player's location.
  */
