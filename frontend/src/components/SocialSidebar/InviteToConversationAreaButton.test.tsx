@@ -10,7 +10,7 @@ import { LoginController } from '../../contexts/LoginControllerContext';
 import TownControllerContext from '../../contexts/TownControllerContext';
 import { mockTownControllerConnection } from '../../TestUtils';
 import { BoundingBox, CoveyTownSocket } from '../../types/CoveyTownSocket';
-import InviteToConversationArea from './InviteToConversationArea';
+import InviteToConversationAreaButton from './InviteToConversationAreaButton';
 
 /**
  * Mocks the socket-io client constructor such that it will always return the same
@@ -160,7 +160,7 @@ describe('ConversationAreaInviteList', () => {
         <ChakraProvider>
           <React.StrictMode>
             <TownControllerContext.Provider value={testController}>
-              <InviteToConversationArea />
+              <InviteToConversationAreaButton />
             </TownControllerContext.Provider>
           </React.StrictMode>
         </ChakraProvider>,

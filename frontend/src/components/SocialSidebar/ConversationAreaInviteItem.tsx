@@ -25,9 +25,13 @@ export default function ConversationAreaInviteItem({
   // this allows us to get the requesting Player's userName, as the TeleportInviteSingular
   // only includes an id as the 'requester' and this would not be enough information
   // for the requested to understand who was inviting them to the area.
-  const requestingPlayerUserName = conversationAreas
-    .find(area => area.occupants.map(player => player.id).includes(requester))
-    ?.occupants.find(occupant => occupant.id === requester)?.userName;
+  const requestingPlayerLocation = conversationAreas.find(area =>
+    area.occupants.map(player => player.id).includes(requester),
+  );
+  const requestingPlayer = requestingPlayerLocation?.occupants.find(
+    occupant => occupant.id === requester,
+  );
+  const requestingPlayerUserName = requestingPlayer?.userName;
 
   return (
     <Tr aria-label={'convAreaRequestsTableRow'}>

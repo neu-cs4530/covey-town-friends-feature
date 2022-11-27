@@ -2,7 +2,7 @@ import { Box, Heading, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import FriendsList from './FriendsList';
-import InviteToConversationArea from './InviteToConversationArea';
+import InviteToConversationAreaButton from './InviteToConversationAreaButton';
 
 /**
  * Lists the current friends of this TownController.ourPlayer, along with the buttons to invite
@@ -28,7 +28,7 @@ export default function FriendsInTownList(): JSX.Element {
         </Heading>
       </Tooltip>
       <FriendsList />
-      <InviteToConversationArea />
+      <InviteToConversationAreaButton />
       {/* {console.log('This is where the text entry box + associated button would go.')} */}
     </Box>
   );

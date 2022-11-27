@@ -15,35 +15,34 @@ export default function ConversationAreaInviteList(): JSX.Element {
   const conversationAreaInvites = usePendingConversationAreaInvites();
   const requestCount = conversationAreaInvites.length;
 
-  return (
-    <>
-      {requestCount === 0 ? (
-        <Center aria-label={'noCurrentRequestsText'}>You Have No Current Requests</Center>
-      ) : (
-        <TableContainer aria-label={'convAreaRequestsTable'}>
-          <Table variant={'simple'}>
-            <Thead aria-label={'convAreaRequestsTableHeader'}>
-              <Tr>
-                <Th>Requester</Th>
-                <Th>Destination Location</Th>
-                <Th>Actions</Th>
-              </Tr>
-            </Thead>
-            <Tbody aria-label={'convAreaRequestsTableBody'}>
-              {conversationAreaInvites.map(request => (
-                <>
-                  <ConversationAreaInviteItem
-                    requester={request.requester}
-                    requested={request.requested}
-                    requesterLocation={request.requesterLocation}
-                    key={request.toString()}
-                  />
-                </>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      )}
-    </>
-  );
+  const drawerContents =
+    requestCount === 0 ? (
+      <Center aria-label={'noCurrentRequestsText'}>You Have No Current Requests</Center>
+    ) : (
+      <TableContainer aria-label={'convAreaRequestsTable'}>
+        <Table variant={'simple'}>
+          <Thead aria-label={'convAreaRequestsTableHeader'}>
+            <Tr>
+              <Th>Requester</Th>
+              <Th>Destination Location</Th>
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody aria-label={'convAreaRequestsTableBody'}>
+            {conversationAreaInvites.map(request => (
+              <>
+                <ConversationAreaInviteItem
+                  requester={request.requester}
+                  requested={request.requested}
+                  requesterLocation={request.requesterLocation}
+                  key={request.toString()}
+                />
+              </>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    );
+
+  return <>{drawerContents}</>;
 }

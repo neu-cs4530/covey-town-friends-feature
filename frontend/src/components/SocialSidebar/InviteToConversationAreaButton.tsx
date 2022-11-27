@@ -8,7 +8,7 @@ import { useActiveConversationAreas, useSelectedFriends } from '../../classes/To
  * friends to enter the conversation area that they are currently in, if they are in one.
  * @returns {JSX.Element} a Chakra Button that invites friends to this player's location.
  */
-export default function InviteToConversationArea(): JSX.Element {
+export default function InviteToConversationAreaButton(): JSX.Element {
   const townController = useTownController();
   const selectedFriends = useSelectedFriends();
   const friendsSelected = selectedFriends.length !== 0;
