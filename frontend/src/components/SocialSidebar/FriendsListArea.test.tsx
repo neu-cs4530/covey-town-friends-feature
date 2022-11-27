@@ -10,6 +10,7 @@ import * as useTownController from '../../hooks/useTownController';
 import { mockTownController } from '../../TestUtils';
 import { PlayerLocation, PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
 import FriendsInTownList from './FriendsListArea';
+import ConversationAreaController from '../../classes/ConversationAreaController';
 
 describe('FriendsInTownList', () => {
   const randomLocation = (): PlayerLocation => ({
@@ -32,10 +33,12 @@ describe('FriendsInTownList', () => {
   let useFriendsSpy: jest.SpyInstance<PlayerController[], []>;
   let useSelectedFriendsSpy: jest.SpyInstance<PlayerController[], []>;
   let useFriendRequestsSpy: jest.SpyInstance<PlayerToPlayerUpdate[], []>;
+  let useActiveConvAreasSpy: jest.SpyInstance<ConversationAreaController[], []>;
   let players: PlayerController[] = [];
   let friends: PlayerController[] = [];
   let selectedFriends: PlayerController[] = [];
   let friendRequests: PlayerToPlayerUpdate[] = [];
+  let activeConvAreas: ConversationAreaController[] = [];
   let townID: string;
   let townFriendlyName: string;
   const expectProperlyRenderedFriendsList = async (
@@ -75,6 +78,7 @@ describe('FriendsInTownList', () => {
     useFriendsSpy = jest.spyOn(TownControllerHooks, 'useCurrentPlayerFriends');
     useSelectedFriendsSpy = jest.spyOn(TownControllerHooks, 'useSelectedFriends');
     useFriendRequestsSpy = jest.spyOn(TownControllerHooks, 'useCurrentPlayerFriendRequests');
+    useActiveConvAreasSpy = jest.spyOn(TownControllerHooks, 'useActiveConversationAreas');
   });
 
   beforeEach(() => {
@@ -91,10 +95,12 @@ describe('FriendsInTownList', () => {
     friends = [];
     friendRequests = [];
     selectedFriends = [];
+    activeConvAreas = [];
     usePlayersSpy.mockReturnValue(players);
     useFriendsSpy.mockReturnValue(friends);
     useFriendRequestsSpy.mockReturnValue(friendRequests);
     useSelectedFriendsSpy.mockReturnValue(selectedFriends);
+    useActiveConvAreasSpy.mockReturnValue(activeConvAreas);
     townID = nanoid();
     townFriendlyName = nanoid();
     const mockedTownController = mockTownController({ friendlyName: townFriendlyName, townID });
