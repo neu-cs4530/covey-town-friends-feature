@@ -684,7 +684,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           this._conversationAreaInvitesInternal.findIndex(
             invite =>
               invite.requester === newRequester &&
-              invite.requesterLocation === newRequesterLocation,
+              invite.requesterLocation.interactableID === newRequesterLocation.interactableID,
           );
         // if invite was not found in current list of conversation area invites, add it
         if (potentialDuplicateInviteIndex === -1) {
