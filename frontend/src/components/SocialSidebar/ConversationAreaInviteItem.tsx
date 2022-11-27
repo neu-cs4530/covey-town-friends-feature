@@ -4,7 +4,7 @@ import useTownController from '../../hooks/useTownController';
 import { TeleportInviteSingular } from '../../types/CoveyTownSocket';
 
 /**
- * Renders a Chakra Table Row in which the requesting player from the invite parameter,
+ * Renders a Chakra Table Row displaying the requesting player from the invite parameter,
  * the requesters Residing Conversation Area's name, as well as Buttons that allow
  * this Player to accept or deny the request to teleport to the given requester's location.
  * @param {TeleportInviteSingular} invite is the Conversation Area invite being displayed
