@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _ from 'lodash';
+import _, { min } from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
@@ -161,14 +161,6 @@ export type TownEvents = {
   clickedDeclineConvAreaInvite: (declinedInvite: TeleportInviteSingular) => void;
 
   /**
-   * An event that indicates that a new mini message has been sent, which is the parameter
-   * passed to the listener. The message object contains the player who is sending the
-   * message (sender), the list of selected friends meant to receive it (recipients),
-   * and the message itself (body).
-   */
-  clickedSendMiniMessage: (miniMessage: MiniMessage) => void;
-
-  /**
    * An event that indicates that one of the affected player's friend requests has been accepted.
    * The request object contains the Player who accepted (actor) and the Player whose friend
    * request was accepted (affected).
@@ -246,7 +238,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * a new mini message is sent to this player, regardless of whether it has the same content. If
    * this player has not recieved any mini messages yet, it remains undefined.
    */
-  private _latestMiniMessage: MiniMessage | undefined;
+  // private _latestMiniMessage: MiniMessage | undefined;
 
   /**
    * The current list of conversation areas in the twon. Adding or removing conversation areas might
@@ -493,17 +485,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public get latestMiniMessage(): MiniMessage | undefined {
-    return this._latestMiniMessage;
-  }
+  // public get latestMiniMessage(): MiniMessage | undefined {
+  //   return this._latestMiniMessage;
+  // }
 
-  public set latestMiniMessage(newLatestMiniMessage: MiniMessage | undefined) {
-    this._latestMiniMessage = newLatestMiniMessage;
-    // if message is set to undefined, don't emit
-    if (newLatestMiniMessage) {
-      this.emit('latestMiniMessageChanged', newLatestMiniMessage);
-    }
-  }
+  // public set latestMiniMessage(newLatestMiniMessage: MiniMessage | undefined) {
+  //   this._latestMiniMessage = newLatestMiniMessage;
+  //   // if message is set to undefined, don't emit
+  //   if (newLatestMiniMessage) {
+  //     this.emit('latestMiniMessageChanged', newLatestMiniMessage);
+  //   }
+  // }
 
   public get interactableEmitter() {
     return this._interactableEmitter;
@@ -844,19 +836,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     /**
-     * Whenever a mini message event is recieved, if we are one of the recipients,
-     * update our latestMessage with the new message.
+     * Whenever a mini message event is recieved, forward the messages to listeners who
+     * subscribe to the controller's events.
      */
     this._socket.on('miniMessageSent', miniMessage => {
-      // search for our player among the list of recipents
-      const ourPlayer = miniMessage.recipients.find(
-        recipientPlayerID => recipientPlayerID === this.ourPlayer.id,
-      );
-
-      // if found our player among the recipients, call the setter for latestMiniMessage
-      if (ourPlayer) {
-        this.latestMiniMessage = miniMessage;
-      }
+      this.emit('latestMiniMessageChanged', miniMessage);
     });
   }
 
@@ -1065,7 +1049,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         this.playerFriendRequests = [];
         this._playerFriendsInternal = [];
         this._selectedFriendsInternal = [];
-        this._latestMiniMessage = undefined;
+        // this._latestMiniMessage = undefined;
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -1478,25 +1462,25 @@ export function useSelectedFriends(): PlayerController[] {
  *
  * @returns the latest mini message sent to this town controller's UI/player
  */
-export function useLatestMiniMessage(): MiniMessage | undefined {
-  const townController = useTownController();
-  const [latestMiniMessage, setLatestMiniMessage] = useState<MiniMessage | undefined>(
-    townController.latestMiniMessage,
-  );
+// export function useLatestMiniMessage(): MiniMessage | undefined {
+//   const townController = useTownController();
+//   const [latestMiniMessage, setLatestMiniMessage] = useState<MiniMessage | undefined>(
+//     townController.latestMiniMessage,
+//   );
 
-  useEffect(() => {
-    const updateLatestMiniMessage = (newLatestMiniMessage: MiniMessage) => {
-      setLatestMiniMessage(newLatestMiniMessage);
-    };
+//   useEffect(() => {
+//     const updateLatestMiniMessage = (newLatestMiniMessage: MiniMessage) => {
+//       setLatestMiniMessage(newLatestMiniMessage);
+//     };
 
-    townController.addListener('latestMiniMessageChanged', updateLatestMiniMessage);
-    return () => {
-      townController.removeListener('latestMiniMessageChanged', updateLatestMiniMessage);
-    };
-  }, [townController]);
+//     townController.addListener('latestMiniMessageChanged', updateLatestMiniMessage);
+//     return () => {
+//       townController.removeListener('latestMiniMessageChanged', updateLatestMiniMessage);
+//     };
+//   }, [townController]);
 
-  return latestMiniMessage;
-}
+//   return latestMiniMessage;
+// }
 
 /**
  * A react hook to return the PlayerController's corresponding to each player in the town.

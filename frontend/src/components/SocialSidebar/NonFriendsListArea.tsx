@@ -26,7 +26,7 @@ export function playerIsInList(givenPlayer: PlayerController, playerList: Player
 }
 
 /**
- * Lists the current not-friended players in the town (via their username), along with buttons
+ * Lists the current nonfriended players in the town (via their username), along with buttons
  * to send/cancel/accept/decline friend requests.
  *
  * See relevant hooks: `usePlayersInTown`, `useCoveyAppState`, `useCurrentPlayerFriends` and
@@ -41,15 +41,15 @@ export default function NonFriendsInTownList(): JSX.Element {
   const friends = useCurrentPlayerFriends();
   const friendRequests = useCurrentPlayerFriendRequests();
 
-  // Set up a not-friends list to be updated every time the players and/or friends list changes
+  // Set up a nonfriends list to be updated every time the players and/or friends list changes
   const [nonFriendPlayers, setPlayerNonFriends] = useState<PlayerController[]>(players);
   useEffect(() => {
-    // the new not-friends list should include any player in the Town that is not the friends list
+    // the new nonfriends list should include any player in the Town that is not the friends list
     const newNonFriends = players.filter(player => !playerIsInList(player, friends));
     setPlayerNonFriends(newNonFriends);
   }, [friends, players]);
 
-  // Make a copy to ensure we don't modify the original & then sort the not-friends list
+  // Make a copy to ensure we don't modify the original & then sort the nonfriends list
   const sorted = nonFriendPlayers.concat([]);
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),
