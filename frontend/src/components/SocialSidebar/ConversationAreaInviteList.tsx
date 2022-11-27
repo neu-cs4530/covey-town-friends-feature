@@ -18,7 +18,7 @@ export default function ConversationAreaInviteList(): JSX.Element {
   return (
     <>
       {requestCount === 0 ? (
-        <Center>You Have No Current Requests</Center>
+        <Center aria-label={'noCurrentRequestsText'}>You Have No Current Requests</Center>
       ) : (
         <TableContainer aria-label={'convAreaRequestsTable'}>
           <Table variant={'simple'}>

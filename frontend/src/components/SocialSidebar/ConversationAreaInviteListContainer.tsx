@@ -47,20 +47,14 @@ export default function ConversationAreaInviteListContainer(): JSX.Element {
             borderRadius='full'
             variant='solid'
             colorScheme='red'
-            style={{ marginLeft: '5px' }}
-            aria-label={'requestCountTag'}>
-            <TagLabel>{requestCount}</TagLabel>
+            style={{ marginLeft: '5px' }}>
+            <TagLabel aria-label={'requestCountTag'}>{requestCount}</TagLabel>
           </Tag>
         )}
       </Button>
-      <Drawer
-        isOpen={isOpen}
-        placement='left'
-        onClose={onClose}
-        size='lg'
-        aria-label={'convAreaRequestsDrawer'}>
+      <Drawer isOpen={isOpen} placement='left' onClose={onClose} size='lg'>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent aria-label={'convAreaRequestsDrawer'}>
           <DrawerCloseButton />
           <DrawerHeader aria-label={'convAreaRequestsDrawerHeader'}>
             <Center>Your Conversation Area Invites</Center>

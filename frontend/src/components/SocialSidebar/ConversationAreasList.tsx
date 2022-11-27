@@ -58,7 +58,11 @@ export default function ConversationAreasList(): JSX.Element {
           )
           .map(area => <ConversationAreaView area={area} key={area.id} />)
       )}
-      <Heading as='h2' fontSize='l' style={{ paddingTop: '5px' }}>
+      <Heading
+        as='h2'
+        fontSize='l'
+        style={{ paddingTop: '5px' }}
+        aria-label={'yourConvAreaInvites'}>
         Your Conversation Areas Invitations:
       </Heading>
       <ConversationAreaInviteListContainer />
