@@ -56,6 +56,7 @@ export default function MiniMessageBox(): JSX.Element {
     }
   };
 
+  // Allows player to move again once they have clicked out of the input box
   useEffect(() => {
     if (isTextareaFocused) {
       townController.pause();
