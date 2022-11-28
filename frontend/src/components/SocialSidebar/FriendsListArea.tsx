@@ -27,7 +27,7 @@ export default function FriendsInTownList(): JSX.Element {
       </Tooltip>
       <FriendsList />
       <InviteToConversationAreaButton />
-      {MiniMessageBox()}
+      <MiniMessageBox />
     </Box>
   );
 }
