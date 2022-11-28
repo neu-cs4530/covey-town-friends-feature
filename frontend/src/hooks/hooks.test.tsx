@@ -2,7 +2,6 @@ import { cleanup, render, RenderResult } from '@testing-library/react';
 import { MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import * as React from 'react';
-import Player from '../../../townService/src/lib/Player';
 import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import { act } from 'react-dom/test-utils';
 import ConversationAreaController, {
@@ -21,11 +20,9 @@ import TownController, {
   useTownSettings,
   useCurrentPlayerFriends,
   useSelectedFriends,
-  useLatestBriefMessage,
 } from '../classes/TownController';
 import { EventNames, getTownEventListener, mockTownController } from '../TestUtils';
 import {
-  BriefMessage,
   PlayerLocation,
   PlayerToPlayerUpdate,
   TeleportInviteSingular,
@@ -37,9 +34,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
   // Data to test some of our Final Project hooks:
   let players: PlayerController[];
-  let player1: Player;
-  let player2: Player;
-  let player3: Player;
   let playerTestData1: MockedPlayer;
   let playerTestData2: MockedPlayer;
   let playerTestData3: MockedPlayer;
@@ -245,6 +239,9 @@ describe('[T3] TownController-Dependent Hooks', () => {
 
     let hookReturnValue: TeleportInviteSingular[] = [];
     let renderData: RenderResult;
+    let player1ID: string;
+    let player2ID: string;
+    let player3ID: string;
 
     let player1Location: PlayerLocation;
     let player2Location: PlayerLocation;
@@ -264,25 +261,19 @@ describe('[T3] TownController-Dependent Hooks', () => {
         conversationAreaInvites,
       });
       useTownControllerSpy.mockReturnValue(townController);
-      playerTestData1 = mockPlayer(townController.townID);
-      playerTestData2 = mockPlayer(townController.townID);
-      playerTestData3 = mockPlayer(townController.townID);
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
-      player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
-      player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
-      player3Location = { x: 2, y: 2, rotation: 'left', moving: false };
+      player1ID = '001';
+      player2ID = '002';
+      player3ID = '003';
 
       // Push conversation area invites with requested = townController.ourPlayer
       teleportInvite1 = {
-        requester: player1,
-        requested: townController.ourPlayer,
+        requester: player1ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: player2,
-        requested: townController.ourPlayer,
+        requester: player2ID,
+        requested: townController.ourPlayer.id,
         requesterLocation: player2Location,
       };
       conversationAreaInvites.push(teleportInvite1);
@@ -300,8 +291,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
@@ -313,8 +304,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         teleportInvite1,
         teleportInvite2,
         {
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         },
       ]);
@@ -326,8 +317,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'conversationAreaInvitesChanged');
         conversationAreaInvites.push({
-          requester: player3,
-          requested: townController.ourPlayer,
+          requester: player3ID,
+          requested: townController.ourPlayer.id,
           requesterLocation: player3Location,
         });
         listener(conversationAreaInvites);
@@ -389,18 +380,15 @@ describe('[T3] TownController-Dependent Hooks', () => {
       playerTestData1 = mockPlayer(townController.townID);
       playerTestData2 = mockPlayer(townController.townID);
       playerTestData3 = mockPlayer(townController.townID);
-      player1 = playerTestData1.player as Player;
-      player2 = playerTestData2.player as Player;
-      player3 = playerTestData3.player as Player;
 
       // Push conversation area invites with requested = townController.ourPlayer
       request1 = {
-        actor: player1,
-        affected: townController.ourPlayer,
+        actor: playerTestData1.id,
+        affected: townController.ourPlayer.id,
       };
       request2 = {
-        actor: townController.ourPlayer,
-        affected: player2,
+        actor: townController.ourPlayer.id,
+        affected: playerTestData2.id,
       };
       playerFriendRequests.push(request1);
       playerFriendRequests.push(request2);
@@ -415,8 +403,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getSingleListenerAdded('playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });
@@ -425,8 +413,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
         request1,
         request2,
         {
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         },
       ]);
     });
@@ -437,8 +425,8 @@ describe('[T3] TownController-Dependent Hooks', () => {
       act(() => {
         const listener = getTownEventListener(townController, 'playerFriendRequestsChanged');
         playerFriendRequests.push({
-          actor: player3,
-          affected: townController.ourPlayer,
+          actor: playerTestData3.id,
+          affected: townController.ourPlayer.id,
         });
         listener(playerFriendRequests);
       });
@@ -657,94 +645,6 @@ describe('[T3] TownController-Dependent Hooks', () => {
       renderData.rerender(<TestComponent />);
       expect(getSingleListenerRemoved('selectedFriendsChanged')).toBe(addCall);
       getSingleListenerAdded('selectedFriendsChanged', newController.addListener);
-    });
-  });
-  describe('useLatestBriefMessage', () => {
-    let friendlyName: string;
-    let townIsPubliclyListed: boolean;
-    let hookReturnValue: BriefMessage | undefined;
-    let renderData: RenderResult;
-    function TestComponent() {
-      hookReturnValue = useLatestBriefMessage();
-      return null;
-    }
-    let firstMessageToPlayer1: BriefMessage;
-    let secondMessageToPlayer1: BriefMessage;
-
-    beforeEach(() => {
-      friendlyName = nanoid();
-      townIsPubliclyListed = true;
-      townController = mockTownController({
-        friendlyName,
-        townIsPubliclyListed,
-        players,
-      });
-      useTownControllerSpy.mockReturnValue(townController);
-
-      firstMessageToPlayer1 = {
-        sender: player2,
-        recipients: [player1, player3],
-        body: nanoid(),
-      };
-      secondMessageToPlayer1 = {
-        sender: player3,
-        recipients: [player1],
-        body: nanoid(),
-      };
-
-      renderData = render(<TestComponent />);
-    });
-    it('Returns initial state of latestBriefMessage for the town', () => {
-      expect(hookReturnValue).toEqual(undefined);
-    });
-    it('Updates latestBriefMessage in response to latestBriefMessageChanged events', () => {
-      const listener = getSingleListenerAdded('latestBriefMessageChanged');
-      act(() => {
-        listener(firstMessageToPlayer1);
-      });
-      expect(hookReturnValue).toEqual(firstMessageToPlayer1);
-      act(() => {
-        listener(secondMessageToPlayer1);
-      });
-      expect(hookReturnValue).toEqual(secondMessageToPlayer1);
-    });
-    it('Adds exactly one listener', () => {
-      const listener = getSingleListenerAdded('latestBriefMessageChanged');
-      act(() => {
-        listener(firstMessageToPlayer1);
-      });
-      getSingleListenerAdded('latestBriefMessageChanged');
-    });
-    it('Removes the listener when the component is unmounted', () => {
-      const listenerAdded = getSingleListenerAdded('latestBriefMessageChanged');
-      act(() => {
-        listenerAdded(firstMessageToPlayer1);
-      });
-      cleanup();
-      const listenerRemoved = getSingleListenerRemoved('latestBriefMessageChanged');
-      expect(listenerRemoved).toBe(listenerAdded);
-    });
-    it('Adds a listener on first render and does not re-register a listener on each render', () => {
-      getSingleListenerAdded('latestBriefMessageChanged');
-      renderData.rerender(<TestComponent />);
-      renderData.rerender(<TestComponent />);
-      renderData.rerender(<TestComponent />);
-      getSingleListenerAdded('latestBriefMessageChanged');
-    });
-
-    it('Removes the listener if the townController changes and adds one to the new controller', () => {
-      const addCall = getSingleListenerAdded('latestBriefMessageChanged');
-      const newController = mockTownController({
-        friendlyName: nanoid(),
-        townID: nanoid(),
-        players: [],
-      });
-
-      useTownControllerSpy.mockReturnValue(newController);
-      renderData.rerender(<TestComponent />);
-      expect(getSingleListenerRemoved('latestBriefMessageChanged')).toBe(addCall);
-
-      getSingleListenerAdded('latestBriefMessageChanged', newController.addListener);
     });
   });
   describe('[T3] useTownSettings', () => {

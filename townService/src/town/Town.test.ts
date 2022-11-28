@@ -12,7 +12,7 @@ import {
   mockPlayer,
 } from '../TestUtils';
 import {
-  BriefMessage,
+  MiniMessage,
   ChatMessage,
   ConversationAreaGroupInvite,
   Interactable,
@@ -360,8 +360,6 @@ describe('Town', () => {
   let playerLocation: PlayerLocation;
   let player2Location: PlayerLocation;
   let player3Location: PlayerLocation;
-  let playerFriends: Player[];
-  let player2Friends: Player[];
   let friendRequest: PlayerToPlayerUpdate;
   let teleportRequest: TeleportInviteSingular;
   let conversationRequest: ConversationAreaGroupInvite;
@@ -382,24 +380,22 @@ describe('Town', () => {
     playerTestData2.moveTo(-5, -5);
     playerTestData3.moveTo(-3, -3);
     friendRequest = {
-      actor: player,
-      affected: player2,
+      actor: player.id,
+      affected: player2.id,
     };
     teleportRequest = {
-      requester: player,
-      requested: player2,
+      requester: player.id,
+      requested: player2.id,
       requesterLocation: player.location,
     };
     conversationRequest = {
-      requester: player,
-      requested: [player2],
+      requester: player.id,
+      requested: [player2.id],
       requesterLocation: player.location,
     };
     playerLocation = player.location;
     player2Location = player2.location;
     player3Location = player3.location;
-    playerFriends = player.friends;
-    player2Friends = player2.friends;
     mockReset(townEmitter);
   });
 
@@ -434,7 +430,7 @@ describe('Town', () => {
         'inviteAllToConvArea',
         'acceptConvAreaInvite',
         'declineConvAreaInvite',
-        'sendBriefMessage',
+        'sendMiniMessage',
       ];
       expectedEvents.forEach(eachEvent =>
         expect(getEventListener(playerTestData.socket, eachEvent)).toBeDefined(),
@@ -628,8 +624,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestAccepted event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -643,8 +639,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestDeclined event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestDeclined', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -658,8 +654,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRequestSent event', () => {
         expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -674,15 +670,15 @@ describe('Town', () => {
       it('TownService should emit a canceledFriendRequest event', () => {
         // expect the request was sent
         expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
         // cancel the request
         playerTestData.cancelFriendRequest(player, player2);
         // expect it to be canceled
         expect(townEmitter.emit).toBeCalledWith('friendRequestCanceled', {
-          actor: player,
-          affected: player2,
+          actor: player.id,
+          affected: player2.id,
         });
       });
     });
@@ -700,8 +696,8 @@ describe('Town', () => {
       });
       it('TownService should emit a friendRemoved event', () => {
         expect(townEmitter.emit).toHaveBeenCalledWith('friendRemoved', {
-          actor: player,
-          affected: player3,
+          actor: player.id,
+          affected: player3.id,
         });
       });
     });
@@ -709,18 +705,18 @@ describe('Town', () => {
       beforeEach(() => {
         // Set up all of the invites between players
         playerTestData.invitedAllToConvArea({
-          requester: player,
-          requested: [player2, player3],
+          requester: player.id,
+          requested: [player2.id, player3.id],
           requesterLocation: playerLocation,
         });
         playerTestData2.invitedAllToConvArea({
-          requester: player2,
-          requested: [player3, player],
+          requester: player2.id,
+          requested: [player3.id, player.id],
           requesterLocation: player2Location,
         });
         playerTestData3.invitedAllToConvArea({
-          requester: player3,
-          requested: [player2],
+          requester: player3.id,
+          requested: [player2.id],
           requesterLocation: player3.location,
         });
       });
@@ -728,14 +724,14 @@ describe('Town', () => {
         expect(player2.conversationAreaInvites.length).toBe(2);
         expect(
           player2.conversationAreaInvites.find(
-            invite => invite.requester === player && invite.requesterLocation === playerLocation,
+            invite => invite.requester === player.id && invite.requesterLocation === playerLocation,
           ),
         ).toBeTruthy();
       });
       it('Should not move any players from their current location', () => {
         expect(townEmitter.emit).not.toBeCalledWith('inviteAllToConvArea', {
-          requester: player,
-          requested: [player2],
+          requester: player.id,
+          requested: [player2.id],
           requesterLocation: playerLocation,
         });
         expect(player3.location).toBe(player3Location);
@@ -744,31 +740,31 @@ describe('Town', () => {
       });
       it('TownService should emit a conversationAreaRequestSent event', () => {
         expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
-          requester: player,
-          requested: [player2, player3],
+          requester: player.id,
+          requested: [player2.id, player3.id],
           requesterLocation: playerLocation,
         });
         expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
-          requester: player2,
-          requested: [player3, player],
+          requester: player2.id,
+          requested: [player3.id, player.id],
           requesterLocation: player2Location,
         });
         expect(townEmitter.emit).toHaveBeenCalledWith('conversationAreaRequestSent', {
-          requester: player3,
-          requested: [player2],
+          requester: player3.id,
+          requested: [player2.id],
           requesterLocation: player3.location,
         });
       });
     });
     describe('acceptConvAreaInvite (listener)', () => {
       beforeEach(() => {
-        playerTestData.acceptedConvAreaInvite(player, player2, playerLocation);
+        playerTestData.acceptedConvAreaInvite(player.id, player2.id, playerLocation);
       });
       it('Should remove the invite from the requested Player list of conv area invites', () => {
         expect(
           player2.conversationAreaInvites.includes({
-            requester: player,
-            requested: player2,
+            requester: player.id,
+            requested: player2.id,
             requesterLocation: playerLocation,
           }),
         ).toBeFalsy();
@@ -779,21 +775,21 @@ describe('Town', () => {
       });
       it('TownService should emit a conversationAreaRequestAccepted event', () => {
         expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestAccepted', {
-          requester: player,
-          requested: player2,
+          requester: player.id,
+          requested: player2.id,
           requesterLocation: playerLocation,
         });
       });
     });
     describe('declineConvAreaInvite (listener)', () => {
       beforeEach(() => {
-        playerTestData.declinedConvAreaInvite(player, player2, playerLocation);
+        playerTestData.declinedConvAreaInvite(player.id, player2.id, playerLocation);
       });
       it('Should remove the invite from the requested Player list of conv area invites', () => {
         expect(
           player2.conversationAreaInvites.includes({
-            requester: player,
-            requested: player2,
+            requester: player.id,
+            requested: player2.id,
             requesterLocation: playerLocation,
           }),
         ).toBeFalsy();
@@ -803,8 +799,8 @@ describe('Town', () => {
       });
       it('TownService should emit a conversationAreaRequestDeclined event', () => {
         expect(townEmitter.emit).toBeCalledWith('conversationAreaRequestDeclined', {
-          requester: player,
-          requested: player2,
+          requester: player.id,
+          requested: player2.id,
           requesterLocation: playerLocation,
         });
       });
@@ -823,18 +819,18 @@ describe('Town', () => {
       const emittedMessage = getLastEmittedEvent(townEmitter, 'chatMessage');
       expect(emittedMessage).toEqual(chatMessage);
     });
-    it('Forwards brief message events to all players in the same town', async () => {
-      const briefMessageHandler = getEventListener(playerTestData.socket, 'sendBriefMessage');
-      const testBriefMessage: BriefMessage = {
-        sender: player,
-        recipients: [player2, player3],
+    it('Forwards mini message events to all players in the same town', async () => {
+      const miniMessageHandler = getEventListener(playerTestData.socket, 'sendMiniMessage');
+      const testMiniMessage: MiniMessage = {
+        sender: player.id,
+        recipients: [player2.id, player3.id],
         body: nanoid(),
       };
 
-      briefMessageHandler(testBriefMessage);
+      miniMessageHandler(testMiniMessage);
 
-      const emittedMessage = getLastEmittedEvent(townEmitter, 'briefMessageSent');
-      expect(emittedMessage).toEqual(testBriefMessage);
+      const emittedMessage = getLastEmittedEvent(townEmitter, 'miniMessageSent');
+      expect(emittedMessage).toEqual(testMiniMessage);
     });
   });
   describe('addConversationArea', () => {
@@ -1031,31 +1027,12 @@ describe('Town', () => {
       });
     });
   });
-  describe('inviteFriend', () => {
-    it('Emits a friendRequestSent event when called.', () => {
-      town.inviteFriend(friendRequest);
-      expect(townEmitter.emit).toBeCalledWith('friendRequestSent', {
-        actor: player,
-        affected: player2,
-      });
-    });
-    it('Does not change the actors friends lists.', () => {
-      expect(player.friends).toEqual(playerFriends);
-      town.inviteFriend(friendRequest);
-      expect(player.friends).toEqual(playerFriends);
-    });
-    it('Does not change the affected friends lists.', () => {
-      expect(player2.friends).toEqual(player2Friends);
-      town.inviteFriend(friendRequest);
-      expect(player2.friends).toEqual(player2Friends);
-    });
-  });
   describe('acceptFriendRequest (method)', () => {
     it('Emits a friendRequestAccepted event when called.', () => {
       town.acceptFriendRequest(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRequestAccepted', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Expects the affected to be added to the actors friend list.', () => {
@@ -1067,29 +1044,6 @@ describe('Town', () => {
       expect(player2.friends.includes(player)).toBeTruthy();
     });
   });
-  describe('declineFriendRequest (method)', () => {
-    it('Emits a friendRequestDeclined event when called.', () => {
-      town.inviteFriend(friendRequest);
-      mockClear(townEmitter);
-      town.declineFriendRequest(friendRequest);
-      expect(townEmitter.emit).toHaveBeenCalledWith('friendRequestDeclined', {
-        actor: player,
-        affected: player2,
-      });
-    });
-    it('Does not change the actors friends lists.', () => {
-      town.inviteFriend(friendRequest);
-      expect(player.friends).toEqual(playerFriends);
-      town.declineFriendRequest(friendRequest);
-      expect(player.friends).toEqual(playerFriends);
-    });
-    it('Does not change the affected friends lists.', () => {
-      town.inviteFriend(friendRequest);
-      expect(player2.friends).toEqual(player2Friends);
-      town.declineFriendRequest(friendRequest);
-      expect(player2.friends).toEqual(player2Friends);
-    });
-  });
   describe('removeFriend', () => {
     it('Emits a friendRemoved event when called.', () => {
       town.acceptFriendRequest(friendRequest);
@@ -1097,8 +1051,8 @@ describe('Town', () => {
       expect(player2.friends.includes(player)).toBeTruthy();
       town.removeFriend(friendRequest);
       expect(townEmitter.emit).toBeCalledWith('friendRemoved', {
-        actor: player,
-        affected: player2,
+        actor: player.id,
+        affected: player2.id,
       });
     });
     it('Removeds the affected from the actors friends list.', () => {

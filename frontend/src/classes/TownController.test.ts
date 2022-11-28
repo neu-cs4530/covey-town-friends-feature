@@ -1,5 +1,6 @@
 import { mock, mockClear, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
+import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { ViewingArea } from '../generated/client';
 import {
@@ -8,20 +9,18 @@ import {
   mockTownControllerConnection,
   ReceivedEventParameter,
 } from '../TestUtils';
-import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
+  ConversationAreaGroupInvite,
   CoveyTownSocket,
+  MiniMessage,
   Player as PlayerModel,
   PlayerLocation,
   PlayerToPlayerUpdate,
   ServerToClientEvents,
-  ConversationAreaGroupInvite,
-  TeleportAction,
   TeleportInviteSingular,
   TownJoinResponse,
-  BriefMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
@@ -115,13 +114,13 @@ describe('TownController', () => {
       player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
       player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
       teleportInvite1 = {
-        requester: playerTestData,
-        requested: playerTestData3,
+        requester: playerTestData.id,
+        requested: playerTestData3.id,
         requesterLocation: player1Location,
       };
       teleportInvite2 = {
-        requester: playerTestData2,
-        requested: playerTestData3,
+        requester: playerTestData2.id,
+        requested: playerTestData3.id,
         requesterLocation: player2Location,
       };
       newInvites = [teleportInvite1, teleportInvite2];
@@ -152,12 +151,12 @@ describe('TownController', () => {
     let newFriendRequests: PlayerToPlayerUpdate[];
     beforeEach(() => {
       request1 = {
-        actor: playerTestData,
-        affected: playerTestData3,
+        actor: playerTestData.id,
+        affected: playerTestData3.id,
       };
       request2 = {
-        actor: playerTestData3,
-        affected: playerTestData2,
+        actor: playerTestData3.id,
+        affected: playerTestData2.id,
       };
       newFriendRequests = [request1, request2];
       mockClear(mockListeners.playerFriendRequestsChanged);
@@ -478,24 +477,14 @@ describe('TownController', () => {
       };
       emitEventAndExpectListenerFiring('chatMessage', message, 'chatMessage', message);
     });
-    it('Emits a sendBriefMessage event when clickedSendBriefMessage is called', () => {
-      const testPlayer1 = {
-        id: nanoid(),
-        location: { moving: false, rotation: 'back', x: 10, y: 12, interactableID: nanoid() },
-        userName: nanoid(),
-      };
-      const testPlayer2 = {
-        id: nanoid(),
-        location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
-        userName: nanoid(),
-      };
-      const testMessage: BriefMessage = {
-        sender: testPlayer1,
-        recipients: [testPlayer2],
+    it('Emits a sendMiniMessage event when clickedSendMiniMessage is called', () => {
+      const testMessage: MiniMessage = {
+        sender: '001',
+        recipients: ['002'],
         body: nanoid(),
       };
-      testController.clickedSendBriefMessage(testMessage);
-      expect(mockSocket.emit).toBeCalledWith('sendBriefMessage', testMessage);
+      testController.clickedSendMiniMessage(testMessage);
+      expect(mockSocket.emit).toBeCalledWith('sendMiniMessage', testMessage);
     });
     it("Emits the local player's movement updates to the socket and to locally subscribed CoveyTownEvents listeners", () => {
       const newLocation: PlayerLocation = { ...testController.ourPlayer.location, x: 10, y: 10 };
@@ -547,32 +536,32 @@ describe('TownController', () => {
     });
     it('Emits acceptFriendRequest when clickedAcceptFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedAcceptFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('acceptFriendRequest', testRequest);
     });
     it('Emits declineFriendRequest when clickedDeclineFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedDeclineFriendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('declineFriendRequest', testRequest);
     });
     it('Emits sendFriendRequest event when clickedSendFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedSendRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('sendFriendRequest', testRequest);
     });
     it('Emits cancelFriendRequest event when clickedCancelFriendRequest is called', () => {
       const testRequest: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedCancelRequest(testRequest);
       expect(mockSocket.emit).toBeCalledWith('cancelFriendRequest', testRequest);
@@ -585,25 +574,21 @@ describe('TownController', () => {
         y: 1,
         interactableID: nanoid(),
       };
-      const testTeleportAction: TeleportAction = {
-        actor: playerTestData.player,
-        playerDestinationLocation: testPlayerLocation,
-      };
-      testController.clickedTeleportToFriend(testTeleportAction);
+      testController.clickedTeleportToFriend(testPlayerLocation);
       expect(mockSocket.emit).toBeCalledWith('playerMovement', testPlayerLocation);
     });
     it('Emits removeFriend when clickedRemoveFriend is called', () => {
       const testRemoveFriend: PlayerToPlayerUpdate = {
-        actor: playerTestData.player,
-        affected: playerTestData2.player,
+        actor: playerTestData.id,
+        affected: playerTestData2.id,
       };
       testController.clickedRemoveFriend(testRemoveFriend);
       expect(mockSocket.emit).toBeCalledWith('removeFriend', testRemoveFriend);
     });
     it('Does not emit inviteAllToConvArea when clickedInviteAllToConvArea is called and the requesting player is not in a conversation area', () => {
       const testInvite: ConversationAreaGroupInvite = {
-        requester: playerTestData,
-        requested: [playerTestData2],
+        requester: playerTestData.id,
+        requested: [playerTestData2.id],
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
@@ -618,8 +603,8 @@ describe('TownController', () => {
         }),
       );
       const testInvite: ConversationAreaGroupInvite = {
-        requester: playerTestData,
-        requested: [playerTestData2],
+        requester: playerTestData.id,
+        requested: [playerTestData2.id],
         requesterLocation: player1Location,
       };
       testController.clickedInviteAllToConvArea(testInvite);
@@ -627,8 +612,8 @@ describe('TownController', () => {
     });
     it('Emits acceptConvAreaInvite when clickedAcceptConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
-        requester: playerTestData.player,
-        requested: playerTestData2.player,
+        requester: playerTestData.id,
+        requested: playerTestData2.id,
         requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
       };
       testController.clickedAcceptConvAreaInvite(testInvite);
@@ -636,8 +621,8 @@ describe('TownController', () => {
     });
     it('Emits declineConvAreaInvite when clickedDeclineConvAreaInvite is called', () => {
       const testInvite: TeleportInviteSingular = {
-        requester: playerTestData.player,
-        requested: playerTestData2.player,
+        requester: playerTestData.id,
+        requested: playerTestData2.id,
         requesterLocation: { x: 0, y: 0, rotation: 'back', moving: false },
       };
       testController.clickedDeclineConvAreaInvite(testInvite);
@@ -897,13 +882,13 @@ describe('TownController', () => {
 
         // create a P2PUpdate with testController.ourPlayer as actor and playerTestData2 as affected
         updateFromOurPlayerToPlayer2 = {
-          actor: testController.ourPlayer,
-          affected: playerTestData2,
+          actor: testController.ourPlayer.id,
+          affected: playerTestData2.id,
         };
         // create a P2PUpdate with playerTestData2 as actor and testController.ourPlayer as affected
         updateFromPlayer2ToOurPlayer = {
-          actor: playerTestData2,
-          affected: testController.ourPlayer,
+          actor: playerTestData2.id,
+          affected: testController.ourPlayer.id,
         };
       });
       describe('friendRequestSent events', () => {
@@ -942,8 +927,8 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
 
           expect(testController.playerFriendRequests).toEqual([]);
@@ -1004,12 +989,12 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
           const testDecline: PlayerToPlayerUpdate = {
-            actor: playerTestData,
-            affected: playerTestData2,
+            actor: playerTestData.id,
+            affected: playerTestData2.id,
           };
 
           // expect our stored friend requests to remain empty
@@ -1051,18 +1036,24 @@ describe('TownController', () => {
           playerTestData2.id = 'id2';
           // creates a PlayerToPlayer update from playerTestData to the testController's ourPlayer
           player1ToOurPlayer = {
-            actor: playerTestData,
-            affected: testController.ourPlayer,
+            actor: playerTestData.id,
+            affected: testController.ourPlayer.id,
           };
           // creates a PlayerToPlayer update from the testController's ourPlayer to playerTestData2
           ourPlayerToPlayer2 = {
-            actor: testController.ourPlayer,
-            affected: playerTestData2,
+            actor: testController.ourPlayer.id,
+            affected: playerTestData2.id,
           };
           // creates a PlayerToPlayer update from the testController's ourPlayer to playerTestData
-          ourPlayerAcceptPlayer1 = { actor: testController.ourPlayer, affected: playerTestData };
+          ourPlayerAcceptPlayer1 = {
+            actor: testController.ourPlayer.id,
+            affected: playerTestData.id,
+          };
           // creates a PlayerToPlayer update from playerTestData2 to the testController's ourPlayer
-          player2AcceptOurPlayer = { actor: playerTestData2, affected: testController.ourPlayer };
+          player2AcceptOurPlayer = {
+            actor: playerTestData2.id,
+            affected: testController.ourPlayer.id,
+          };
 
           // set up two outgoing requests, one from player1 to our player and one from our player to player2
           friendRequestSentEventListener(player1ToOurPlayer);
@@ -1144,7 +1135,10 @@ describe('TownController', () => {
           ]);
 
           // player 1 accepts a request from player 2
-          friendRequestAcceptedEventListener({ actor: playerTestData, affected: playerTestData2 });
+          friendRequestAcceptedEventListener({
+            actor: playerTestData.id,
+            affected: playerTestData2.id,
+          });
 
           // check our players, friends and friends requests haven't changed
           expect(testController.playerFriends).toEqual([]);
@@ -1206,8 +1200,8 @@ describe('TownController', () => {
         });
         it('Does nothing if the request doesnt include ourPlayer', () => {
           const testRequest: PlayerToPlayerUpdate = {
-            actor: playerTestData2,
-            affected: playerTestData,
+            actor: playerTestData2.id,
+            affected: playerTestData.id,
           };
 
           // make sure we don't have any requests before, during, or after
@@ -1253,15 +1247,21 @@ describe('TownController', () => {
           playerTestData2.id = 'id2';
           // define the P2PUpdates
           player1ToOurPlayer = {
-            actor: playerTestData,
-            affected: testController.ourPlayer,
+            actor: playerTestData.id,
+            affected: testController.ourPlayer.id,
           };
           ourPlayerToPlayer2 = {
-            actor: testController.ourPlayer,
-            affected: playerTestData2,
+            actor: testController.ourPlayer.id,
+            affected: playerTestData2.id,
           };
-          ourPlayerAcceptPlayer1 = { actor: testController.ourPlayer, affected: playerTestData };
-          player2AcceptOurPlayer = { actor: playerTestData2, affected: testController.ourPlayer };
+          ourPlayerAcceptPlayer1 = {
+            actor: testController.ourPlayer.id,
+            affected: playerTestData.id,
+          };
+          player2AcceptOurPlayer = {
+            actor: playerTestData2.id,
+            affected: testController.ourPlayer.id,
+          };
 
           // send a request from player 1 to our player and from our player to player 2
           friendRequestSentEventListener(player1ToOurPlayer);
@@ -1330,7 +1330,7 @@ describe('TownController', () => {
           expect(testController.playerFriends).toEqual([player1PC, player2PC]);
 
           // player 1 removes player 2 as friend
-          friendRemovedEventListener({ actor: playerTestData, affected: playerTestData2 });
+          friendRemovedEventListener({ actor: playerTestData.id, affected: playerTestData2.id });
 
           // make sure that it doesn't change
           expect(mockListeners.playerFriendsChanged).toBeCalledTimes(2);
@@ -1371,28 +1371,28 @@ describe('TownController', () => {
         player1Location = { x: 0, y: 0, rotation: 'back', moving: false };
         player2Location = { x: 1, y: 1, rotation: 'front', moving: false };
         convAreaGroupInviteOurPlayer = {
-          requester: playerTestData,
-          requested: [testController.ourPlayer],
+          requester: playerTestData.id,
+          requested: [testController.ourPlayer.id],
           requesterLocation: player1Location,
         };
         convAreaGroupInviteNotOurPlayer = {
-          requester: playerTestData,
-          requested: [playerTestData3],
+          requester: playerTestData.id,
+          requested: [playerTestData3.id],
           requesterLocation: player1Location,
         };
         teleportInviteOurPlayer = {
-          requester: playerTestData,
-          requested: testController.ourPlayer,
+          requester: playerTestData.id,
+          requested: testController.ourPlayer.id,
           requesterLocation: player1Location,
         };
         teleportInviteOurPlayer2 = {
-          requester: playerTestData2,
-          requested: testController.ourPlayer,
+          requester: playerTestData2.id,
+          requested: testController.ourPlayer.id,
           requesterLocation: player2Location,
         };
         teleportInviteNotOurPlayer = {
-          requester: playerTestData,
-          requested: playerTestData3,
+          requester: playerTestData.id,
+          requested: playerTestData3.id,
           requesterLocation: player1Location,
         };
         ourPlayerInvites = [teleportInviteOurPlayer, teleportInviteOurPlayer2];
@@ -1497,77 +1497,38 @@ describe('TownController', () => {
         });
       });
     });
-    describe('BriefMessage events', () => {
-      let briefMessageSentEventListener: (update: BriefMessage) => void;
-      let testMessageToOurPlayer: BriefMessage;
-      let testMessageToOurPlayer2: BriefMessage;
-      let testMessageNotToOurPlayer: BriefMessage;
+    describe('MiniMessage events', () => {
+      let miniMessageSentEventListener: (update: MiniMessage) => void;
+      let testMessageToOurPlayer: MiniMessage;
       beforeEach(() => {
-        briefMessageSentEventListener = getEventListener(mockSocket, 'briefMessageSent');
+        miniMessageSentEventListener = getEventListener(mockSocket, 'miniMessageSent');
         testMessageToOurPlayer = {
-          sender: playerTestData2,
-          recipients: [playerTestData, testController.ourPlayer, playerTestData3],
+          sender: playerTestData2.id,
+          recipients: [playerTestData.id, testController.ourPlayer.id, playerTestData3.id],
           body: 'Hi',
         };
-        testMessageToOurPlayer2 = {
-          sender: playerTestData3,
-          recipients: [testController.ourPlayer],
-          body: nanoid(),
-        };
-        testMessageNotToOurPlayer = {
-          sender: playerTestData3,
-          recipients: [playerTestData, playerTestData2],
-          body: nanoid(),
-        };
 
-        mockClear(mockListeners.latestBriefMessageChanged);
-        testController.addListener(
-          'latestBriefMessageChanged',
-          mockListeners.latestBriefMessageChanged,
-        );
+        mockClear(mockListeners.newMiniMessageReceived);
+        testController.addListener('newMiniMessageReceived', mockListeners.newMiniMessageReceived);
       });
-      it('Emits a latestBriefMessageChanged event if a new brief message is sent and this player was one of the recipients', () => {
-        // send a brief message from player2 to ourPlayer
-        briefMessageSentEventListener(testMessageToOurPlayer);
+      it('Emits a newMiniMessageReceived event if a new mini message is sent and this player was one of the recipients', () => {
+        // send a mini message from player2 to ourPlayer
+        miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see it emitted
-        expect(mockListeners.latestBriefMessageChanged).toBeCalledWith(testMessageToOurPlayer);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledWith(testMessageToOurPlayer);
       });
-      it('Emits a latestBriefMessageChanged event if an identical brief message is sent and this player was one of the recipients', () => {
-        briefMessageSentEventListener(testMessageToOurPlayer);
+      it('Emits a newMiniMessageReceived event if an identical mini message is sent and this player was one of the recipients', () => {
+        miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see first event emitted
-        expect(mockListeners.latestBriefMessageChanged).toBeCalledWith(testMessageToOurPlayer);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledWith(testMessageToOurPlayer);
 
         // send identical message again
-        briefMessageSentEventListener(testMessageToOurPlayer);
+        miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see listener called twice
-        expect(mockListeners.latestBriefMessageChanged).toBeCalledTimes(2);
-      });
-      it('Updates the latestBriefMessage if a new message is sent and this player was one of the recipients', () => {
-        expect(testController.latestBriefMessage).toStrictEqual(undefined);
-        briefMessageSentEventListener(testMessageToOurPlayer);
-
-        // expect to see the new invite added to conversationAreaInvitesInternal
-        const latestBriefMessageAfter: BriefMessage = testMessageToOurPlayer;
-        expect(testController.latestBriefMessage).toStrictEqual(latestBriefMessageAfter);
-      });
-      it('Does not emit a latestBriefMessage event if this player was not one of the recipients in the received brief message', () => {
-        briefMessageSentEventListener(testMessageNotToOurPlayer);
-
-        // expect to not see event emitted
-        expect(mockListeners.latestBriefMessageChanged).not.toHaveBeenCalled();
-      });
-      it('Does not modify the latestBriefMessage if this player was not one of the recipients in the received brief message', () => {
-        // const latestBriefMessageBefore: BriefMessage = ;
-        briefMessageSentEventListener(testMessageNotToOurPlayer);
-        expect(testController.latestBriefMessage).toStrictEqual(undefined);
-
-        // send a message event that concerns our player and a suceeding one that doesn't
-        briefMessageSentEventListener(testMessageToOurPlayer2);
-        briefMessageSentEventListener(testMessageNotToOurPlayer);
-        expect(testController.latestBriefMessage).toStrictEqual(testMessageToOurPlayer2);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledTimes(2);
       });
     });
   });
@@ -1635,8 +1596,8 @@ describe('TownController', () => {
       emitEventAndExpectListenerFiring('playerJoined', testPlayer2, 'playersChanged');
       // create a request from player 1 to player 2 and store it and store it in the friend request list
       const requestFromPlayer1ToPlayer2 = {
-        actor: testPlayer,
-        affected: testPlayer2,
+        actor: testPlayer.id,
+        affected: testPlayer2.id,
       };
       testController.playerFriendRequests = [requestFromPlayer1ToPlayer2];
 

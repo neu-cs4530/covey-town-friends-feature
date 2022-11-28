@@ -175,7 +175,7 @@ export default class Player {
         !(
           invite.requesterLocation.x === inviteToRemove.requesterLocation.x &&
           invite.requesterLocation.y === inviteToRemove.requesterLocation.y &&
-          invite.requester.id === inviteToRemove.requester.id
+          invite.requester === inviteToRemove.requester
         ),
     );
   }
