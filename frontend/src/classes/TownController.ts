@@ -103,10 +103,10 @@ export type TownEvents = {
   selectedFriendsChanged: (selectedFriends: PlayerController[]) => void;
 
   /**
-   * An event that indicates that the latest mini message to this player has changed. This event
-   * is dispatched after updating the player's latest mini message.
+   * An event that indicates that this player has received a new MiniMessage. This event
+   * is dispatched to trigger the display of the new message.
    */
-  latestMiniMessageChanged: (latestMiniMessage: MiniMessage) => void;
+  newMiniMessageReceived: (latestMiniMessage: MiniMessage) => void;
 
   /**
    * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
@@ -816,7 +816,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
      * subscribe to the controller's events.
      */
     this._socket.on('miniMessageSent', miniMessage => {
-      this.emit('latestMiniMessageChanged', miniMessage);
+      this.emit('newMiniMessageReceived', miniMessage);
     });
   }
 

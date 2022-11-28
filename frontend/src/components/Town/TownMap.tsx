@@ -72,9 +72,9 @@ export default function TownMap(): JSX.Element {
         });
       }
     };
-    townController.addListener('latestMiniMessageChanged', renderMiniMessageReceivedToast);
+    townController.addListener('newMiniMessageReceived', renderMiniMessageReceivedToast);
     return () => {
-      townController.removeListener('latestMiniMessageChanged', renderMiniMessageReceivedToast);
+      townController.removeListener('newMiniMessageReceived', renderMiniMessageReceivedToast);
     };
   }, [townController, toast, players]);
 

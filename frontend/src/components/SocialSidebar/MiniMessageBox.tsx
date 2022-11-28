@@ -64,6 +64,14 @@ export default function MiniMessageBox(): JSX.Element {
     }
   }, [isTextareaFocused, townController]);
 
+  // Allows "enter" key to send the message
+  const handleReturnKeyPress = (event: React.KeyboardEvent) => {
+    if (isTextareaFocused && event.key === 'Enter') {
+      event.preventDefault();
+      attemptSendMessage();
+    }
+  };
+
   return (
     <VStack align='left' mt='2'>
       <Input
@@ -74,7 +82,8 @@ export default function MiniMessageBox(): JSX.Element {
         value={miniMessageBody}
         onChange={event => setMiniMessageBody(event.target.value)}
         onFocus={() => setIsTextareaFocused(true)}
-        onBlur={() => setIsTextareaFocused(false)}></Input>
+        onBlur={() => setIsTextareaFocused(false)}
+        onKeyPress={handleReturnKeyPress}></Input>
       <Button
         type='submit'
         size='sm'
