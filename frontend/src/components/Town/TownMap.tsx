@@ -1,14 +1,13 @@
-import React from 'react';
+import { useToast } from '@chakra-ui/react';
 import Phaser from 'phaser';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import PlayerController from '../../classes/PlayerController';
+import { usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
+import { MiniMessage, PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
-import { usePlayers } from '../../classes/TownController';
-import { useToast } from '@chakra-ui/react';
-import { PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
-import PlayerController from '../../classes/PlayerController';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
@@ -43,6 +42,38 @@ export default function TownMap(): JSX.Element {
     townController.addListener('friendRequestAccepted', renderFriendGainedToast);
     return () => {
       townController.removeListener('friendRequestAccepted', renderFriendGainedToast);
+    };
+  }, [townController, toast, players]);
+
+  // Set up a toast message to be displayed when ourPlayer recieves a MiniMessage
+  useEffect(() => {
+    const renderMiniMessageReceivedToast = (miniMessage: MiniMessage) => {
+      // Find the sender by ID, in order to get their username
+      let senderPlayer: PlayerController | undefined;
+      // OurPlayer has to be a recipient (otherwise no toast should be rendered)
+      const ourPlayer = miniMessage.recipients.find(
+        recipientPlayerID => recipientPlayerID === townController.ourPlayer.id,
+      );
+      // If our player is a recipient
+      if (ourPlayer) {
+        senderPlayer = players.find(playerController => playerController.id === miniMessage.sender);
+      }
+      // Display the toast message if sender exists
+      if (senderPlayer) {
+        toast({
+          title: `From ${senderPlayer.userName}:`,
+          description: miniMessage.body,
+          status: 'info',
+          duration: 9000,
+          isClosable: true,
+          variant: 'subtle',
+          position: 'top-left',
+        });
+      }
+    };
+    townController.addListener('newMiniMessageReceived', renderMiniMessageReceivedToast);
+    return () => {
+      townController.removeListener('newMiniMessageReceived', renderMiniMessageReceivedToast);
     };
   }, [townController, toast, players]);
 

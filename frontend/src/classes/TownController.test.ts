@@ -1,5 +1,6 @@
 import { mock, mockClear, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
+import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { ViewingArea } from '../generated/client';
 import {
@@ -8,19 +9,18 @@ import {
   mockTownControllerConnection,
   ReceivedEventParameter,
 } from '../TestUtils';
-import { MockedPlayer, mockPlayer } from '../../../townService/src/TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
+  ConversationAreaGroupInvite,
   CoveyTownSocket,
+  MiniMessage,
   Player as PlayerModel,
   PlayerLocation,
   PlayerToPlayerUpdate,
   ServerToClientEvents,
-  ConversationAreaGroupInvite,
   TeleportInviteSingular,
   TownJoinResponse,
-  MiniMessage,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea } from '../types/TypeUtils';
 import PlayerController from './PlayerController';
@@ -1500,8 +1500,6 @@ describe('TownController', () => {
     describe('MiniMessage events', () => {
       let miniMessageSentEventListener: (update: MiniMessage) => void;
       let testMessageToOurPlayer: MiniMessage;
-      let testMessageToOurPlayer2: MiniMessage;
-      let testMessageNotToOurPlayer: MiniMessage;
       beforeEach(() => {
         miniMessageSentEventListener = getEventListener(mockSocket, 'miniMessageSent');
         testMessageToOurPlayer = {
@@ -1509,64 +1507,28 @@ describe('TownController', () => {
           recipients: [playerTestData.id, testController.ourPlayer.id, playerTestData3.id],
           body: 'Hi',
         };
-        testMessageToOurPlayer2 = {
-          sender: playerTestData3.id,
-          recipients: [testController.ourPlayer.id],
-          body: nanoid(),
-        };
-        testMessageNotToOurPlayer = {
-          sender: playerTestData3.id,
-          recipients: [playerTestData.id, playerTestData2.id],
-          body: nanoid(),
-        };
 
-        mockClear(mockListeners.latestMiniMessageChanged);
-        testController.addListener(
-          'latestMiniMessageChanged',
-          mockListeners.latestMiniMessageChanged,
-        );
+        mockClear(mockListeners.newMiniMessageReceived);
+        testController.addListener('newMiniMessageReceived', mockListeners.newMiniMessageReceived);
       });
-      it('Emits a latestMiniMessageChanged event if a new mini message is sent and this player was one of the recipients', () => {
+      it('Emits a newMiniMessageReceived event if a new mini message is sent and this player was one of the recipients', () => {
         // send a mini message from player2 to ourPlayer
         miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see it emitted
-        expect(mockListeners.latestMiniMessageChanged).toBeCalledWith(testMessageToOurPlayer);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledWith(testMessageToOurPlayer);
       });
-      it('Emits a latestMiniMessageChanged event if an identical mini message is sent and this player was one of the recipients', () => {
+      it('Emits a newMiniMessageReceived event if an identical mini message is sent and this player was one of the recipients', () => {
         miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see first event emitted
-        expect(mockListeners.latestMiniMessageChanged).toBeCalledWith(testMessageToOurPlayer);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledWith(testMessageToOurPlayer);
 
         // send identical message again
         miniMessageSentEventListener(testMessageToOurPlayer);
 
         // expect to see listener called twice
-        expect(mockListeners.latestMiniMessageChanged).toBeCalledTimes(2);
-      });
-      it('Updates the latestMiniMessage if a new message is sent and this player was one of the recipients', () => {
-        expect(testController.latestMiniMessage).toStrictEqual(undefined);
-        miniMessageSentEventListener(testMessageToOurPlayer);
-
-        // expect to see the new invite added to conversationAreaInvitesInternal
-        const latestMiniMessageAfter: MiniMessage = testMessageToOurPlayer;
-        expect(testController.latestMiniMessage).toStrictEqual(latestMiniMessageAfter);
-      });
-      it('Does not emit a latestMiniMessage event if this player was not one of the recipients in the received mini message', () => {
-        miniMessageSentEventListener(testMessageNotToOurPlayer);
-
-        // expect to not see event emitted
-        expect(mockListeners.latestMiniMessageChanged).not.toHaveBeenCalled();
-      });
-      it('Does not modify the latestMiniMessage if this player was not one of the recipients in the received mini message', () => {
-        miniMessageSentEventListener(testMessageNotToOurPlayer);
-        expect(testController.latestMiniMessage).toStrictEqual(undefined);
-
-        // send a message event that concerns our player and a suceeding one that doesn't
-        miniMessageSentEventListener(testMessageToOurPlayer2);
-        miniMessageSentEventListener(testMessageNotToOurPlayer);
-        expect(testController.latestMiniMessage).toStrictEqual(testMessageToOurPlayer2);
+        expect(mockListeners.newMiniMessageReceived).toBeCalledTimes(2);
       });
     });
   });

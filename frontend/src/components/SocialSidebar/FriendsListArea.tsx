@@ -3,22 +3,20 @@ import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import FriendsList from './FriendsList';
 import InviteToConversationAreaButton from './InviteToConversationAreaButton';
+import MiniMessageBox from './MiniMessageBox';
 
 /**
  * Lists the current friends of this TownController.ourPlayer, along with the buttons to invite
- * selected friends to a conversation area, view conversation area invites, and send a mini
- * message to all selected friends.
+ * selected friends to a conversation area, view conversation area invites, and send MiniMessages
+ * to all selected friends.
  *
- * See relevant hooks: 'useTownController', + ADD IN OTHERS YOU USE
+ * See relevant hooks: 'useTownController'
  *
- * Called in the SocialSidebar component. Uses the FriendsList component
+ * Called in the SocialSidebar component. Uses the FriendsList, InviteToConversationAreaButton,
+ * and MiniMessageBox components.
  */
 export default function FriendsInTownList(): JSX.Element {
   const { townID } = useTownController();
-
-  // IMPORTANT NOTE: Remember that you can define buttons elsewhere, and then just import them
-  // and add them where necessary here.
-  // TODO: remove the above comment in Sprint 3.
 
   return (
     <Box>
@@ -29,7 +27,7 @@ export default function FriendsInTownList(): JSX.Element {
       </Tooltip>
       <FriendsList />
       <InviteToConversationAreaButton />
-      {/* {console.log('This is where the text entry box + associated button would go.')} */}
+      <MiniMessageBox />
     </Box>
   );
 }
