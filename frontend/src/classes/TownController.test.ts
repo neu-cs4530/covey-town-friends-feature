@@ -1500,24 +1500,12 @@ describe('TownController', () => {
     describe('MiniMessage events', () => {
       let miniMessageSentEventListener: (update: MiniMessage) => void;
       let testMessageToOurPlayer: MiniMessage;
-      let testMessageToOurPlayer2: MiniMessage;
-      let testMessageNotToOurPlayer: MiniMessage;
       beforeEach(() => {
         miniMessageSentEventListener = getEventListener(mockSocket, 'miniMessageSent');
         testMessageToOurPlayer = {
           sender: playerTestData2.id,
           recipients: [playerTestData.id, testController.ourPlayer.id, playerTestData3.id],
           body: 'Hi',
-        };
-        testMessageToOurPlayer2 = {
-          sender: playerTestData3.id,
-          recipients: [testController.ourPlayer.id],
-          body: nanoid(),
-        };
-        testMessageNotToOurPlayer = {
-          sender: playerTestData3.id,
-          recipients: [playerTestData.id, playerTestData2.id],
-          body: nanoid(),
         };
 
         mockClear(mockListeners.latestMiniMessageChanged);
@@ -1545,29 +1533,6 @@ describe('TownController', () => {
         // expect to see listener called twice
         expect(mockListeners.latestMiniMessageChanged).toBeCalledTimes(2);
       });
-      // it('Updates the latestMiniMessage if a new message is sent and this player was one of the recipients', () => {
-      //   expect(testController.latestMiniMessage).toStrictEqual(undefined);
-      //   miniMessageSentEventListener(testMessageToOurPlayer);
-
-      //   // expect to see the new invite added to conversationAreaInvitesInternal
-      //   const latestMiniMessageAfter: MiniMessage = testMessageToOurPlayer;
-      //   expect(testController.latestMiniMessage).toStrictEqual(latestMiniMessageAfter);
-      // });
-      // it('Does not emit a latestMiniMessage event if this player was not one of the recipients in the received mini message', () => {
-      //   miniMessageSentEventListener(testMessageNotToOurPlayer);
-
-      //   // expect to not see event emitted
-      //   expect(mockListeners.latestMiniMessageChanged).not.toHaveBeenCalled();
-      // });
-      // it('Does not modify the latestMiniMessage if this player was not one of the recipients in the received mini message', () => {
-      //   miniMessageSentEventListener(testMessageNotToOurPlayer);
-      //   expect(testController.latestMiniMessage).toStrictEqual(undefined);
-
-      //   // send a message event that concerns our player and a suceeding one that doesn't
-      //   miniMessageSentEventListener(testMessageToOurPlayer2);
-      //   miniMessageSentEventListener(testMessageNotToOurPlayer);
-      //   expect(testController.latestMiniMessage).toStrictEqual(testMessageToOurPlayer2);
-      // });
     });
   });
   describe('Processing events that are received over the socket from the townService', () => {

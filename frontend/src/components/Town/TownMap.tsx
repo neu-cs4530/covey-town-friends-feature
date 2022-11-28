@@ -14,7 +14,6 @@ export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
   const townController = useTownController();
   const players = usePlayers();
-  // const latestMiniMessage = useLatestMiniMessage();
 
   // Set up a toast message to be displayed when ourPlayer gains a friend via a friend
   // request being accepted.
