@@ -1,14 +1,13 @@
-import React from 'react';
+import { useToast } from '@chakra-ui/react';
 import Phaser from 'phaser';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import PlayerController from '../../classes/PlayerController';
+import { usePlayers } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
+import { MiniMessage, PlayerToPlayerUpdate } from '../../types/CoveyTownSocket';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
-import { usePlayers } from '../../classes/TownController';
-import { useToast } from '@chakra-ui/react';
-import { PlayerToPlayerUpdate, MiniMessage } from '../../types/CoveyTownSocket';
-import PlayerController from '../../classes/PlayerController';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
