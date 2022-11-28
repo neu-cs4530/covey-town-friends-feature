@@ -595,7 +595,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             friendToUpdate.location = movedPlayer.location;
           }
 
-          // Potential TODO: reassess whether this update is necessary because of deep vs shallow copies
           // find the player in our selectedFriends list whose location we also want to update
           const selectedFriendToUpdate = this.selectedFriends.find(
             eachFriend => eachFriend.id === movedPlayer.id,

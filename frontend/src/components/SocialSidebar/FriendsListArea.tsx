@@ -6,19 +6,20 @@ import MiniMessageBox from './MiniMessageBox';
 
 /**
  * Lists the current friends of this TownController.ourPlayer, along with the buttons to invite
- * selected friends to a conversation area, view conversation area invites, and send a mini
- * message to all selected friends.
+ * selected friends to a conversation area, view conversation area invites, and send MiniMessages
+ * to all selected friends.
  *
  * See relevant hooks: 'useTownController'
  *
- * Called in the SocialSidebar component. Uses the FriendsList component
+ * Called in the SocialSidebar component. Uses the FriendsList, InviteToConversationAreaButton,
+ * and MiniMessageBox components.
  */
 export default function FriendsInTownList(): JSX.Element {
-  const townController = useTownController();
+  const { townID } = useTownController();
 
   return (
     <Box>
-      <Tooltip label={`Town ID: ${townController.townID}`}>
+      <Tooltip label={`Town ID: ${townID}`}>
         <Heading as='h2' fontSize='l'>
           Friends:
         </Heading>

@@ -162,10 +162,6 @@ export default class Town {
       }
     });
 
-    // Sprint 3 Potential TODO: Check to see if we should be removing the invite/send/cancel
-    // friend request methods and instead just emitting directly from their listeners, like
-    // in the 'chatMessage' and 'sendMiniMessage' listeners.
-
     // Set up a listener to process accepted friend requests.
     // Makes the necessary backend changes & then emits an event to let the TownController know
     // the changes have been made.

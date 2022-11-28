@@ -1,21 +1,21 @@
 import { Button, Input, useToast, VStack } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react'; // gets rid of eslint error
-import useTownController from '../../hooks/useTownController';
 import { useSelectedFriends } from '../../classes/TownController';
+import useTownController from '../../hooks/useTownController';
 import { MiniMessage } from '../../types/CoveyTownSocket';
 
 /**
- * Creates a Chakra Button element and text box that allows a given player to send a MiniMessage
+ * Creates a Chakra Button and Input text box that allows a given player to send a MiniMessage
  * to their currently selected friends.
- * @returns {JSX.Element} a Chakra VStack containing a text box and button that sends the message
- *                        within the text box to the selected players
+ * @returns {JSX.Element} a Chakra VStack containing an input box and button that sends the
+ *                        message input to the selected players as a Toast
  */
 export default function MiniMessageBox(): JSX.Element {
   const townController = useTownController();
   const selectedFriends = useSelectedFriends();
   const [miniMessageBody, setMiniMessageBody] = useState<string>('');
-  const toast = useToast();
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+  const toast = useToast();
 
   const attemptSendMessage = () => {
     if (miniMessageBody !== '') {
@@ -80,7 +80,6 @@ export default function MiniMessageBox(): JSX.Element {
         size='sm'
         onClick={async () => {
           attemptSendMessage();
-          townController.unPause();
         }}>
         Send MiniMessage to selected
       </Button>
