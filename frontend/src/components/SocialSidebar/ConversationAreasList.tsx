@@ -5,6 +5,7 @@ import ConversationAreaController, {
   useConversationAreaTopic,
 } from '../../classes/ConversationAreaController';
 import { useActiveConversationAreas } from '../../classes/TownController';
+import ConversationAreaInviteListContainer from './ConversationAreaInviteListContainer';
 import PlayerName from './PlayerName';
 
 type ConversationAreaViewProps = {
@@ -25,7 +26,7 @@ function ConversationAreaView({ area }: ConversationAreaViewProps): JSX.Element 
   const topic = useConversationAreaTopic(area);
 
   return (
-    <Box>
+    <Box style={{ paddingLeft: '15px' }}>
       <Heading as='h3' fontSize='m'>
         {area.id}: {topic}
       </Heading>
@@ -45,7 +46,7 @@ export default function ConversationAreasList(): JSX.Element {
   const activeConversationAreas = useActiveConversationAreas();
   return (
     <Box>
-      <Heading as='h2' fontSize='l'>
+      <Heading as='h2' fontSize='l' style={{ paddingBottom: '5px' }}>
         Active Conversation Areas:
       </Heading>
       {activeConversationAreas.length === 0 ? (
@@ -57,6 +58,14 @@ export default function ConversationAreasList(): JSX.Element {
           )
           .map(area => <ConversationAreaView area={area} key={area.id} />)
       )}
+      <Heading
+        as='h2'
+        fontSize='l'
+        style={{ paddingTop: '5px' }}
+        aria-label={'yourConvAreaInvites'}>
+        Your Conversation Area Invitations:
+      </Heading>
+      <ConversationAreaInviteListContainer />
     </Box>
   );
 }

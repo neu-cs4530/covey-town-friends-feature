@@ -21,8 +21,9 @@ type FriendNameProps = {
 export default function FriendsListItem({ player }: FriendNameProps): JSX.Element {
   const townController = useTownController();
   const selectedFriends = useSelectedFriends();
-
   const [checked, setChecked] = useState<boolean>(selectedFriends.includes(player));
+  const buttonSize = 'xs';
+  const buttonVariant = 'outline';
 
   // handle selecting or deselecting a friend
   function selectOrDeselect(newSelectedValue: boolean) {
@@ -36,7 +37,7 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
 
   // space between playername and button is to separate button from name
   return (
-    <ListItem>
+    <ListItem style={{ paddingTop: '5px' }}>
       <HStack>
         <Checkbox
           size='md'
@@ -47,10 +48,9 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           {player.userName}
         </Checkbox>
         <Button
-          outlineOffset={'--px'}
-          outlineColor='black'
-          style={{ height: '15px' }}
-          size='xs'
+          colorScheme={'blue'}
+          variant={buttonVariant}
+          size={buttonSize}
           title='Teleport to this friend'
           onClick={() => {
             // move ourPlayer sprite and label
@@ -61,11 +61,9 @@ export default function FriendsListItem({ player }: FriendNameProps): JSX.Elemen
           Teleport
         </Button>
         <Button
-          background='red.200'
-          outlineOffset={'--px'}
-          outlineColor='black'
-          style={{ height: '15px' }}
-          size='xs'
+          colorScheme={'red'}
+          variant={buttonVariant}
+          size={buttonSize}
           onClick={() => {
             townController.clickedRemoveFriend({
               actor: townController.ourPlayer.id,

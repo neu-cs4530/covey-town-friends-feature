@@ -2,6 +2,7 @@ import { Box, Heading, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import useTownController from '../../hooks/useTownController';
 import FriendsList from './FriendsList';
+import InviteToConversationAreaButton from './InviteToConversationAreaButton';
 import MiniMessageBox from './MiniMessageBox';
 
 /**
@@ -24,10 +25,8 @@ export default function FriendsInTownList(): JSX.Element {
           Friends:
         </Heading>
       </Tooltip>
-      {FriendsList()}
-      {/* {console.log(
-        'This is where the create conversation area button would go. Add a button somewhere to open the drawer holding the invites.',
-      )} */}
+      <FriendsList />
+      <InviteToConversationAreaButton />
       {MiniMessageBox()}
     </Box>
   );
